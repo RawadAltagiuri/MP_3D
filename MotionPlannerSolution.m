@@ -49,7 +49,7 @@
 clear, clc, close;
 
 sp.problemName = "hole";
-sp.typeOfAlg = 'greedy';
+sp.typeOfAlg = 'Astar';
 sp.typeOfHeuristic = 'continue';
 
 switch sp.problemName
