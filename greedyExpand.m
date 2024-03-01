@@ -8,16 +8,19 @@
 function [children] = greedyExpand(node, searchProblem)
     children = [];
 
-    [greedyChild, isValid] = eversionChild(node, searchProblem); %Produce the eversion child
+    [greedyChild, isValid] = steeringChild(node, searchProblem); %Produce the steering child
     if isValid == true %if the child is not valid then we do not account for it
         children = [children ; greedyChild];
     end
 
-    [greedyChild, isValid] = steeringChild(node, searchProblem); %Produce the steering child
-    if isValid == true %if the child is not valid then we do not account for it
-        children = [];
-        children = [children ; greedyChild];
+    if ~isValid %if we have a steering child we do not generate an eversion child, this way we prioritize steering first
+        [greedyChild, isValid] = eversionChild(node, searchProblem); %Produce the eversion child
+        if isValid == true %if the child is not valid then we do not account for it
+            children = [children ; greedyChild];
+        end
     end
+
+
 end
 
 %Produces the eversion child
@@ -85,7 +88,7 @@ function [greedyChild, isValid] = steeringChild(node, searchProblem)
      %update the x and y coordinates of the child based on steering towards the goal
     child_conf(:, 1:2) = parent_conf(:, 1:2) + (sign(searchProblem.goal_conf(:, 1:2) - parent_conf(:, 1:2)) * searchProblem.stepSize(1));
     
-
+%   Make sure we don't overshoot to our taget due to the step size
     for ConfCount = 1:searchProblem.j
         if searchProblem.goal_conf(ConfCount, 1) > parent_conf(ConfCount, 1) && searchProblem.goal_conf(ConfCount, 1) < child_conf(ConfCount, 1)
             child_conf(ConfCount,1) = searchProblem.goal_conf(ConfCount, 1);

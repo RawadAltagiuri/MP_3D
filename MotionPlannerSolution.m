@@ -48,8 +48,8 @@
 
 clear, clc, close;
 
-sp.problemName = "hole";
-sp.typeOfAlg = 'Astar';
+sp.problemName = "wall";
+sp.typeOfAlg = 'astar';
 sp.typeOfHeuristic = 'continue';
 
 switch sp.problemName
@@ -64,7 +64,7 @@ switch sp.problemName
         sp.lengthMin = 5;
         sp.plane_z = 1000;
         sp.costArray = [1, 1, 1];
-        sp.stepSize = [5,30];
+        sp.stepSize = [5,40];
         sp.obstacles = [
         -50	-300 sp.plane_z	25	650
         -50	-250 sp.plane_z	25	650
