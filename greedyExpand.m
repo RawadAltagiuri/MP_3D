@@ -15,6 +15,7 @@ function [children] = greedyExpand(node, searchProblem)
 
     [greedyChild, isValid] = steeringChild(node, searchProblem); %Produce the steering child
     if isValid == true %if the child is not valid then we do not account for it
+        children = [];
         children = [children ; greedyChild];
     end
 end
@@ -84,6 +85,19 @@ function [greedyChild, isValid] = steeringChild(node, searchProblem)
      %update the x and y coordinates of the child based on steering towards the goal
     child_conf(:, 1:2) = parent_conf(:, 1:2) + (sign(searchProblem.goal_conf(:, 1:2) - parent_conf(:, 1:2)) * searchProblem.stepSize(1));
     
+
+    for ConfCount = 1:searchProblem.j
+        if searchProblem.goal_conf(ConfCount, 1) > parent_conf(ConfCount, 1) && searchProblem.goal_conf(ConfCount, 1) < child_conf(ConfCount, 1)
+            child_conf(ConfCount,1) = searchProblem.goal_conf(ConfCount, 1);
+        elseif searchProblem.goal_conf(ConfCount, 1) < parent_conf(ConfCount, 1) && searchProblem.goal_conf(ConfCount, 1) > child_conf(ConfCount, 1)
+            child_conf(ConfCount,1) = searchProblem.goal_conf(ConfCount, 1);
+        end
+        if searchProblem.goal_conf(ConfCount, 2) > parent_conf(ConfCount, 2) && searchProblem.goal_conf(ConfCount, 2) < child_conf(ConfCount, 2)
+            child_conf(ConfCount,2) = searchProblem.goal_conf(ConfCount, 2);
+        elseif searchProblem.goal_conf(ConfCount, 2) < parent_conf(ConfCount, 2) && searchProblem.goal_conf(ConfCount, 2) > child_conf(ConfCount, 2)
+            child_conf(ConfCount,2) = searchProblem.goal_conf(ConfCount, 2);
+        end
+    end
     %Check if the resulting child violates the minimum length constraint
     for r = 1 : searchProblem.j
         if child_conf(r, 3) < searchProblem.lengthMin
