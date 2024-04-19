@@ -48,7 +48,7 @@
 
 clear, clc, close;
 
-sp.problemName = "wall";
+sp.problemName = "hole";
 sp.typeOfAlg = 'astar';
 sp.typeOfHeuristic = 'continue';
 
@@ -162,7 +162,7 @@ sp.home_base = [0,0,0];
 
 
 tic
-[solution, expandedNodes] =searchAlgorithm(sp);
+[solution, expandedNodes] = searchAlgorithm(sp);
 time = toc
 if isempty(solution)
     return;
