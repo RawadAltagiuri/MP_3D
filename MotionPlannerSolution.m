@@ -48,7 +48,7 @@
 
 clear, clc, close;
 
-sp.problemName = "hole";
+sp.problemName = "wall";
 sp.typeOfAlg = 'astar';
 sp.typeOfHeuristic = 'continue';
 
