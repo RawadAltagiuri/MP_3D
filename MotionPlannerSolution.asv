@@ -168,12 +168,10 @@ sizes = [50, 100, 500, 1000];
 for size = sizes
     for i = 1:timeSize
         tic
-        [solution, expandedNodes] = searchAlgorithm(sp, size);
-        time = toc;        
+        [solution, expandedNodes] = searchAlgorithm(sp);
         disp("Size: " + size);
-        disp("Iteration: " + i);
-        disp("Time: " + time);
-        disp(" ");
+        disp("")
+        time = toc
         times(i) = time;    
         if isempty(solution)
             disp("No Solution");

@@ -13,14 +13,14 @@
 %'expandedNodes': the number of expanded nodes to find the optimal solution
 %
 
-function [solution, exapndedNodes] = searchAlgorithm(sp)
+function [solution, exapndedNodes] = searchAlgorithm(sp, fringeSize)
     exapndedNodes = 0;
     root.g = 0;
     root.h = getHeuristic(sp.typeOfHeuristic, sp.start_conf, sp);
     root.f = calculateCostBasedOnAlgorithm(root.g, root.h, sp.typeOfAlg);
     root.path = sp.start_conf;
 
-    instanceId = PDQ_test("init", 10000);
+    instanceId = PDQ_test("init", fringeSize);
     PDQ_test("insertAny", instanceId, root.path, [root.g, root.h, root.f]);
     set = java.util.HashSet; %A hashset used from the Java library to prevent cycles
     set.add(mat2str(root.path(:,end-2:end)));
@@ -31,9 +31,10 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
         fringeNode.f = priority(3);
         fringeNode.path = path;
 
-        % set.add(mat2str(fringeNode.path(:,end-2:end))); %Getting the last configuration from the polled path
-        
         exapndedNodes = exapndedNodes + 1;
+
+        % set.add(mat2str(fringeNode.path(:,end-2:end))); %Getting the last configuration from the polled path
+
         if(fringeNode.h < 1)
             if size(sp.goals, 1) ~= 0
                 sp.goals(1:sp.j, :) = [];
@@ -56,7 +57,7 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
                 % sp.goal_conf = sp.goals(1:sp.j, 1:3);
                 % fringeNode.h = getHeuristic(sp.typeOfHeuristic, sp.start_conf, sp);
             end
-        end
+        end        
 
         nextChildren = {};
 
@@ -79,6 +80,7 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
                 end
             end
         end
+
         if validGreedyFound == false %If no valid greedy children were found, we generate children according to the current algorithm [Astar, UCS, Greedy]
             children = FullExpand(fringeNode, sp);
             for i = 1 :size(children, 1)
@@ -96,8 +98,7 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
                 end
             end
         end
-
-        PDQ_test("expandHead", instanceId, nextChildren);
+        PDQ_test("expandHead", instanceId, nextChildren);        
 
         if PDQ_test("size", instanceId) == 0
             disp('no path found');
