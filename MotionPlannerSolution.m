@@ -2,7 +2,7 @@
 % •Fabio Stroppa (Algorithms, Concept)
 % •Rawad E. H. Altagiuri (Algorithms)
 % •Omar H. A. Zaghloul (Algorithms)
-
+% •Ömer Kalafatlar
 
 %Start of the motion planner
 %
@@ -160,21 +160,27 @@ sp.goal_conf = sp.goals(1:sp.j, 1:3);
 sp.home_base = [0,0,0];
 
 
-timeSize = 20;
+timeSize = 5;
 times = zeros(20, 1);
 
 sizes = [50, 100, 500, 1000];
+sizes = 1000;
+
+solutions = zeros(timeSize, 2);
 
 for size = sizes
     for i = 1:timeSize
         tic
         [solution, expandedNodes] = searchAlgorithm(sp, size);
-        time = toc;        
+        time = toc;
+
+        solutions(i, 1) = solution.f;
+        solutions(i, 2) = time;
+
         disp("Size: " + size);
         disp("Iteration: " + i);
         disp("Time: " + time);
         disp(" ");
-        times(i) = time;    
         if isempty(solution)
             disp("No Solution");
             return;
