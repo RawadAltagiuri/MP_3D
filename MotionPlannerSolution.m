@@ -160,62 +160,120 @@ sp.goal_conf = sp.goals(1:sp.j, 1:3);
 sp.home_base = [0,0,0];
 
 
-timeSize = 5;
-times = zeros(20, 1);
+% timeSize = 5;
+% times = zeros(20, 1);
+% 
+% sizes = [50, 100, 500, 1000];
+% sizes = 1000;
+% 
+% solutions = zeros(timeSize, 2);
+% 
+% for size = sizes
+%     for i = 1:timeSize
+%         tic
+%         [solution, expandedNodes] = searchAlgorithm(sp, size);
+%         time = toc;
+% 
+%         solutions(i, 1) = solution.f;
+%         solutions(i, 2) = time;
+% 
+%         disp("Size: " + size);
+%         disp("Iteration: " + i);
+%         disp("Time: " + time);
+%         disp(" ");
+%         if isempty(solution)
+%             disp("No Solution");
+%             return;
+%         end 
+%     end
+% end
 
-sizes = [50, 100, 500, 1000];
-sizes = 1000;
+% sp.obstacles = [];
+% [path, cost] = directExpansion(sp.start_conf, sp.goal_conf, sp);
+% solution.path = pathConversion1(path);
+% solution.g = 0;
+% solution.f = 0;
+% sollution.h = 0;
 
-solutions = zeros(timeSize, 2);
 
-for size = sizes
-    for i = 1:timeSize
-        tic
-        [solution, expandedNodes] = searchAlgorithm(sp, size);
-        time = toc;
+% lengthSum = 0;
+% for i = 1:size(sp.design)
+%     length = sp.design(i);
+%     lengthSum = lengthSum + length;
+% end
+% 
+% randConfig = randomConf(sp, rand(1) * lengthSum);
+% 
+% [solution, expandedNodes] = searchAlgorithm(sp, 1000);
+% 
+% expandedNodes
+% solution.g
 
-        solutions(i, 1) = solution.f;
-        solutions(i, 2) = time;
+sp.obstacles = [10000, 10000, 0.1, 0.1, 0.1];
 
-        disp("Size: " + size);
-        disp("Iteration: " + i);
-        disp("Time: " + time);
-        disp(" ");
-        if isempty(solution)
-            disp("No Solution");
-            return;
-        end 
+pathsSteps = {};
+pathsSteps{1, 1} = size(directExpansion(sp.start_conf, sp.goal_conf, sp), 2) - 1;
+pathsSteps{2, 1} = totalStep(sp.start_conf, sp.goal_conf, sp);
+for i = 2:100
+    randConf1 = randomConf(sp);
+    randConf2 = randomConf(sp);
+    
+    [path, ~] = directExpansion(randConf1, randConf2, sp);
+    pathsSteps{1, i} = size(path, 2) - 1;
+    pathsSteps{2, i} = totalStep(randConf1, randConf2, sp);
+    if pathsSteps{1, i} ~= pathsSteps{2, i}
+        x = 10;
     end
 end
 
 
-% expandedNodes
-% solution.g
-% 
-% % Calculate the number of submatrices you will create
-% numSubMatrices = size(solution.path, 2) / 3;
-% 
-% % Preallocate the 3D array to store the submatrices
-% formattedPathForAnimation = zeros(sp.j, 3, numSubMatrices);
-% 
-% % Extract the submatrices and store them in the 3D array
-% for i = 1:numSubMatrices
-%     formattedPathForAnimation(:, :, i) = solution.path(:, (i-1)*3 + 1 : i*3);
-% end
-% 
-% growthCount = 0;
-% retractCount = 0;
-% steerCount = 0;
-% for i=2:size(formattedPathForAnimation,3)
-%     [growthCount, retractCount, steerCount] = actionCounter(formattedPathForAnimation(:, :, i), formattedPathForAnimation(:, :, i-1), growthCount, retractCount, steerCount);
-% end
-% 
-%  softRobot_animation(formattedPathForAnimation, [0,0,0], true, sp);
-% 
-% 
-% 
-% 
-% 
-% 
-% 
-% 
+sp.obstacles = [
+    -150, 0, 500, 25, 100;
+    -150, 50, 500, 25, 100;
+    -150, 100, 500, 25, 100;
+
+    -150, -50, 500, 25, 100;
+    -150, -100, 500, 25, 100;
+    ];
+
+
+
+
+rrtConf.pOfGoal = 0.95;
+rrtConf.numOfNodes = 1000;
+rrtConf.stepSize = 10;
+[path, cost] = searchAlgorithmRRT(sp, rrtConf);
+solution.path = pathConversion1(path);
+solution.g = cost;
+solution.f = solution.g;
+solution.h = 0;
+
+% solution = searchAlgorithm(sp, 1000);
+
+% Calculate the number of submatrices you will create
+numSubMatrices = size(solution.path, 2) / 3;
+
+% Preallocate the 3D array to store the submatrices
+formattedPathForAnimation = zeros(sp.j, 3, numSubMatrices);
+
+% Extract the submatrices and store them in the 3D array
+for i = 1:numSubMatrices
+    formattedPathForAnimation(:, :, i) = solution.path(:, (i-1)*3 + 1 : i*3);
+end
+
+growthCount = 0;
+retractCount = 0;
+steerCount = 0;
+for i=2:size(formattedPathForAnimation,3)
+    [growthCount, retractCount, steerCount] = actionCounter(formattedPathForAnimation(:, :, i), formattedPathForAnimation(:, :, i-1), growthCount, retractCount, steerCount);
+end
+
+ softRobot_animation(formattedPathForAnimation, [0,0,0], true, sp);
+
+
+
+
+
+
+
+

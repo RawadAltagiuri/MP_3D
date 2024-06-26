@@ -13,7 +13,7 @@ Author: Rawad Altagiuri
 */
 
 template <class T>
-class priority_deque{
+class priority_deque {
     public:
     std::vector<T>vec; //the heap    
     int maxSize;
@@ -29,8 +29,8 @@ class priority_deque{
 
         
         //Operations
-        std::pair<std::vector<double>, std::vector<std::vector<double>>> poll(); //returns and removes the top element.
-        void add(std::pair<std::vector<double>, std::vector<std::vector<double>>>); 
+        T poll(); //returns and removes the top element.
+        void add(T); 
         void clear(); //clears the heap
         void setMaxSize(int); //sets the maximum size of the heap
 
@@ -44,7 +44,7 @@ class priority_deque{
         void bubbleUp(int);
         void bubbleDown(int);
         int findLeavesIndexes();
-        void addingAtMaxSize(std::pair<std::vector<double>, std::vector<std::vector<double>>>);
+        void addingAtMaxSize(T);
         
 };
 
@@ -148,7 +148,7 @@ TIME: O(Log n)
 SPACE: O(1)
 */
 template <class T>
-std::pair<std::vector<double>, std::vector<std::vector<double>>> priority_deque<T>::poll(){
+T priority_deque<T>::poll() {
     if(this->vec.size() == 0){
         throw std::runtime_error("Priority Queue is empty");
     }
@@ -169,7 +169,7 @@ TIME : O(LOG N)
 SPACE: O(1)
 */
 template <class T>
-void priority_deque<T>::add(std::pair<std::vector<double>, std::vector<std::vector<double>>> data){
+void priority_deque<T>::add(T data){
      if(this->maxSize == 0) return; //if for some reason someone put the maxSize as 0 i guess.
 
      if(this->vec.size() < this->maxSize){ //if we haven't reached the maximum size yet, we just add the value to the end of the vector and bubble it up.
@@ -194,7 +194,7 @@ TIME: O(LOG N)
 SPACE: O(1)
 */
 template <class T>
-void priority_deque<T>::addingAtMaxSize(std::pair<std::vector<double>, std::vector<std::vector<double>>> data){
+void priority_deque<T>::addingAtMaxSize(T data){
     //srand(static_cast<unsigned int>(time(0)));
     //if we reach the maximum size, we start switching out the leaf nodes with the new values, this assure that all the new values we insert can go into all the branches.
     this->currLeaf = this->firstLeafIndex + (rand() % (this->vec.size() - this->firstLeafIndex));
