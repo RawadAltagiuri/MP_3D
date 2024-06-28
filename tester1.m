@@ -160,89 +160,33 @@ sp.goal_conf = sp.goals(1:sp.j, 1:3);
 sp.home_base = [0,0,0];
 
 
-% timeSize = 5;
-% times = zeros(20, 1);
+sp.obstacles = [5000, 5000, 0.1, 0.1, 0.1];
+% randC1 = [
+%     0 0 50;
+%     0  0 150;
+%     0 0 150;
+%     0 0 150;
+%     0 0 150];
 % 
-% sizes = [50, 100, 500, 1000];
-% sizes = 1000;
-% 
-% solutions = zeros(timeSize, 2);
-% 
-% for size = sizes
-%     for i = 1:timeSize
-%         tic
-%         [solution, expandedNodes] = searchAlgorithm(sp, size);
-%         time = toc;
-% 
-%         solutions(i, 1) = solution.f;
-%         solutions(i, 2) = time;
-% 
-%         disp("Size: " + size);
-%         disp("Iteration: " + i);
-%         disp("Time: " + time);
-%         disp(" ");
-%         if isempty(solution)
-%             disp("No Solution");
-%             return;
-%         end 
-%     end
-% end
+% randC2 = [
+%     0 0 50;
+%     0  0 150;
+%     0 0 60;
+%     0 0 0;
+%     0 0 0];
 
-% sp.obstacles = [];
-% [path, cost] = directExpansion(sp.start_conf, sp.goal_conf, sp);
-% solution.path = pathConversion1(path);
-% solution.g = 0;
-% solution.f = 0;
-% sollution.h = 0;
+randC1 = randomConf(sp);
+randC2 = randomConf(sp);
 
-
-% lengthSum = 0;
-% for i = 1:size(sp.design)
-%     length = sp.design(i);
-%     lengthSum = lengthSum + length;
-% end
-% 
-% randConfig = randomConf(sp, rand(1) * lengthSum);
-% 
-% [solution, expandedNodes] = searchAlgorithm(sp, 1000);
-% 
-% expandedNodes
-% solution.g
-
-sp.obstacles = [10000, 10000, 0.1, 0.1, 0.1];
-
-pathsSteps = {};
-for i = 1:100
-    randConf1 = randomConf(sp);
-    randConf2 = randomConf(sp);
-    
-    pathsSteps{1, i} = size(directExpansion(randConf1, randConf2, sp), 2);
-    pathsSteps{2, i} = totalStep(randConf1, randConf, sp);
+[directPath12, directCost12] = directExpansion(randC1, randC2, sp);
+[directPath21, directCost21] = directExpansion(randC2, randC1, sp);
+dP12 = pathConversion1(directPath12);
+dP21 = pathConversion1(flip(directPath21, 2));
+if dP12 == dP21
+    x = 10;
+else
+    x = 20;
 end
-
-
-sp.obstacles = [
-    -150, 0, 500, 25, 100;
-    -150, 50, 500, 25, 100;
-    -150, 100, 500, 25, 100;
-
-    -150, -50, 500, 25, 100;
-    -150, -100, 500, 25, 100;
-    ];
-
-
-
-
-rrtConf.pOfGoal = 0.95;
-rrtConf.numOfNodes = 1000;
-rrtConf.stepSize = 10;
-[path, cost] = searchAlgorithmRRT(sp, rrtConf);
-solution.path = pathConversion1(path);
-solution.g = cost;
-solution.f = solution.g;
-solution.h = 0;
-
-% solution = searchAlgorithm(sp, 1000);
 
 % Calculate the number of submatrices you will create
 numSubMatrices = size(solution.path, 2) / 3;
@@ -262,7 +206,7 @@ for i=2:size(formattedPathForAnimation,3)
     [growthCount, retractCount, steerCount] = actionCounter(formattedPathForAnimation(:, :, i), formattedPathForAnimation(:, :, i-1), growthCount, retractCount, steerCount);
 end
 
- softRobot_animation(formattedPathForAnimation, [0,0,0], true, sp);
+softRobot_animation(formattedPathForAnimation, [0,0,0], true, sp);
 
 
 

@@ -21,7 +21,7 @@ function [path, cost] = searchAlgorithmRRT(sp, rrtConf)
     end
 
     prevTreeSize = size(graphTree, 1);
-    graphTree = updateTree(sp, rrtConf, graphTree, randomConfig);
+    graphTree = updateTree(sp, rrtConf, graphTree, sp.goal_conf);
     if chosenGoal && prevTreeSize ~= size(graphTree, 1)
         [path, cost] = backtractPath(sp, graphTree);
     else

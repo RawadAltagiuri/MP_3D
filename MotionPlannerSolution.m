@@ -209,22 +209,24 @@ sp.home_base = [0,0,0];
 % expandedNodes
 % solution.g
 
-sp.obstacles = [10000, 10000, 0.1, 0.1, 0.1];
+% sp.obstacles = [10000, 10000, 0.1, 0.1, 0.1];
+% 
+% pathsSteps = {};
+% pathsSteps{1, 1} = size(directExpansion(sp.start_conf, sp.goal_conf, sp), 2) - 1;
+% pathsSteps{2, 1} = totalStep(sp.start_conf, sp.goal_conf, sp);
+% for i = 2:100
+%     randConf1 = randomConf(sp);
+%     randConf2 = randomConf(sp);
+% 
+%     [path, ~] = directExpansion(randConf1, randConf2, sp);
+%     pathsSteps{1, i} = size(path, 2) - 1;
+%     pathsSteps{2, i} = totalStep(randConf1, randConf2, sp);
+%     if pathsSteps{1, i} ~= pathsSteps{2, i}
+%         x = 10;
+%     end
+% end
 
-pathsSteps = {};
-pathsSteps{1, 1} = size(directExpansion(sp.start_conf, sp.goal_conf, sp), 2) - 1;
-pathsSteps{2, 1} = totalStep(sp.start_conf, sp.goal_conf, sp);
-for i = 2:100
-    randConf1 = randomConf(sp);
-    randConf2 = randomConf(sp);
-    
-    [path, ~] = directExpansion(randConf1, randConf2, sp);
-    pathsSteps{1, i} = size(path, 2) - 1;
-    pathsSteps{2, i} = totalStep(randConf1, randConf2, sp);
-    if pathsSteps{1, i} ~= pathsSteps{2, i}
-        x = 10;
-    end
-end
+
 
 
 sp.obstacles = [
@@ -238,15 +240,25 @@ sp.obstacles = [
 
 
 
+% rrtConf.pOfGoal = 0.95;
+% rrtConf.numOfNodes = 1000;
+% rrtConf.stepSize = 10;
+% [path, cost] = searchAlgorithmRRT(sp, rrtConf);
+% solution.path = pathConversion1(path);
+% solution.g = cost;
+% solution.f = solution.g;
+% solution.h = 0;
 
-rrtConf.pOfGoal = 0.95;
-rrtConf.numOfNodes = 1000;
-rrtConf.stepSize = 10;
-[path, cost] = searchAlgorithmRRT(sp, rrtConf);
+rrtConf.pOfGoal = 0.1;
+rrtConf.numOfNodes = 100;
+rrtConf.stepSize = 5;
+rrtConf.neighbourSize = 5;
+[path, cost] = searchAlgorithmRRT_star(sp, rrtConf);
 solution.path = pathConversion1(path);
 solution.g = cost;
 solution.f = solution.g;
 solution.h = 0;
+
 
 % solution = searchAlgorithm(sp, 1000);
 
