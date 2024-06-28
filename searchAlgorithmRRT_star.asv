@@ -33,6 +33,13 @@ function [fullPath, totalCost] = backtractPath(sp, graphTree)
     while curNode{2} > 0
         parentNode = graphTree(curNode{2}, :);
         [path, cost] = directExpansion(parentNode{1}, curNode{1}, sp);
+
+        if isempty(path)
+            fullPath = {};
+            totalCost = -1;
+            return;
+        end
+
         paths = [paths, {path}];
         totalCost = totalCost + cost;
         curNode = parentNode;
@@ -46,14 +53,14 @@ end
 function graphTree = updateTree(sp, rrtConf, graphTree, randomConfig)
     neighbours = [];
     for i = 1:size(graphTree, 1)
-        [path, cost] = directExpansion(graphTree{i, 1}, randomConfig, sp);
+        
         if ~isempty(path) && size(path, 2) < rrtConf.neighbourSize
             neighbours = [neighbours; i, cost];
         end
     end
 
     if isempty(neighbours)
-        updateTreeRRT(sp, rrtConf, graphTree, randomConfig);
+        graphTree = updateTreeRRT(sp, rrtConf, graphTree, randomConfig);
         return;
     end
 
@@ -73,7 +80,7 @@ function graphTree = updateTree(sp, rrtConf, graphTree, randomConfig)
             continue;
         end
         [path, cost] = directExpansion(randomConfig, graphTree{neighbours(i, 1), 1}, sp);
-        if ~isempty(path)
+        if ~isempty(path) && size(path, 2) < rrtConf.neighbourSize
             realNeighbours = [realNeighbours; neighbours(i, 1), cost + graphTree{end, 3}];
         end
     end
