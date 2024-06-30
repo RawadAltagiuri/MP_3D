@@ -158,6 +158,7 @@ sp.start_conf = start.matrix;
 sp.j = size(sp.start_conf, 1);
 sp.goal_conf = sp.goals(1:sp.j, 1:3);
 sp.home_base = [0,0,0];
+sp.weight = 0.01;
 
 
 
@@ -180,6 +181,9 @@ formattedPathForAnimation = zeros(sp.j, 3, numSubMatrices);
 for i = 1:numSubMatrices
     formattedPathForAnimation(:, :, i) = solution.path(:, (i-1)*3 + 1 : i*3);
 end
+
+%now reverse the 3D array
+formattedPathForAnimation = flip(formattedPathForAnimation, 3);
 
 growthCount = 0;
 retractCount = 0;

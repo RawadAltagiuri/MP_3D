@@ -9,9 +9,17 @@ function [intersected_obstacles,j] = collisionCheck(conf,op)
 
     %these two lines are to deal with obstacles as if they are bigger to
     %avoid getting too close
-    op.obstacles(:, 4) = op.obstacles(:, 4) + 25; % increases the radius by 25 so it makes the range that should be considered as collision
-    op.obstacles(:, 5) = op.obstacles(:, 5) + 10; % increasing the height by 10 so it makes the range that should be considered as collision
-   
+    %if there are NO obstacles, then the obstacles are set to be bigger
+    if ~isempty(op.obstacles)
+         op.obstacles(:, 4) = op.obstacles(:, 4) + 25; % increases the radius by 25 so it makes the range that should be considered as collision
+         op.obstacles(:, 5) = op.obstacles(:, 5) + 10; % increasing the height by 10 so it makes the range that should be considered as collision
+    else
+        intersected_obstacles = false;
+        j = 0;
+        return;
+    end
+    
+    
     for ee=1:op.j % setting the current end effector of the robot
         if conf(ee,3)==0
             break

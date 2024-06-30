@@ -39,16 +39,16 @@ function [greedyChild, isValid] = eversionChild(node, searchProblem)
     %we can calculate the eversion of the next link by sum of current links
     %+ amount of eversion which is the difference between the goal and the
     %parent
-    amountOfEversion = (sign(sum(searchProblem.goal_conf(:, 3)) - sum(parent_conf(:, 3))) * searchProblem.stepSize(2));
+    amountOfEversion = (sign(sum(searchProblem.random_conf(:, 3)) - sum(parent_conf(:, 3))) * searchProblem.stepSize(2));
     totaleversion = sum(parent_conf(:, 3)) + amountOfEversion;
     
     %distributing the eversion among links
     for r = 1 : searchProblem.j
         child_conf(r, 3) = totaleversion;
-        if child_conf(r, 3) < searchProblem.goal_conf(r, 3) && amountOfEversion < 0
-            child_conf(r, 3) = searchProblem.goal_conf(r, 3);
-        elseif child_conf(r, 3) > searchProblem.goal_conf(r, 3) && amountOfEversion > 0
-            child_conf(r, 3) = searchProblem.goal_conf(r, 3);
+        if child_conf(r, 3) < searchProblem.random_conf(r, 3) && amountOfEversion < 0
+            child_conf(r, 3) = searchProblem.random_conf(r, 3);
+        elseif child_conf(r, 3) > searchProblem.random_conf(r, 3) && amountOfEversion > 0
+            child_conf(r, 3) = searchProblem.random_conf(r, 3);
         end
         if child_conf(r, 3) > searchProblem.design(r)
             child_conf(r, 3) = searchProblem.design(r);
@@ -86,19 +86,19 @@ function [greedyChild, isValid] = steeringChild(node, searchProblem)
     child_conf = parent_conf;
 
      %update the x and y coordinates of the child based on steering towards the goal
-    child_conf(:, 1:2) = parent_conf(:, 1:2) + (sign(searchProblem.goal_conf(:, 1:2) - parent_conf(:, 1:2)) * searchProblem.stepSize(1));
+    child_conf(:, 1:2) = parent_conf(:, 1:2) + (sign(searchProblem.random_conf(:, 1:2) - parent_conf(:, 1:2)) * searchProblem.stepSize(1));
     
 %   Make sure we don't overshoot to our taget due to the step size
     for ConfCount = 1:searchProblem.j
-        if searchProblem.goal_conf(ConfCount, 1) > parent_conf(ConfCount, 1) && searchProblem.goal_conf(ConfCount, 1) < child_conf(ConfCount, 1)
-            child_conf(ConfCount,1) = searchProblem.goal_conf(ConfCount, 1);
-        elseif searchProblem.goal_conf(ConfCount, 1) < parent_conf(ConfCount, 1) && searchProblem.goal_conf(ConfCount, 1) > child_conf(ConfCount, 1)
-            child_conf(ConfCount,1) = searchProblem.goal_conf(ConfCount, 1);
+        if searchProblem.random_conf(ConfCount, 1) > parent_conf(ConfCount, 1) && searchProblem.random_conf(ConfCount, 1) < child_conf(ConfCount, 1)
+            child_conf(ConfCount,1) = searchProblem.random_conf(ConfCount, 1);
+        elseif searchProblem.random_conf(ConfCount, 1) < parent_conf(ConfCount, 1) && searchProblem.random_conf(ConfCount, 1) > child_conf(ConfCount, 1)
+            child_conf(ConfCount,1) = searchProblem.random_conf(ConfCount, 1);
         end
-        if searchProblem.goal_conf(ConfCount, 2) > parent_conf(ConfCount, 2) && searchProblem.goal_conf(ConfCount, 2) < child_conf(ConfCount, 2)
-            child_conf(ConfCount,2) = searchProblem.goal_conf(ConfCount, 2);
-        elseif searchProblem.goal_conf(ConfCount, 2) < parent_conf(ConfCount, 2) && searchProblem.goal_conf(ConfCount, 2) > child_conf(ConfCount, 2)
-            child_conf(ConfCount,2) = searchProblem.goal_conf(ConfCount, 2);
+        if searchProblem.random_conf(ConfCount, 2) > parent_conf(ConfCount, 2) && searchProblem.random_conf(ConfCount, 2) < child_conf(ConfCount, 2)
+            child_conf(ConfCount,2) = searchProblem.random_conf(ConfCount, 2);
+        elseif searchProblem.random_conf(ConfCount, 2) < parent_conf(ConfCount, 2) && searchProblem.random_conf(ConfCount, 2) > child_conf(ConfCount, 2)
+            child_conf(ConfCount,2) = searchProblem.random_conf(ConfCount, 2);
         end
     end
     %Check if the resulting child violates the minimum length constraint

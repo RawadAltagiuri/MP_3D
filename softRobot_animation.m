@@ -42,6 +42,12 @@ function [] = softRobot_animation(commands, home_base, drawPath, sp)
         for i=2:1:n_joints+1
             plot3([startConf(i-1,1),startConf(i,1)],[startConf(i-1,2),startConf(i,2)],[startConf(i-1,3),startConf(i,3)],'-o','Color',grayRobotColor, 'LineWidth', 1.5);
         end
+        %draw the end configuration sp.goal_conf, it must be pink
+        goal_conf = sp.goal_conf;
+        [goalConf,~] = solveForwardKinematics_3D(goal_conf,home_base,false);
+        for i=2:1:n_joints+1
+            plot3([goalConf(i-1,1),goalConf(i,1)],[goalConf(i-1,2),goalConf(i,2)],[goalConf(i-1,3),goalConf(i,3)],'-o','Color','m', 'LineWidth', 1.5);
+        end
         % draws the soft robot
         for i=2:1:n_joints+1
             plot3([robot_CC(i-1,1),robot_CC(i,1)],[robot_CC(i-1,2),robot_CC(i,2)],[robot_CC(i-1,3),robot_CC(i,3)],'-o','Color','r', 'LineWidth', 1.5);
@@ -74,7 +80,11 @@ function [] = softRobot_animation(commands, home_base, drawPath, sp)
             plot3(xunit, yunit, (zunit-sp.obstacles(i,5)),'Color',grayColor);
         end
 
-
+%         filepath = "C:\Users\rawad\Desktop\WORK\EVO\Figuresss\" + sp.problemName;
+%         fullFilePath = fullfile(filepath, [num2str(k), '.fig']);
+%         savefig(gcf, fullFilePath)
+%         fullFilePathPng = fullfile(filepath, [num2str(k), '.png']);
+%         saveas(gcf, fullFilePathPng);
         f.CurrentAxes.ZDir = 'Reverse';
         cameratoolbar('SetCoordSys','x');
         view(60, 30)

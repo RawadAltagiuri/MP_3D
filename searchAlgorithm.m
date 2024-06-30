@@ -13,74 +13,76 @@
 %'expandedNodes': the number of expanded nodes to find the optimal solution
 %
 
+%the function uses RRT to find a path
 function [solution, exapndedNodes] = searchAlgorithm(sp)
-    exapndedNodes = 0;
-    root.g = 0;
-    root.h = getHeuristic(sp.typeOfHeuristic, sp.start_conf, sp);
-    root.f = calculateCostBasedOnAlgorithm(root.g, root.h, sp.typeOfAlg);
+    finalChild = [];
     root.path = sp.start_conf;
-    fringe = PDQ('init');
-    PDQ('add', fringe, {[root.f, root.g, root.h], root.path}); %Initiating the the priority deque which is a custom class implemented in c++ and used with a wrapper in matlab
-    PDQ('setMaxSize', fringe, 10000); %Set the max size of the priority deque
-    set = java.util.HashSet; %A hashset used from the Java library to prevent cycles
-    while ~PDQ('empty', fringe)
-        [priority, path] = PDQ('poll', fringe);
-        fringeNode.f = priority(1);
-        fringeNode.g = priority(2);
-        fringeNode.h = priority(3);
-        fringeNode.path = path;
-        set.add(mat2str(fringeNode.path(:,end-2:end))); %Getting the last configuration from the polled path
-        exapndedNodes = exapndedNodes +1;
-        if(fringeNode.h < 1)
-            if size(sp.goals, 1) ~= 0
-                sp.goals(1:sp.j, :) = [];
-            end
-            if size(sp.goals, 1) == 0 %Found the optimal path
-                solution = fringeNode;
-                return;
-            else 
-                PDQ('clear', fringe);
-                set.clear;
-                sp.goal_conf = sp.goals(1:sp.j, 1:3);
-                fringeNode.h = getHeuristic(sp.typeOfHeuristic, sp.start_conf, sp);
-            end
-        end
-        [greedyChildren] = greedyExpand(fringeNode, sp); %Generating children of the current node according to greedy algorithm
-        validGreedyFound = false;
-        for i = 1 :size(greedyChildren, 1)
-            child = greedyChildren(i);
-            [isColliding, ~] = collisionCheck(child.path(:,end-2:end), sp);%Checking if the greedy children are valid (not colliding), if not we will generate children according to the current algorithm [Astar, UCS, greedy]
-            if ~set.contains(mat2str(child.path(:,end-2:end)))
-                if isColliding == false
-                    validGreedyFound = true;
-                    PDQ('add', fringe, {[child.f child.g child.h], child.path});
-                    set.add(mat2str(child.path(:,end-2:end)));
-                else
-                    set.add(mat2str(child.path(:,end-2:end)));
+    root.g = 0;
+    root.h = getHeuristic(sp.typeOfHeuristic, root.path(:, end-2:end), sp);
+    root.f = calculateCostBasedOnAlgorithm(root.g, root.h, sp.typeOfAlg);
+    %create a map to store the nodes, the key is the configuration matrix and the value is the parent node
+    nodes_map = containers.Map({mat2str(root.path(:, end-2:end))}, {root});
+
+    for i = 1:100000
+        %generate a random configuriation
+        random_conf = RrtExpand(sp);
+        %find the nearest node to the random configuration
+        nearest_node = findNearestNode(nodes_map, random_conf, sp);
+        sp.random_conf = random_conf;
+        greedyChildren = greedyExpand(nearest_node, sp);
+
+        child = greedyChildren(1);
+        if ~nodes_map.isKey(mat2str(child.path(:, end-2:end))) %check if the child is already in the tree
+            [isColliding, ~] = collisionCheck(child.path(:,end-2:end), sp);%Checking if the greedy children are valid (not colliding)
+            if isColliding == false
+                nodes_map(mat2str(child.path(:, end-2:end))) = nearest_node;
+                %check if the the difference between all cells in the child configuration and the goal configuration is less than 100
+                if calculateCost(child.path(:, end-2:end), sp.goal_conf, sp.home_base) < 25
+                    finalChild = child;
+                    break;
                 end
+            else
+                continue;
             end
         end
-        if validGreedyFound == false %If no valid greedy children were found, we generate children according to the current algorithm [Astar, UCS, Greedy]
-            children = FullExpand(fringeNode, sp);
-            for i = 1 :size(children, 1)
-                child = children(i);
-                [isColliding, ~] = collisionCheck(child.path(:,end-2:end), sp);
-                if ~set.contains(mat2str(child.path(:,end-2:end)))
-                    if isColliding == false
-                        PDQ('add', fringe, {[child.f child.g child.h], child.path});
-                        set.add(mat2str(child.path(:,end-2:end)));
-                    else
-                        set.add(mat2str(child.path(:,end-2:end)));
-                    end
-                end
-            end
-        end
-        if PDQ('empty', fringe)
-            disp('no path found');
-            solution = [];
+
+
+
+        if(i == 99000)
+            a= 5;
         end
     end
-    PDQ('delete', fringe);
+
+    if i == 100000 && isempty(finalChild)
+        solution = [];
+        exapndedNodes = i;
+        return;
+    end
+        
+
+    exapndedNodes = nodes_map.Count;
+
+    %create the path beginning from the final child to the root, then reverse it, we retrieve the parent of the last (:, end-2:end) from the map and then add it to the right of the path
+    path = finalChild.path(:, end-2:end);
+    while ~isequal(path(:, end-2:end), sp.start_conf)
+        parent = nodes_map(mat2str(path(:, end-2:end)));
+        path = [path, parent.path(:, end-2:end)];
+    end
+
+%     path = fliplr(path);
+    %solution = [path; finalChild.h, finalChild.g, finalChild.f];
+    solution.path = path;
+    solution.g = 0;
+    %calculate the cost of the path using the cost function, every three columns represent a configuration matrix
+    for i = 1:size(path, 2)/3
+        solution.g = solution.g + calculateCost(path(:, (i-1)*3 + 1 : i*3), sp.goal_conf, sp.home_base);
+    end
+    solution.h = getHeuristic(sp.typeOfHeuristic, path(:, 1:3), sp);
+    solution.f = calculateCostBasedOnAlgorithm(solution.g, solution.h, sp.typeOfAlg);
+    
+    
+
+
 end
 
 
