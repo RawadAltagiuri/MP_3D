@@ -48,7 +48,7 @@
 
 clear, clc, close;
 
-sp.problemName = "wall";
+sp.problemName = "hole";
 sp.typeOfAlg = 'astar';
 sp.typeOfHeuristic = 'continue';
 
@@ -227,18 +227,18 @@ sp.home_base = [0,0,0];
 % end
 
 
-
-
-sp.obstacles = [
-    -150, 0, 500, 25, 100;
-    -150, 50, 500, 25, 100;
-    -150, 100, 500, 25, 100;
-
-    -150, -50, 500, 25, 100;
-    -150, -100, 500, 25, 100;
-    ];
-
-
+% sp.start_conf = [0 0 50; 0 30 150; 0 -10 150; 0 -20 150; 0 0 150];
+% sp.goal_conf = [0 0 50; 0 -30 150; 0 10 150; 0 20 150; 0 0 150];
+% sp.obstacles = [
+%     0, 0, 500, 25, 300;
+%     0, 50, 500, 25, 300;
+%     0, 100, 500, 25, 300;
+% 
+%     0, -50, 500, 25, 300;
+%     0, -100, 500, 25, 300;
+%     ];
+% 
+% 
 
 
 % rrtConf.pOfGoal = 0.95;
@@ -250,11 +250,12 @@ sp.obstacles = [
 % solution.f = solution.g;
 % solution.h = 0;
 
-rrtConf.pOfGoal = 0.2;
-rrtConf.numOfNodes = 100;
+
+rrtConf.pOfGoal = 0.1;
+rrtConf.numOfNodes = 1000;
 rrtConf.stepSize = 5;
 rrtConf.neighbourSize = rrtConf.stepSize;
-[path, cost] = searchAlgorithmRRT_star(sp, rrtConf);
+[path, cost] = searchAlgorithmRRT(sp, rrtConf, false);
 solution.path = pathConversion1(path);
 solution.g = cost;
 solution.f = solution.g;

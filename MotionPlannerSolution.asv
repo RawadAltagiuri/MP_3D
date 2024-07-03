@@ -230,17 +230,14 @@ sp.home_base = [0,0,0];
 
 
 sp.obstacles = [
-    -150, 0, 500, 25, 100;
-    -150, 50, 500, 25, 100;
-    -150, 100, 500, 25, 100;
+    0, 0, 500, 25, 100;
+    0, 50, 500, 25, 100;
+    0, 100, 500, 25, 100;
 
-    -150, -50, 500, 25, 100;
-    -150, -100, 500, 25, 100;
+    0, -50, 500, 25, 100;
+    0, -100, 500, 25, 100;
     ];
 
-sp.start_conf = [
-    
-    ];
 
 
 
@@ -253,11 +250,12 @@ sp.start_conf = [
 % solution.f = solution.g;
 % solution.h = 0;
 
-rrtConf.pOfGoal = 0.2;
-rrtConf.numOfNodes = 100;
+
+rrtConf.pOfGoal = 0.05;
+rrtConf.numOfNodes = 10000;
 rrtConf.stepSize = 5;
 rrtConf.neighbourSize = rrtConf.stepSize;
-[path, cost] = searchAlgorithmRRT_star(sp, rrtConf);
+[path, cost] = searchAlgorithmRRT(sp, rrtConf);
 solution.path = pathConversion1(path);
 solution.g = cost;
 solution.f = solution.g;

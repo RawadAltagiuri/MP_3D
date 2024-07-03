@@ -1,5 +1,8 @@
-function [path, cost] = searchAlgorithmRRT(sp, rrtConf, SHOW)
-    graphTree = {sp.start_conf, 0, sp.start_conf};
+function [path, cost] = searchAlgorithmRRT(sp, rrtConf)
+    % For showing the tree (init).
+    drawInit(sp.start_conf, sp.goal_conf, sp.home_base);
+
+    graphTree = {sp.start_conf, 0};
     for i = 1:rrtConf.numOfNodes
         if rand(1) > rrtConf.pOfGoal
             randomConfig = randomConf(sp);
@@ -15,14 +18,6 @@ function [path, cost] = searchAlgorithmRRT(sp, rrtConf, SHOW)
         if chosenGoal && prevTreeSize ~= size(graphTree, 1) && ...
                 getHeuristic(sp.typeOfHeuristic, graphTree{end, 1}, sp) < 1
             [path, cost] = backtractPath(sp, graphTree);
-
-            if SHOW
-                % For showing the tree (init).
-                f = figure;
-                drawInit(f, sp.start_conf, sp.goal_conf, sp);
-                drawTree(f, graphTree, sp);
-            end
-            
             return;
         end
     end
@@ -35,14 +30,6 @@ function [path, cost] = searchAlgorithmRRT(sp, rrtConf, SHOW)
         path = {};
         cost = -1;
     end
-
-    if SHOW
-        % For showing the tree (init).
-        f = figure;
-        drawInit(f, sp.start_conf, sp.goal_conf, sp);
-        drawTree(f, graphTree, sp);
-    end
-    
 end
 
 function heuristic = getHeuristicBridge(sp, conf1, conf2)
@@ -86,15 +73,12 @@ function graphTree = updateTree(sp, rrtConf, graphTree, randomConfig)
             newNodeIndex = newNodeIndex + 1;
         end
         newNode = directPath{newNodeIndex};
-        graphTree = [graphTree; {newNode, closestParent, randomConfig}];
+        graphTree = [graphTree; {newNode, closestParent}];
     end
 end
 
-function drawInit(f, startConfig, goalConfig, sp)
+function drawInit(startConfig, goalConfig, home_base)
     grayRobotColor = '#569c69';
-
-    home_base = sp.home_base;
-    n_obstacles = size(sp.obstacles, 1);
 
     clf;
     hold on;
@@ -113,54 +97,21 @@ function drawInit(f, startConfig, goalConfig, sp)
     n_joints = size(startConfig,1);
 
     for i=2:1:n_joints+1
-        plot3([startConf(i-1,1),startConf(i,1)],[startConf(i-1,2),startConf(i,2)],[startConf(i-1,3),startConf(i,3)],'-o','Color','r', 'LineWidth', 1.5);
+        plot3([startConf(i-1,1),startConf(i,1)],[startConf(i-1,2),startConf(i,2)],[startConf(i-1,3),startConf(i,3)],'-o','Color',grayRobotColor, 'LineWidth', 1.5);
     end
     for i=2:1:n_joints+1
-        plot3([goalConf(i-1,1),goalConf(i,1)],[goalConf(i-1,2),goalConf(i,2)],[goalConf(i-1,3),goalConf(i,3)],'-o','Color','g', 'LineWidth', 1.5);
-    end    
-
-    for i = 1:1:n_obstacles
-        [X, Y, Z] = cylinder(sp.obstacles(i, 4), 10);
-        X = X + sp.obstacles(i, 1);
-        Y = Y + sp.obstacles(i, 2);
-        Z = Z * -sp.obstacles(i, 5) + sp.obstacles(i, 3);
-
-        surf(X, Y, Z, 'FaceColor', 'w', 'EdgeColor', 'none');
-        grayColor = '#778079';
-        plot3(X,Y,Z,'Color',grayColor);
-        th = 0:pi / 50:2 * pi;
-        xunit = sp.obstacles(i, 4) * cos(th) + sp.obstacles(i, 1);
-        yunit = sp.obstacles(i, 4) * sin(th) + sp.obstacles(i, 2);
-        zunit = 0 * th + sp.obstacles(i, 3);
-
-        plot3(xunit, yunit, zunit,'Color',grayColor);
-        plot3(xunit, yunit, (zunit-sp.obstacles(i,5)),'Color',grayColor);
-    end
-    
-    f.CurrentAxes.ZDir = 'Reverse';
-    cameratoolbar('SetCoordSys','x');
-    view(60, 30)
-end
-
-function drawTree(f, graphTree, sp)
-    for i = 2:size(graphTree, 1)
-        drawConfig(f, graphTree{i, 1}, sp, 'b');
-        drawConfig(f, graphTree{i, 3}, sp, 'k');
-        pause;
+        plot3([goalConf(i-1,1),goalConf(i,1)],[goalConf(i-1,2),goalConf(i,2)],[goalConf(i-1,3),goalConf(i,3)],'-o','Color',grayRobotColor, 'LineWidth', 1.5);
     end
 end
 
-function drawConfig(f, config, sp, color)
+function drawTree
+function drawEach(config, home_base)
     n_joints = size(config, 1);
-    [robot_CC,~] = solveForwardKinematics_3D(config, sp.home_base, false); %solve the forward kinematics for a given robot configuration
+    [robot_CC,~] = solveForwardKinematics_3D(config, home_base, false); %solve the forward kinematics for a given robot configuration
 
     % draws the soft robot
     for i=2:1:n_joints+1
-        plot3([robot_CC(i-1,1),robot_CC(i,1)],[robot_CC(i-1,2),robot_CC(i,2)],[robot_CC(i-1,3),robot_CC(i,3)],'-o','Color',color, 'LineWidth', 1.5);
+        plot3([robot_CC(i-1,1),robot_CC(i,1)],[robot_CC(i-1,2),robot_CC(i,2)],[robot_CC(i-1,3),robot_CC(i,3)],'-o','Color','r', 'LineWidth', 1.5);
     end
-
-    % f.CurrentAxes.ZDir = 'Reverse';
-    % cameratoolbar('SetCoordSys','x');
-    % view(60, 30)
 end
 
