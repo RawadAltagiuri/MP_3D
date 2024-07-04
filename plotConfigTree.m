@@ -10,7 +10,11 @@ function plotConfigTree(configMap, sp)
 
     goalConfig = sp.goal_conf;
     startConfig = sp.start_conf;
-    final_child = sp.final_child;
+    if isfield(sp, 'final_child')
+        final_child = sp.final_child;
+    else
+        final_child = [];
+    end
 
     % initialize arrays for edges and configurations
     src = {};
@@ -37,9 +41,9 @@ function plotConfigTree(configMap, sp)
         matrix = eval(config);
         matrix = solveForwardKinematics_3D(matrix, sp.home_base, false);
         % Sum of absolute values of every column
-        x_sum = sum(abs(matrix(:, 1))); 
-        y_sum = sum(abs(matrix(:, 2))); 
-        z_sum = sum(abs(matrix(:, 3))); 
+        x_sum = sum(matrix(:, 1)); 
+        y_sum = sum(matrix(:, 2)); 
+        z_sum = sum(matrix(:, 3)); 
         positions(i, :) = [x_sum, y_sum, z_sum];
     end
 
@@ -58,10 +62,14 @@ scatter3(positions(:, 1), positions(:, 2), positions(:, 3), 36, 'b', 'filled');
 % highlight goal, start and final child nodes
 goalConfigPos = positions(strcmp(allConfigs, mat2str(goalConfig)), :);
 startConfigPos = positions(strcmp(allConfigs, mat2str(startConfig)), :);
-finalChildPos = positions(strcmp(allConfigs, mat2str(final_child.path(:, end-2:end))), :);
+if isfield(sp, 'final_child')
+    finalChildPos = positions(strcmp(allConfigs, mat2str(final_child.path(:, end-2:end))), :);
+end
 h1 =scatter3(goalConfigPos(1), goalConfigPos(2), goalConfigPos(3), 100, 'r', 'filled');
 h2 = scatter3(startConfigPos(1), startConfigPos(2), startConfigPos(3), 100, 'g', 'filled');
-h3 = scatter3(finalChildPos(1), finalChildPos(2), finalChildPos(3), 100, 'm', 'filled');
+if isfield(sp, 'final_child')
+    h3 = scatter3(finalChildPos(1), finalChildPos(2), finalChildPos(3), 100, 'm', 'filled');
+end
 
 xlabel('Sum of 1st Column');
 ylabel('Sum of 2nd Column');
@@ -75,7 +83,11 @@ axis auto;
 %zlim([-2000 2000]);
 
 % legend
-lgd = legend([h1, h2, h3], {'Goal Node', 'Start Node', 'Final Child Node'});
+if isfield(sp, 'final_child')
+    lgd = legend([h1, h2, h3], {'Goal Node', 'Start Node', 'Final Child Node'});
+else
+    lgd = legend([h1, h2], {'Goal Node', 'Start Node'});
+end
 lgd.FontSize = 8;
 lgdPos = lgd.Position;
 lgd.Position = [lgdPos(1) + 0, lgdPos(2), lgdPos(3), lgdPos(4)];
