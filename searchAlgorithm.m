@@ -23,33 +23,27 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
     %create a map to store the nodes, the key is the configuration matrix and the value is the parent node
     nodes_map = containers.Map({mat2str(root.path(:, end-2:end))}, {root});
 
-    for i = 1:100000
+    for i = 1:sp.iterations
         %generate a random configuriation
         random_conf = RrtExpand(sp);
         %find the nearest node to the random configuration
         nearest_node = findNearestNode(nodes_map, random_conf, sp);
         sp.random_conf = random_conf;
         greedyChildren = greedyExpand(nearest_node, sp);
-
         child = greedyChildren(1);
         if ~nodes_map.isKey(mat2str(child.path(:, end-2:end))) %check if the child is already in the tree
             [isColliding, ~] = collisionCheck(child.path(:,end-2:end), sp);%Checking if the greedy children are valid (not colliding)
             if isColliding == false
                 nodes_map(mat2str(child.path(:, end-2:end))) = nearest_node;
+
                 %check if the the difference between all cells in the child configuration and the goal configuration is less than 100
-                if calculateCost(child.path(:, end-2:end), sp.goal_conf, sp.home_base) < 25
+                if calculateCost(child.path(:, end-2:end), sp.goal_conf, sp.home_base) < sp.AcceptedEuclideanDistance
                     finalChild = child;
                     break;
                 end
             else
                 continue;
             end
-        end
-
-
-
-        if(i == 99000)
-            a= 5;
         end
     end
 
@@ -61,6 +55,7 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
         
 
     exapndedNodes = nodes_map.Count;
+    solution.map = nodes_map;
 
     %create the path beginning from the final child to the root, then reverse it, we retrieve the parent of the last (:, end-2:end) from the map and then add it to the right of the path
     path = finalChild.path(:, end-2:end);
@@ -68,9 +63,6 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
         parent = nodes_map(mat2str(path(:, end-2:end)));
         path = [path, parent.path(:, end-2:end)];
     end
-
-%     path = fliplr(path);
-    %solution = [path; finalChild.h, finalChild.g, finalChild.f];
     solution.path = path;
     solution.g = 0;
     %calculate the cost of the path using the cost function, every three columns represent a configuration matrix
@@ -79,7 +71,7 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
     end
     solution.h = getHeuristic(sp.typeOfHeuristic, path(:, 1:3), sp);
     solution.f = calculateCostBasedOnAlgorithm(solution.g, solution.h, sp.typeOfAlg);
-    
+    solution.final_child = child;
     
 
 

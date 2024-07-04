@@ -1,5 +1,5 @@
 function plotConfigTree(configMap, sp)
-    % Add the sp.goal_conf to the map, its parent is itself
+    % add the sp.goal_conf to the map, its parent is itself
     goalNode.path = sp.goal_conf;
     goalNode.h = 0;
     goalNode.g = 0;
@@ -8,88 +8,78 @@ function plotConfigTree(configMap, sp)
     configs = keys(configMap);
     numConfigs = length(configs);
 
-    % Initialize arrays for edges and configurations
+    goalConfig = sp.goal_conf;
+    startConfig = sp.start_conf;
+    final_child = sp.final_child;
+
+    % initialize arrays for edges and configurations
     src = {};
     tgt = {};
     allConfigs = {};
 
-    % Iterate through each configuration and extract the edges
+    % iterate through each configuration and extract the edges
     for i = 1:numConfigs
         config = configs{i};
         parentConfig = mat2str(configMap(config).path);
 
-        % Add edge if there is a parent configuration
         if ~isempty(parentConfig)
             src{end+1} = char(parentConfig);
             tgt{end+1} = char(config);
         end
 
-        % Store all configurations
         allConfigs{end+1} = config;
     end
 
-    % Create a directed graph
-    G = digraph(src, tgt);
-
-    % Initialize the distance matrix
-    distanceMatrix = zeros(numConfigs, numConfigs);
-
-    % Calculate distances between configurations
+    % calculate positions for 3D plotting
+    positions = zeros(numConfigs, 3);
     for i = 1:numConfigs
-        for j = 1:numConfigs
-            if i ~= j
-                distanceMatrix(i, j) = calculateCost(eval(allConfigs{i}), eval(allConfigs{j}), sp.home_base);
-            end
-        end
+        config = allConfigs{i};
+        matrix = eval(config);
+        matrix = solveForwardKinematics_3D(matrix, sp.home_base, false);
+        % Sum of absolute values of every column
+        x_sum = sum(abs(matrix(:, 1))); 
+        y_sum = sum(abs(matrix(:, 2))); 
+        z_sum = sum(abs(matrix(:, 3))); 
+        positions(i, :) = [x_sum, y_sum, z_sum];
     end
 
-    % Use multidimensional scaling (MDS) to position the nodes
-    positions = mdscale(distanceMatrix, 2);
+ % PLOTTING STARTS HERE
+figure;
+hold on;
+% plot the edges
+for i = 1:length(src)
+    srcPos = positions(strcmp(allConfigs, src{i}), :);
+    tgtPos = positions(strcmp(allConfigs, tgt{i}), :);
+    plot3([srcPos(1), tgtPos(1)], [srcPos(2), tgtPos(2)], [srcPos(3), tgtPos(3)], 'k');
+end
+% plot nodes
+scatter3(positions(:, 1), positions(:, 2), positions(:, 3), 36, 'b', 'filled');
 
-    % Find indices of the start, goal, and final child configurations
-    startIdx = find(strcmp(allConfigs, mat2str(sp.start_conf)));
-    goalIdx = find(strcmp(allConfigs, mat2str(sp.goal_conf)));
-    
-    % Check if final_child is present
-    if isfield(sp, 'final_child')
-        finalChildIdx = find(strcmp(allConfigs, mat2str(sp.final_child)));
-    else
-        finalChildIdx = [];
-    end
+% highlight goal, start and final child nodes
+goalConfigPos = positions(strcmp(allConfigs, mat2str(goalConfig)), :);
+startConfigPos = positions(strcmp(allConfigs, mat2str(startConfig)), :);
+finalChildPos = positions(strcmp(allConfigs, mat2str(final_child.path(:, end-2:end))), :);
+h1 =scatter3(goalConfigPos(1), goalConfigPos(2), goalConfigPos(3), 100, 'r', 'filled');
+h2 = scatter3(startConfigPos(1), startConfigPos(2), startConfigPos(3), 100, 'g', 'filled');
+h3 = scatter3(finalChildPos(1), finalChildPos(2), finalChildPos(3), 100, 'm', 'filled');
 
-    % Check if goalIdx is empty (sp.goal_conf not found)
-    if isempty(goalIdx)
-        warning('Goal configuration (%s) not found in configMap.', mat2str(sp.goal_conf));
-    end
-    
-    % Initialize node colors (default: 1 for blue)
-    nodeColors = ones(numConfigs, 1);
+xlabel('Sum of 1st Column');
+ylabel('Sum of 2nd Column');
+zlabel('Sum of 3rd Column');
 
-    % Highlight start, goal, and final child nodes
-    if ~isempty(startIdx)
-        nodeColors(startIdx) = 2; % Start node color: 2 (green)
-    else
-        warning('Start configuration (%s) not found in configMap.', mat2str(sp.start_conf));
-    end
-    
-    if ~isempty(goalIdx)
-        nodeColors(goalIdx) = 3; % Goal node color: 3 (red)
-    end
-    
-    if ~isempty(finalChildIdx)
-        nodeColors(finalChildIdx) = 4; % Final child node color: 4 (purple)
-    end
+% automatically adjust axes limits
+axis auto;
+% manually set axes limits
+%xlim([-50 1100]);
+%ylim([-50 1100]);
+%zlim([-2000 2000]);
 
-    % Plot the graph with edges and custom positions
-    figure;
-    h = plot(G, 'XData', positions(:,1), 'YData', positions(:,2), 'MarkerSize', 6, 'NodeLabel', {});
-    title('Robot Configuration Tree');
-    xlabel('Configuration');
-    ylabel('Parent Configuration');
-    axis equal;
+% legend
+lgd = legend([h1, h2, h3], {'Goal Node', 'Start Node', 'Final Child Node'});
+lgd.FontSize = 8;
+lgdPos = lgd.Position;
+lgd.Position = [lgdPos(1) + 0, lgdPos(2), lgdPos(3), lgdPos(4)];
 
-    % Set node colors using NodeCData
-    h.NodeCData = nodeColors;
-    colormap([0 0 1; 0 1 0; 1 0 0; 0.5 0 0.5]); % Blue, Green, Red, Purple colormap for nodeColors
-    colorbar('Ticks', [1, 2, 3, 4], 'TickLabels', {'Default', 'Start', 'Goal', 'Final Child'});
+
+hold off;
 end

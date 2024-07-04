@@ -158,7 +158,9 @@ sp.start_conf = start.matrix;
 sp.j = size(sp.start_conf, 1);
 sp.goal_conf = sp.goals(1:sp.j, 1:3);
 sp.home_base = [0,0,0];
-sp.weight = 0.01;
+sp.weight = 0.1;
+sp.iterations = 10000;
+sp.AcceptedEuclideanDistance = 150;
 
 
 
@@ -170,6 +172,10 @@ if isempty(solution)
 end
 expandedNodes
 solution.g
+
+if isfield(solution, 'final_child')
+    sp.final_child = solution.final_child
+end
 
 % Calculate the number of submatrices you will create
 numSubMatrices = size(solution.path, 2) / 3;
@@ -192,7 +198,7 @@ for i=2:size(formattedPathForAnimation,3)
     [growthCount, retractCount, steerCount] = actionCounter(formattedPathForAnimation(:, :, i), formattedPathForAnimation(:, :, i-1), growthCount, retractCount, steerCount);
 end
  
- softRobot_animation(formattedPathForAnimation, [0,0,0], true, sp);
+%  softRobot_animation(formattedPathForAnimation, [0,0,0], true, sp);
 
 
 
