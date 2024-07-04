@@ -86,35 +86,10 @@ function testWriter(testCases, fileName)
     rrtStarStats = {rrtStarCosts / length(testCases), rrtStarTimes / length(testCases)};
     aStarStats = {aStarCosts / length(testCases), aStarTimes / length(testCases)};
 
-    statsFillerRRT = cell(1, size(rrtTable, 2) - size(statsHeaders, 2) + size(filler, 2));
-    statsFillerRRT(1:end) = {""};
+    statsFiller = cell(2, size(rrtTable, 2) - size(statsHeaders, 2) + size(filler, 2));
+    stats = {statsHeaders};
 
-    statsFillerRRTStar = cell(1, size(rrtStarTable, 2) - size(statsHeaders, 2) + size(filler, 2));
-    statsFillerRRTStar(1:end) = {""};
-
-    statsFillerAStar = cell(1, size(aStarTable, 2) - size(statsHeaders, 2));
-    statsFillerAStar(1:end) = {""};
-   
-    stats = [statsHeaders, statsFillerRRT, ... 
-        statsHeaders, statsFillerRRTStar, ...
-        statsHeaders, statsFillerAStar
-        ];
-    stats = [stats; 
-        rrtStats, statsFillerRRT, ...
-        rrtStarStats, statsFillerRRTStar, ...
-        aStarStats, statsFillerAStar
-        ];
-
-    rowFiller = cell(1, size(rrtTable, 2) + size(filler, 2) ... 
-        + size(rrtStarTable, 2) + size(filler, 2) ...
-        + size(aStarTable, 2));
-
-    completeTable = [
-        titles;
-        headers;
-        [rrtTable, filler, rrtStarTable, filler, aStarTable];
-        rowFiller
-        stats];
+    completeTable = [titles; headers; [rrtTable, filler, rrtStarTable, filler, aStarTable]];
 
     writecell(completeTable, fileName, 'Range', 'B2');
 end
