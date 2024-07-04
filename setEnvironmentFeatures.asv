@@ -1,0 +1,420 @@
+function[environment] = setEnvironmentFeatures(sp, index)
+% design, steerBounds, lengthMin, plane_z, costArray, stepSize
+% matrix, obstacles, goals
+
+    % % Define the cell array to hold different scenarios' features
+    % environments = cell(1, 4);  % Adjust the size based on the number of scenarios
+    % 
+    % % Scenario 1 - wall
+    % environments{1}.environmentName = "wall";
+    % environments{1}.design = [50; 150; 150; 150; 150];
+    % environments{1}.matrix = [0 0 50;
+    %                           0 0 150;
+    %                           0 0 150;
+    %                           0 0 150;
+    %                           0 0 150];
+    % environments{1}.steerBounds = [-30 30];
+    % environments{1}.lengthMin = 5;
+    % environments{1}.baseRotate = false;
+    % environments{1}.plane_z = 1000;
+    % environments{1}.costArray = [1, 1, 1];
+    % environments{1}.stepSize = [5, 40];
+    % environments{1}.obstacles = [
+    %     -50 -300 environments{1}.plane_z 25 650
+    %     -50 -250 environments{1}.plane_z 25 650
+    %     -50 -200 environments{1}.plane_z 25 650
+    %     -50 -150 environments{1}.plane_z 25 650
+    %     -50 -100 environments{1}.plane_z 25 650
+    %     -50 -50  environments{1}.plane_z 25 650
+    %     -50 0    environments{1}.plane_z 25 650
+    %     -50 50   environments{1}.plane_z 25 650
+    %     -50 100  environments{1}.plane_z 25 650
+    %     -50 150  environments{1}.plane_z 25 650
+    %     -50 200  environments{1}.plane_z 25 650
+    %     -50 250  environments{1}.plane_z 25 650
+    %     -50 300  environments{1}.plane_z 25 650
+    % ];
+    % environments{1}.goals = [
+    %     [0 0 50; 0 -25 150; 0 -20 150; 0 20 150; 0 0 150]
+    % ];
+    % 
+    % % Scenario 2 - wallWithEntrance
+    % environments{2}.environmentName = "wallWithEntrance";
+    % environments{2}.design = [50; 150; 150; 150; 150];
+    % environments{2}.matrix = [0 0 50;
+    %                           10 0 150;
+    %                           10 0 150;
+    %                           0 0 150;
+    %                           0 0 150];
+    % environments{2}.steerBounds = [-30 30];
+    % environments{2}.lengthMin = 5;
+    % environments{2}.baseRotate = false;
+    % environments{2}.plane_z = 1000;
+    % environments{2}.costArray = [1, 1, 1];
+    % environments{2}.stepSize = [2.5, 30];
+    % environments{2}.obstacles = [
+    %     -50 -300 environments{2}.plane_z 25 650
+    %     -50 -250 environments{2}.plane_z 25 650
+    %     -50 -200 environments{2}.plane_z 25 650
+    %     -50 -150 environments{2}.plane_z 25 650
+    %     -50 0    environments{2}.plane_z 25 650
+    %     -50 50   environments{2}.plane_z 25 650
+    %     -50 100  environments{2}.plane_z 25 650
+    %     -50 150  environments{2}.plane_z 25 650
+    %     -50 200  environments{2}.plane_z 25 650
+    %     -50 250  environments{2}.plane_z 25 650
+    %     -50 300  environments{2}.plane_z 25 650
+    % ];
+    % environments{2}.goals = [
+    %     [0 0 50; 0 -25 150; 0 -20 150; 0 20 150; 0 0 150]
+    % ];
+    % 
+    % % Scenario 3 - hole
+    % environments{3}.environmentName = "hole";
+    % environments{3}.design = [50; 150; 175; 150; 200];
+    % environments{3}.matrix = [0 0 50;
+    %                           0 0 150;
+    %                           0 0 175;
+    %                           0 0 150;
+    %                           0 0 150];
+    % environments{3}.steerBounds = [-40 30];
+    % environments{3}.lengthMin = 5;
+    % environments{3}.baseRotate = false;
+    % environments{3}.plane_z = 1000;
+    % environments{3}.costArray = [1, 1, 1];
+    % environments{3}.stepSize = [2.5, 30];
+    % environments{3}.obstacles = [
+    %     0 100 450 25 100
+    %     -50 100 450 25 100
+    %     50 100 450 25 100
+    %     50 100 environments{3}.plane_z 25 430
+    %     -50 100 environments{3}.plane_z 25 430
+    %     0 100 environments{3}.plane_z 25 430
+    %     -125 100 environments{3}.plane_z 50 650
+    %     125 100 environments{3}.plane_z 50 650
+    % ];
+    % environments{3}.goals = [
+    %     [0 0 50; 0 0 150; 0 0 175; -30 0 150; -40 0 200]
+    % ];
+    % 
+    % % Scenario 4 - GrabbingTest
+    % environments{4}.environmentName = "GrabbingTest";
+    % environments{4}.design = [50; 100; 150; 150; 150];
+    % environments{4}.matrix = [0 0 0;
+    %                           0 0 0;
+    %                           0 0 0;
+    %                           0 0 0;
+    %                           0 0 0];
+    % environments{4}.steerBounds = [-40 40];
+    % environments{4}.lengthMin = 5;
+    % environments{4}.baseRotate = false;
+    % environments{4}.plane_z = 1000;
+    % environments{4}.costArray = [1, 1, 1];
+    % environments{4}.stepSize = [2.5, 30];
+    % environments{4}.obstacles = [
+    %     0 -200 environments{4}.plane_z 25 450
+    %     0 200 environments{4}.plane_z 25 450
+    % ];
+    % environments{4}.goals = [
+    %     [0 0 50; 0 0 100; 5 0 150; 20 0 150; 35 0 140]
+    %     [0 0 50; 0 0 100; -5 0 150; -20 0 150; -35 0 140]
+    % ];
+    % 
+    % % Scenario 5 - highWallWithGap
+    % environments{5}.environmentName = "highWallWithGap";
+    % environments{5}.design = [50; 150; 150; 150; 150];
+    % environments{5}.matrix = [0 0 50; 0 30 150; 0 -30 150; 0 0 150; 0 0 50];
+    % environments{5}.steerBounds = [-30 30];
+    % environments{5}.lengthMin = 5;
+    % environments{5}.plane_z = 1000;
+    % environments{5}.costArray = [1, 1, 1];
+    % environments{5}.stepSize = [2.5, 30];
+    % environments{5}.obstacles = [
+    %     0, 50, 500, 25, 300;
+    %     0, 100, 500, 25, 300;
+    %     0, 150, 500, 25, 300;
+    %     0, 200, 500, 25, 300;
+    % 
+    %     0, -50, 500, 25, 300;
+    %     0, -100, 500, 25, 300;
+    %     0, -150, 500, 25, 300;
+    %     0, -200, 500, 25, 300;
+    %     ];
+    % environments{5}.goals = [0 0 50; 0 -30 150; 0 30 150; 0 0 150; 0 0 50];
+    % 
+    % % Scenario 6 - wallWithEntranceAndSteer
+    % environments{6}.environmentName = "wallWithEntranceAndSteer";
+    % environments{6}.design = [50; 200; 100; 175; 175];
+    % environments{6}.matrix = [0 0 50; 0 0 200; 0 0 100; 0 0 175; 0 0 175];
+    % environments{6}.steerBounds = [-35 35];
+    % environments{6}.lengthMin = 5;
+    % environments{6}.plane_z = 1000;
+    % environments{6}.costArray = [1, 1, 1];
+    % environments{6}.stepSize = [5, 30];
+    % environments{6}.obstacles = [
+    %     45, 0, 800, 12, 350;
+    %     45, 24, 800, 12, 350;
+    %     45, 48, 800, 12, 350;
+    %     45, 72, 800, 12, 350;
+    %     45, 96, 800, 12, 350;
+    %     45, 120, 800, 12, 350;
+    %     45, -24, 800, 12, 350;
+    %     45, -48, 800, 12, 350;
+    %     45, -72, 800, 12, 350;
+    %     45, -96, 800, 12, 350;
+    %     45, -120, 800, 12, 350;
+    % 
+    %     55, 0, 250, 12, 50;
+    %     55, 24, 250, 12, 50;
+    %     55, 48, 250, 12, 50;
+    %     55, 72, 250, 12, 50;
+    %     55, 96, 250, 12, 50;
+    %     55, 120, 250, 12, 50;
+    %     55, -24, 250, 12, 50;
+    %     55, -48, 250, 12, 50;
+    %     55, -72, 250, 12, 50;
+    %     55, -96, 250, 12, 50;
+    %     55, -120, 250, 12, 50;
+    %     ];
+    % environments{6}.goals = [0 0 50; 0 0 200; 0 35 100; 0 -15 175; 0 -20 100];
+    % 
+    % % Scenario 7 - oneBucketIntoAnother
+    % environments{7}.environmentName = "oneBucketIntoAnother";
+    % environments{7}.design = [50; 175; 150; 150; 150];
+    % environments{7}.matrix = [0 0 50; 30 0 175; 0 0 150; -30 0 150; 0 0 0];
+    % environments{7}.steerBounds = [-30 30];
+    % environments{7}.lengthMin = 5;
+    % environments{7}.plane_z = 1000;
+    % environments{7}.costArray = [1, 1, 1];
+    % environments{7}.stepSize = [2.5, 30];
+    % environments{7}.obstacles = [
+    %     100, 100, 800, 25, 450;
+    %     50, 100, 800, 25, 450;
+    %     0, 100, 800, 25, 450;
+    %     -50, 100, 800, 25, 450;
+    %     100, 150, 800, 25, 450;
+    %     100, 200, 800, 25, 450;
+    %     50, 250, 800, 25, 450;
+    %     0, 250, 800, 25, 450;
+    %     -50, 250, 800, 25, 450;
+    %     100, 250, 800, 25, 450;
+    %     100, -100, 800, 25, 450;
+    %     100, -150, 800, 25, 450;
+    %     100, -200, 800, 25, 450;
+    %     100, -250, 800, 25, 450;
+    % 
+    %     -100, 100, 800, 25, 450;
+    %     -100, 150, 800, 25, 450;
+    %     -100, 200, 800, 25, 450;
+    %     -100, 250, 800, 25, 450;
+    %     -100, -100, 800, 25, 450;
+    %     0, -100, 800, 25, 450;
+    %     -50, -100, 800, 25, 450;
+    %     50, -100, 800, 25, 450;
+    %     -100, -150, 800, 25, 450;
+    %     -100, -200, 800, 25, 450;
+    %     0, -250, 800, 25, 450;
+    %     -50, -250, 800, 25, 450;
+    %     50, -250, 800, 25, 450;
+    %     -100, -250, 800, 25, 450;
+    %     ];
+    % environments{7}.goals = [0 0 50; -30 0 175; 0 0 150; 30 0 150; 0 0 0];
+    % 
+    % % Scenario 8 - IntoTheBucket
+    % environments{8}.environmentName = "IntoTheBucket";
+    % environments{8}.design = [50; 175; 150; 150; 150];
+    % environments{8}.matrix = [0 0 50; 0 0 175; 0 0 150; 0 0 150; 0 0 90];
+    % environments{8}.steerBounds = [-30 30];
+    % environments{8}.lengthMin = 5;
+    % environments{8}.plane_z = 1000;
+    % environments{8}.costArray = [1, 1, 1];
+    % environments{8}.stepSize = [2.5, 30];
+    % environments{8}.obstacles = [
+    %     100, 100, 800, 25, 450;
+    %     50, 100, 800, 25, 450;
+    %     0, 100, 800, 25, 450;
+    %     -50, 100, 800, 25, 450;
+    %     100, 150, 800, 25, 450;
+    %     100, 200, 800, 25, 450;
+    %     50, 250, 800, 25, 450;
+    %     0, 250, 800, 25, 450;
+    %     -50, 250, 800, 25, 450;
+    %     100, 250, 800, 25, 450;
+    %     -100, 100, 800, 25, 450;
+    %     -100, 150, 800, 25, 450;
+    %     -100, 200, 800, 25, 450;
+    %     -100, 250, 800, 25, 450;
+    %     ];
+    % environments{8}.goals = [0 0 50; -30 0 175; 0 0 150; 30 0 150; 0 0 0];
+    % 
+    % % Scenario 9 - FromTheBucket
+    % environments{9}.environmentName = "FromTheBucket";
+    % environments{9}.design = [50; 175; 150; 150; 150];
+    % environments{9}.matrix = [0 0 50; -30 0 175; 0 0 150; 30 0 150; 0 0 0];
+    % environments{9}.steerBounds = [-30 30];
+    % environments{9}.lengthMin = 5;
+    % environments{9}.plane_z = 1000;
+    % environments{9}.costArray = [1, 1, 1];
+    % environments{9}.stepSize = [2.5, 30];
+    % environments{9}.obstacles = [
+    %     100, 100, 800, 25, 450;
+    %     50, 100, 800, 25, 450;
+    %     0, 100, 800, 25, 450;
+    %     -50, 100, 800, 25, 450;
+    %     100, 150, 800, 25, 450;
+    %     100, 200, 800, 25, 450;
+    %     50, 250, 800, 25, 450;
+    %     0, 250, 800, 25, 450;
+    %     -50, 250, 800, 25, 450;
+    %     100, 250, 800, 25, 450;
+    %     -100, 100, 800, 25, 450;
+    %     -100, 150, 800, 25, 450;
+    %     -100, 200, 800, 25, 450;
+    %     -100, 250, 800, 25, 450;
+    %     ];
+    % environments{9}.goals = [0 0 50; 0 0 175; 0 0 150; 0 0 150; 0 0 0];
+    % 
+    % % Scenario 10 - plusSign
+    % environments{10}.environmentName = "plusSign";
+    % environments{10}.design = [50; 150; 150; 150; 150];
+    % environments{10}.matrix = [0 0 50; -30 0 150; 0 0 150; 0 0 150; 0 0 130];
+    % environments{10}.steerBounds = [-30 30];
+    % environments{10}.lengthMin = 5;
+    % environments{10}.plane_z = 1000;
+    % environments{10}.costArray = [1, 1, 1];
+    % environments{10}.stepSize = [2.5, 30];
+    % environments{10}.obstacles = [
+    %     300, 200, 450, 50, 100;
+    %     200, 200, 450, 50, 100;
+    %     100, 200, 450, 50, 100;
+    % 
+    %     300, -300, 450, 50, 100;
+    %     300, -200, 450, 50, 100;
+    %     300, -100, 450, 50, 100;
+    %     300, 300, 450, 50, 100;
+    %     300, 200, 450, 50, 100;
+    %     300, 100, 450, 50, 100;
+    %     200, -300, 450, 50, 100;
+    %     200, -200, 450, 50, 100;
+    %     200, -100, 450, 50, 100;
+    %     200, 300, 450, 50, 100;
+    %     200, 200, 450, 50, 100;
+    %     200, 100, 450, 50, 100;
+    %     100, -300, 450, 50, 100;
+    %     100, -200, 450, 50, 100;
+    %     100, -100, 450, 50, 100;
+    %     100, 300, 450, 50, 100;
+    %     100, 200, 450, 50, 100;
+    %     100, 100, 450, 50, 100;
+    % 
+    %     -300, -300, 450, 50, 100;
+    %     -300, -200, 450, 50, 100;
+    %     -300, -100, 450, 50, 100;
+    %     -300, 300, 450, 50, 100;
+    %     -300, 200, 450, 50, 100;
+    %     -300, 100, 450, 50, 100;
+    %     -200, -300, 450, 50, 100;
+    %     -200, -200, 450, 50, 100;
+    %     -200, -100, 450, 50, 100;
+    %     -200, 300, 450, 50, 100;
+    %     -200, 200, 450, 50, 100;
+    %     -200, 100, 450, 50, 100;
+    %     -100, -300, 450, 50, 100;
+    %     -100, -200, 450, 50, 100;
+    %     -100, -100, 450, 50, 100;
+    %     -100, 300, 450, 50, 100;
+    %     -100, 200, 450, 50, 100;
+    %     -100, 100, 450, 50, 100;
+    %     ];
+    % environments{10}.goals = [0 0 50; 0 30 150; 0 0 150; 0 0 150; 0 0 60];
+    % 
+    % % Scenario 11 - plusSign_long
+    % environments{11}.environmentName = "plusSign_long";
+    % environments{11}.design = [50; 150; 150; 150; 150];
+    % environments{11}.matrix = [0 0 50; -30 0 150; 0 0 150; 0 0 150; 0 0 130];
+    % environments{11}.steerBounds = [-30 30];
+    % environments{11}.lengthMin = 5;
+    % environments{11}.plane_z = 1000;
+    % environments{11}.costArray = [1, 1, 1];
+    % environments{11}.stepSize = [2.5, 30];
+    % environments{11}.obstacles = [
+    %     300, 200, 450, 50, 300;
+    %     200, 200, 450, 50, 300;
+    %     100, 200, 450, 50, 300;
+    % 
+    %     300, -300, 450, 50, 300;
+    %     300, -200, 450, 50, 300;
+    %     300, -100, 450, 50, 300;
+    %     300, 300, 450, 50, 300;
+    %     300, 200, 450, 50, 300;
+    %     300, 100, 450, 50, 300;
+    %     200, -300, 450, 50, 300;
+    %     200, -200, 450, 50, 300;
+    %     200, -100, 450, 50, 300;
+    %     200, 300, 450, 50, 300;
+    %     200, 200, 450, 50, 300;
+    %     200, 100, 450, 50, 300;
+    %     100, -300, 450, 50, 300;
+    %     100, -200, 450, 50, 300;
+    %     100, -100, 450, 50, 300;
+    %     100, 300, 450, 50, 300;
+    %     100, 200, 450, 50, 300;
+    %     100, 100, 450, 50, 300;
+    % 
+    %     -300, -300, 450, 50, 300;
+    %     -300, -200, 450, 50, 300;
+    %     -300, -100, 450, 50, 300;
+    %     -300, 300, 450, 50, 300;
+    %     -300, 200, 450, 50, 300;
+    %     -300, 100, 450, 50, 300;
+    %     -200, -300, 450, 50, 300;
+    %     -200, -200, 450, 50, 300;
+    %     -200, -100, 450, 50, 300;
+    %     -200, 300, 450, 50, 300;
+    %     -200, 200, 450, 50, 300;
+    %     -200, 100, 450, 50, 300;
+    %     -100, -300, 450, 50, 300;
+    %     -100, -200, 450, 50, 300;
+    %     -100, -100, 450, 50, 300;
+    %     -100, 300, 450, 50, 300;
+    %     -100, 200, 450, 50, 300;
+    %     -100, 100, 450, 50, 300;
+    %     ];
+    % environments{11}.goals = [0 0 50; 0 30 150; 0 0 150; 0 0 150; 0 0 60];
+    if()
+
+    load environments.mat
+
+    sp.design = environments{index}.design;
+    sp.steerBounds = environments{index}.steerBounds;
+    sp.lengthMin = environments{index}.lengthMin;
+    sp.plane_z = environments{index}.plane_z;
+    sp.costArray = environments{index}.costArray;
+    sp.stepSize = environments{index}.stepSize;
+    sp.obstacles = environments{index}.obstacles;
+    sp.goals = environments{index}.goals;
+
+    sp.baseRotate = false;
+    sp.start_conf = environments{index}.matrix;
+    sp.j = size(sp.start_conf, 1);
+    sp.home_base = [0,0,0];
+    sp.goal_conf = sp.goals(1:sp.j, 1:3);
+
+
+
+    % Set the environment features based on the index
+    if index > 0 && index <= numel(environments)
+        environment = environments{index};
+        start.design = environment.design;
+        start.matrix = environment.matrix;
+        sp.steerBounds = environment.steerBounds;
+        sp.lengthMin = environment.lengthMin;
+        sp.plane_z = environment.plane_z;
+        sp.costArray = environment.costArray;
+        sp.stepSize = environment.stepSize;
+        sp.obstacles = environment.obstacles;
+        sp.goals = environment.goals;
+    else
+        error('Index out of range. Please provide a valid index.');
+    end
+end

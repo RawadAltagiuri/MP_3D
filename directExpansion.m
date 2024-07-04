@@ -22,9 +22,11 @@ function [path, cost] = directExpansion(start_conf, end_conf, sp)
     while node1.h > 1
         node1 = greedyExpand(node1, sp);
 
-        if isempty(node1) || collisionCheck(node1.path, sp)
-           path = {};
-           cost = -1;
+        if isempty(node1) || collisionCheck(node1.path, sp) 
+            
+           % Controls if obstacles in front of the random node is considered or not (Fix this). 
+           % path = {};
+           % cost = -1;
            return;
         end
 

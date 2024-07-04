@@ -1,4 +1,8 @@
 function [path, cost] = searchAlgorithmRRT(sp, rrtConf, SHOW)
+    if SHOW
+        drawInit(sp.start_conf, sp.goal_conf, sp)
+    end
+
     graphTree = {sp.start_conf, 0, sp.start_conf};
     for i = 1:rrtConf.numOfNodes
         if rand(1) > rrtConf.pOfGoal
@@ -11,18 +15,14 @@ function [path, cost] = searchAlgorithmRRT(sp, rrtConf, SHOW)
 
         prevTreeSize = size(graphTree, 1);
         graphTree = updateTree(sp, rrtConf, graphTree, randomConfig);
+        if SHOW && prevTreeSize ~= size(graphTree, 1)
+            drawConfig(graphTree{end, 1}, sp, 'b');
+            pause
+        end
 
         if chosenGoal && prevTreeSize ~= size(graphTree, 1) && ...
                 getHeuristic(sp.typeOfHeuristic, graphTree{end, 1}, sp) < 1
             [path, cost] = backtractPath(sp, graphTree);
-
-            if SHOW
-                % For showing the tree (init).
-                f = figure;
-                drawInit(f, sp.start_conf, sp.goal_conf, sp);
-                drawTree(f, graphTree, sp);
-            end
-            
             return;
         end
     end
@@ -35,14 +35,6 @@ function [path, cost] = searchAlgorithmRRT(sp, rrtConf, SHOW)
         path = {};
         cost = -1;
     end
-
-    if SHOW
-        % For showing the tree (init).
-        f = figure;
-        drawInit(f, sp.start_conf, sp.goal_conf, sp);
-        drawTree(f, graphTree, sp);
-    end
-    
 end
 
 function heuristic = getHeuristicBridge(sp, conf1, conf2)
@@ -80,6 +72,7 @@ function graphTree = updateTree(sp, rrtConf, graphTree, randomConfig)
     end
 
     [directPath, ~] = directExpansion(graphTree{closestParent, 1}, randomConfig, sp);
+
     if ~isempty(directPath)
         newNodeIndex = 0;
         for j = 1:min(size(directPath, 2), rrtConf.stepSize)
@@ -90,7 +83,9 @@ function graphTree = updateTree(sp, rrtConf, graphTree, randomConfig)
     end
 end
 
-function drawInit(f, startConfig, goalConfig, sp)
+function drawInit(startConfig, goalConfig, sp)
+    f = figure;
+
     grayRobotColor = '#569c69';
 
     home_base = sp.home_base;
@@ -142,15 +137,15 @@ function drawInit(f, startConfig, goalConfig, sp)
     view(60, 30)
 end
 
-function drawTree(f, graphTree, sp)
-    for i = 2:size(graphTree, 1)
-        drawConfig(f, graphTree{i, 1}, sp, 'b');
-        drawConfig(f, graphTree{i, 3}, sp, 'k');
+function drawTree(graphTree, sp)
+    for i = 1:size(graphTree, 1)
+        drawConfig(graphTree{i, 1}, sp, 'r');
+        drawConfig(graphTree{i, 3}, sp, 'k');
         pause;
     end
 end
 
-function drawConfig(f, config, sp, color)
+function drawConfig(config, sp, color)
     n_joints = size(config, 1);
     [robot_CC,~] = solveForwardKinematics_3D(config, sp.home_base, false); %solve the forward kinematics for a given robot configuration
 

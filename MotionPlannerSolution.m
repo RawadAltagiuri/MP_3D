@@ -48,116 +48,435 @@
 
 clear, clc, close;
 
-sp.problemName = "hole";
+%sp.problemName = "plusSign_long";
 sp.typeOfAlg = 'astar';
 sp.typeOfHeuristic = 'continue';
 
-switch sp.problemName
-    case "wall"
-        start.design = [50; 150; 150; 150; 150];
-        start.matrix = [0 0 50;
-                    0  0 150;
-                    0 0 150;
-                    0 0 150;
-                    0 0 150];
-        sp.steerBounds = [-30 30];
-        sp.lengthMin = 5;
-        sp.plane_z = 1000;
-        sp.costArray = [1, 1, 1];
-        sp.stepSize = [5,40];
-        sp.obstacles = [
-        -50	-300 sp.plane_z	25	650
-        -50	-250 sp.plane_z	25	650
-        -50	-200 sp.plane_z	25	650
-        -50	-150 sp.plane_z	25	650
-        -50	-100 sp.plane_z	25	650
-        -50	-50	sp.plane_z	25	650
-        -50	0	sp.plane_z	25	650
-        -50	50	sp.plane_z	25	650
-        -50	100	sp.plane_z	25	650
-        -50	150	sp.plane_z	25	650
-        -50	200	sp.plane_z	25	650
-        -50	250	sp.plane_z	25	650
-        -50	300	sp.plane_z	25	650
-        ];
-        sp.goals =[
-            [0 0 50; 0 -25 150; 0 -20 150; 0 20 150; 0 0 150]
-            ];
+envs = {};
 
-
-    case "wallWithEntrance"
-        start.design = [50; 150; 150; 150; 150];
-        start.matrix = [0 0 50; 10 0 150; 10 0 150; 0 0 150; 0 0 150];
-        sp.steerBounds = [-30 30];
-        sp.lengthMin = 5;
-        sp.plane_z = 1000;
-        sp.costArray = [1, 1, 1];
-        sp.stepSize = [2.5, 30];
-        sp.obstacles = [
-        -50	-300 sp.plane_z	25	650
-        -50	-250 sp.plane_z	25	650
-        -50	-200 sp.plane_z	25	650
-        -50	-150 sp.plane_z	25	650
-        -50	0	sp.plane_z	25	650
-        -50	50	sp.plane_z	25	650
-        -50	100	sp.plane_z	25	650
-        -50	150	sp.plane_z	25	650
-        -50	200	sp.plane_z	25	650
-        -50	250	sp.plane_z	25	650
-        -50	300	sp.plane_z	25	650
-        ];
-        sp.goals =[
-            [0 0 50; 0 -25 150; 0 -20 150; 0 20 150; 0 0 150]
-            ];
-    case "hole"
-        start.design = [50; 150; 175; 150; 200];
-        start.matrix = [0 0 50; 0 0 150; 0 0 175; 0 0 150; 0 0 150];
-        sp.steerBounds = [-40 30];
-        sp.lengthMin = 5;
-        sp.plane_z = 1000;
-        sp.costArray = [1, 1, 1];
-        sp.stepSize = [2.5, 30];
-        sp.obstacles = [
-           0  100   450    25   100
-         -50  100   450    25   100
-          50  100   450    25   100
-          50 100   sp.plane_z    25   430
-         -50 100   sp.plane_z    25   430
-          0  100   sp.plane_z    25   430
-        -125 100   sp.plane_z    50   650
-         125 100   sp.plane_z    50   650
-        ]; 
-        sp.goals =[
-            [0 0 50; 0 0 150; 0 0 175; -30 0 150; -40 0 200]
-            ];
-    case 'GrabbingTest'
-        start.design =[50; 100; 150; 150; 150];
-        start.matrix = [0 0 0; 0 0 0; 0 0 0; 0 0 0; 0 0 0];
-        sp.steerBounds = [-40 40];
-        sp.lengthMin = 5;
-        sp.plane_z = 1000;
-        sp.costArray = [1, 1, 1];
-        sp.stepSize = [2.5, 30];
-        sp.obstacles = [
-           0  -200   sp.plane_z    25   450
-           0  200   sp.plane_z    25   450
-        ]; 
-        sp.goals =[
-            [0 0 50; 0 0 100; 5 0 150; 20 0 150; 35 0 140]
-            [0 0 50; 0 0 100; -5 0 150; -20 0 150; -35 0 140]
-        ];
-        
-end
-
-
-
-
+sp.problemName = "wall";
+start.design = [50; 150; 150; 150; 150];
+start.matrix = [0 0 50;
+    0  0 150;
+    0 0 150;
+    0 0 150;
+    0 0 150];
+sp.steerBounds = [-30 30];
+sp.lengthMin = 5;
+sp.plane_z = 1000;
+sp.costArray = [1, 1, 1];
+sp.stepSize = [5,40];
+sp.obstacles = [
+    -50	-300 sp.plane_z	25	650
+    -50	-250 sp.plane_z	25	650
+    -50	-200 sp.plane_z	25	650
+    -50	-150 sp.plane_z	25	650
+    -50	-100 sp.plane_z	25	650
+    -50	-50	sp.plane_z	25	650
+    -50	0	sp.plane_z	25	650
+    -50	50	sp.plane_z	25	650
+    -50	100	sp.plane_z	25	650
+    -50	150	sp.plane_z	25	650
+    -50	200	sp.plane_z	25	650
+    -50	250	sp.plane_z	25	650
+    -50	300	sp.plane_z	25	650
+    ];
+sp.goals =[
+    [0 0 50; 0 -25 150; 0 -20 150; 0 20 150; 0 0 150]
+    ];
 sp.design = start.design;
 sp.baseRotate = false;
 sp.start_conf = start.matrix;
 sp.j = size(sp.start_conf, 1);
 sp.goal_conf = sp.goals(1:sp.j, 1:3);
 sp.home_base = [0,0,0];
+envs = [envs, {sp}];
+
+
+sp.problemName = "wallWithEntrance";
+start.design = [50; 150; 150; 150; 150];
+start.matrix = [0 0 50; 10 0 150; 10 0 150; 0 0 150; 0 0 150];
+sp.steerBounds = [-30 30];
+sp.lengthMin = 5;
+sp.plane_z = 1000;
+sp.costArray = [1, 1, 1];
+sp.stepSize = [2.5, 30];
+sp.obstacles = [
+    -50	-300 sp.plane_z	25	650
+    -50	-250 sp.plane_z	25	650
+    -50	-200 sp.plane_z	25	650
+    -50	-150 sp.plane_z	25	650
+    -50	0	sp.plane_z	25	650
+    -50	50	sp.plane_z	25	650
+    -50	100	sp.plane_z	25	650
+    -50	150	sp.plane_z	25	650
+    -50	200	sp.plane_z	25	650
+    -50	250	sp.plane_z	25	650
+    -50	300	sp.plane_z	25	650
+    ];
+sp.goals =[
+    [0 0 50; 0 -25 150; 0 -20 150; 0 20 150; 0 0 150]
+    ];
+sp.design = start.design;
+sp.baseRotate = false;
+sp.start_conf = start.matrix;
+sp.j = size(sp.start_conf, 1);
+sp.goal_conf = sp.goals(1:sp.j, 1:3);
+sp.home_base = [0,0,0];
+envs = [envs, {sp}];
+
+
+sp.problemName = "hole";
+start.design = [50; 150; 175; 150; 200];
+start.matrix = [0 0 50; 0 0 150; 0 0 175; 0 0 150; 0 0 150];
+sp.steerBounds = [-40 30];
+sp.lengthMin = 5;
+sp.plane_z = 1000;
+sp.costArray = [1, 1, 1];
+sp.stepSize = [2.5, 30];
+sp.obstacles = [
+    0  100   450    25   100
+    -50  100   450    25   100
+    50  100   450    25   100
+    50 100   sp.plane_z    25   430
+    -50 100   sp.plane_z    25   430
+    0  100   sp.plane_z    25   430
+    -125 100   sp.plane_z    50   650
+    125 100   sp.plane_z    50   650
+    ];
+sp.goals =[
+    [0 0 50; 0 0 150; 0 0 175; -30 0 150; -40 0 200]
+    ];
+envs = [envs, {sp}];
+
+
+sp.problemName = 'GrabbingTest';
+start.design =[50; 100; 150; 150; 150];
+start.matrix = [0 0 0; 0 0 0; 0 0 0; 0 0 0; 0 0 0];
+sp.steerBounds = [-40 40];
+sp.lengthMin = 5;
+sp.plane_z = 1000;
+sp.costArray = [1, 1, 1];
+sp.stepSize = [2.5, 30];
+sp.obstacles = [
+    0  -200   sp.plane_z    25   450
+    0  200   sp.plane_z    25   450
+    ];
+sp.goals =[
+    [0 0 50; 0 0 100; 5 0 150; 20 0 150; 35 0 140]
+    [0 0 50; 0 0 100; -5 0 150; -20 0 150; -35 0 140]
+    ];
+envs = [envs, {sp}];
+
+
+sp.problemName = 'highWallWithGap';
+start.design = [50; 150; 150; 150; 150];
+start.matrix = [0 0 50; 0 30 150; 0 -30 150; 0 0 150; 0 0 50];
+sp.steerBounds = [-30 30];
+sp.lengthMin = 5;
+sp.plane_z = 1000;
+sp.costArray = [1, 1, 1];
+sp.stepSize = [2.5, 30];
+sp.obstacles = [
+    0, 50, 500, 25, 300;
+    0, 100, 500, 25, 300;
+    0, 150, 500, 25, 300;
+    0, 200, 500, 25, 300;
+
+    0, -50, 500, 25, 300;
+    0, -100, 500, 25, 300;
+    0, -150, 500, 25, 300;
+    0, -200, 500, 25, 300;
+    ];
+sp.goals = [0 0 50; 0 -30 150; 0 30 150; 0 0 150; 0 0 50];
+sp.design = start.design;
+sp.baseRotate = false;
+sp.start_conf = start.matrix;
+sp.j = size(sp.start_conf, 1);
+sp.goal_conf = sp.goals(1:sp.j, 1:3);
+sp.home_base = [0,0,0];
+envs = [envs, {sp}];
+
+sp.problemName = 'wallWithEntranceAndSteer';
+start.design = [50; 200; 100; 175; 175];
+start.matrix = [0 0 50; 0 0 200; 0 0 100; 0 0 175; 0 0 175];
+sp.steerBounds = [-35 35];
+sp.lengthMin = 5;
+sp.plane_z = 1000;
+sp.costArray = [1, 1, 1];
+sp.stepSize = [5, 30];
+sp.obstacles = [
+    45, 0, 800, 12, 350;
+    45, 24, 800, 12, 350;
+    45, 48, 800, 12, 350;
+    45, 72, 800, 12, 350;
+    45, 96, 800, 12, 350;
+    45, 120, 800, 12, 350;
+    45, -24, 800, 12, 350;
+    45, -48, 800, 12, 350;
+    45, -72, 800, 12, 350;
+    45, -96, 800, 12, 350;
+    45, -120, 800, 12, 350;
+
+    55, 0, 250, 12, 50;
+    55, 24, 250, 12, 50;
+    55, 48, 250, 12, 50;
+    55, 72, 250, 12, 50;
+    55, 96, 250, 12, 50;
+    55, 120, 250, 12, 50;
+    55, -24, 250, 12, 50;
+    55, -48, 250, 12, 50;
+    55, -72, 250, 12, 50;
+    55, -96, 250, 12, 50;
+    55, -120, 250, 12, 50;
+    ];
+sp.goals = [0 0 50; 0 0 200; 0 35 100; 0 -15 175; 0 -20 100];
+sp.design = start.design;
+sp.baseRotate = false;
+sp.start_conf = start.matrix;
+sp.j = size(sp.start_conf, 1);
+sp.goal_conf = sp.goals(1:sp.j, 1:3);
+sp.home_base = [0,0,0];
+envs = [envs, {sp}];
+
+
+sp.problemName = 'oneBucketIntoAnother';
+start.design = [50; 175; 150; 150; 150];
+start.matrix = [0 0 50; 30 0 175; 0 0 150; -30 0 150; 0 0 0];
+sp.steerBounds = [-30 30];
+sp.lengthMin = 5;
+sp.plane_z = 1000;
+sp.costArray = [1, 1, 1];
+sp.stepSize = [2.5, 30];
+sp.obstacles = [
+    100, 100, 800, 25, 450;
+    50, 100, 800, 25, 450;
+    0, 100, 800, 25, 450;
+    -50, 100, 800, 25, 450;
+    100, 150, 800, 25, 450;
+    100, 200, 800, 25, 450;
+    50, 250, 800, 25, 450;
+    0, 250, 800, 25, 450;
+    -50, 250, 800, 25, 450;
+    100, 250, 800, 25, 450;
+    100, -100, 800, 25, 450;
+    100, -150, 800, 25, 450;
+    100, -200, 800, 25, 450;
+    100, -250, 800, 25, 450;
+
+    -100, 100, 800, 25, 450;
+    -100, 150, 800, 25, 450;
+    -100, 200, 800, 25, 450;
+    -100, 250, 800, 25, 450;
+    -100, -100, 800, 25, 450;
+    0, -100, 800, 25, 450;
+    -50, -100, 800, 25, 450;
+    50, -100, 800, 25, 450;
+    -100, -150, 800, 25, 450;
+    -100, -200, 800, 25, 450;
+    0, -250, 800, 25, 450;
+    -50, -250, 800, 25, 450;
+    50, -250, 800, 25, 450;
+    -100, -250, 800, 25, 450;
+    ];
+sp.goals = [0 0 50; -30 0 175; 0 0 150; 30 0 150; 0 0 0];
+sp.design = start.design;
+sp.baseRotate = false;
+sp.start_conf = start.matrix;
+sp.j = size(sp.start_conf, 1);
+sp.goal_conf = sp.goals(1:sp.j, 1:3);
+sp.home_base = [0,0,0];
+envs = [envs, {sp}];
+
+
+sp.problemName = 'IntoTheBucket';
+start.design = [50; 175; 150; 150; 150];
+start.matrix = [0 0 50; 0 0 175; 0 0 150; 0 0 150; 0 0 90];
+sp.steerBounds = [-30 30];
+sp.lengthMin = 5;
+sp.plane_z = 1000;
+sp.costArray = [1, 1, 1];
+sp.stepSize = [2.5, 30];
+sp.obstacles = [
+    100, 100, 800, 25, 450;
+    50, 100, 800, 25, 450;
+    0, 100, 800, 25, 450;
+    -50, 100, 800, 25, 450;
+    100, 150, 800, 25, 450;
+    100, 200, 800, 25, 450;
+    50, 250, 800, 25, 450;
+    0, 250, 800, 25, 450;
+    -50, 250, 800, 25, 450;
+    100, 250, 800, 25, 450;
+    -100, 100, 800, 25, 450;
+    -100, 150, 800, 25, 450;
+    -100, 200, 800, 25, 450;
+    -100, 250, 800, 25, 450;
+    ];
+sp.goals = [0 0 50; -30 0 175; 0 0 150; 30 0 150; 0 0 0];
+sp.design = start.design;
+sp.baseRotate = false;
+sp.start_conf = start.matrix;
+sp.j = size(sp.start_conf, 1);
+sp.goal_conf = sp.goals(1:sp.j, 1:3);
+sp.home_base = [0,0,0];
+envs = [envs, {sp}];
+
+
+sp.problemName = 'FromTheBucket';
+start.design = [50; 175; 150; 150; 150];
+start.matrix = [0 0 50; -30 0 175; 0 0 150; 30 0 150; 0 0 0];
+sp.steerBounds = [-30 30];
+sp.lengthMin = 5;
+sp.plane_z = 1000;
+sp.costArray = [1, 1, 1];
+sp.stepSize = [2.5, 30];
+sp.obstacles = [
+    100, 100, 800, 25, 450;
+    50, 100, 800, 25, 450;
+    0, 100, 800, 25, 450;
+    -50, 100, 800, 25, 450;
+    100, 150, 800, 25, 450;
+    100, 200, 800, 25, 450;
+    50, 250, 800, 25, 450;
+    0, 250, 800, 25, 450;
+    -50, 250, 800, 25, 450;
+    100, 250, 800, 25, 450;
+    -100, 100, 800, 25, 450;
+    -100, 150, 800, 25, 450;
+    -100, 200, 800, 25, 450;
+    -100, 250, 800, 25, 450;
+    ];
+sp.goals = [0 0 50; 0 0 175; 0 0 150; 0 0 150; 0 0 0];
+sp.design = start.design;
+sp.baseRotate = false;
+sp.start_conf = start.matrix;
+sp.j = size(sp.start_conf, 1);
+sp.goal_conf = sp.goals(1:sp.j, 1:3);
+sp.home_base = [0,0,0];
+envs = [envs, {sp}];
+
+
+sp.problemName = 'plusSign';
+start.design = [50; 150; 150; 150; 150];
+start.matrix = [0 0 50; -30 0 150; 0 0 150; 0 0 150; 0 0 130];
+sp.steerBounds = [-30 30];
+sp.lengthMin = 5;
+sp.plane_z = 1000;
+sp.costArray = [1, 1, 1];
+sp.stepSize = [2.5, 30];
+sp.obstacles = [
+    300, 200, 450, 50, 100;
+    200, 200, 450, 50, 100;
+    100, 200, 450, 50, 100;
+
+    300, -300, 450, 50, 100;
+    300, -200, 450, 50, 100;
+    300, -100, 450, 50, 100;
+    300, 300, 450, 50, 100;
+    300, 200, 450, 50, 100;
+    300, 100, 450, 50, 100;
+    200, -300, 450, 50, 100;
+    200, -200, 450, 50, 100;
+    200, -100, 450, 50, 100;
+    200, 300, 450, 50, 100;
+    200, 200, 450, 50, 100;
+    200, 100, 450, 50, 100;
+    100, -300, 450, 50, 100;
+    100, -200, 450, 50, 100;
+    100, -100, 450, 50, 100;
+    100, 300, 450, 50, 100;
+    100, 200, 450, 50, 100;
+    100, 100, 450, 50, 100;
+
+    -300, -300, 450, 50, 100;
+    -300, -200, 450, 50, 100;
+    -300, -100, 450, 50, 100;
+    -300, 300, 450, 50, 100;
+    -300, 200, 450, 50, 100;
+    -300, 100, 450, 50, 100;
+    -200, -300, 450, 50, 100;
+    -200, -200, 450, 50, 100;
+    -200, -100, 450, 50, 100;
+    -200, 300, 450, 50, 100;
+    -200, 200, 450, 50, 100;
+    -200, 100, 450, 50, 100;
+    -100, -300, 450, 50, 100;
+    -100, -200, 450, 50, 100;
+    -100, -100, 450, 50, 100;
+    -100, 300, 450, 50, 100;
+    -100, 200, 450, 50, 100;
+    -100, 100, 450, 50, 100;
+    ];
+sp.goals = [0 0 50; 0 30 150; 0 0 150; 0 0 150; 0 0 60];
+sp.design = start.design;
+sp.baseRotate = false;
+sp.start_conf = start.matrix;
+sp.j = size(sp.start_conf, 1);
+sp.goal_conf = sp.goals(1:sp.j, 1:3);
+sp.home_base = [0,0,0];
+envs = [envs, {sp}];
+
+
+sp.problemName = 'plusSign_long';
+start.design = [50; 150; 150; 150; 150];
+start.matrix = [0 0 50; -30 0 150; 0 0 150; 0 0 150; 0 0 130];
+sp.steerBounds = [-30 30];
+sp.lengthMin = 5;
+sp.plane_z = 1000;
+sp.costArray = [1, 1, 1];
+sp.stepSize = [2.5, 30];
+sp.obstacles = [
+    300, 200, 450, 50, 300;
+    200, 200, 450, 50, 300;
+    100, 200, 450, 50, 300;
+
+    300, -300, 450, 50, 300;
+    300, -200, 450, 50, 300;
+    300, -100, 450, 50, 300;
+    300, 300, 450, 50, 300;
+    300, 200, 450, 50, 300;
+    300, 100, 450, 50, 300;
+    200, -300, 450, 50, 300;
+    200, -200, 450, 50, 300;
+    200, -100, 450, 50, 300;
+    200, 300, 450, 50, 300;
+    200, 200, 450, 50, 300;
+    200, 100, 450, 50, 300;
+    100, -300, 450, 50, 300;
+    100, -200, 450, 50, 300;
+    100, -100, 450, 50, 300;
+    100, 300, 450, 50, 300;
+    100, 200, 450, 50, 300;
+    100, 100, 450, 50, 300;
+
+    -300, -300, 450, 50, 300;
+    -300, -200, 450, 50, 300;
+    -300, -100, 450, 50, 300;
+    -300, 300, 450, 50, 300;
+    -300, 200, 450, 50, 300;
+    -300, 100, 450, 50, 300;
+    -200, -300, 450, 50, 300;
+    -200, -200, 450, 50, 300;
+    -200, -100, 450, 50, 300;
+    -200, 300, 450, 50, 300;
+    -200, 200, 450, 50, 300;
+    -200, 100, 450, 50, 300;
+    -100, -300, 450, 50, 300;
+    -100, -200, 450, 50, 300;
+    -100, -100, 450, 50, 300;
+    -100, 300, 450, 50, 300;
+    -100, 200, 450, 50, 300;
+    -100, 100, 450, 50, 300;
+    ];
+sp.goals = [0 0 50; 0 30 150; 0 0 150; 0 0 150; 0 0 60];
+sp.design = start.design;
+sp.baseRotate = false;
+sp.start_conf = start.matrix;
+sp.j = size(sp.start_conf, 1);
+sp.goal_conf = sp.goals(1:sp.j, 1:3);
+sp.home_base = [0,0,0];
+envs = [envs, {sp}];
 
 
 % timeSize = 5;
@@ -227,8 +546,8 @@ sp.home_base = [0,0,0];
 % end
 
 
-% sp.start_conf = [0 0 50; 0 30 150; 0 -10 150; 0 -20 150; 0 0 150];
-% sp.goal_conf = [0 0 50; 0 -30 150; 0 10 150; 0 20 150; 0 0 150];
+% sp.start_conf = [0 0 50; 0 30 150; 0 -30 150; 0 0 150; 0 0 50];
+% sp.goal_conf = [0 0 50; 0 -30 150; 0 30 150; 0 0 150; 0 0 150];
 % sp.obstacles = [
 %     0, 0, 500, 25, 300;
 %     0, 50, 500, 25, 300;
@@ -237,8 +556,8 @@ sp.home_base = [0,0,0];
 %     0, -50, 500, 25, 300;
 %     0, -100, 500, 25, 300;
 %     ];
-% 
-% 
+
+
 
 
 % rrtConf.pOfGoal = 0.95;
@@ -251,11 +570,11 @@ sp.home_base = [0,0,0];
 % solution.h = 0;
 
 
-rrtConf.pOfGoal = 0.1;
+rrtConf.pOfGoal = 0.3;
 rrtConf.numOfNodes = 1000;
 rrtConf.stepSize = 5;
 rrtConf.neighbourSize = rrtConf.stepSize;
-[path, cost] = searchAlgorithmRRT(sp, rrtConf, false);
+[path, cost] = searchAlgorithmRRT_star(sp, rrtConf, false);
 solution.path = pathConversion1(path);
 solution.g = cost;
 solution.f = solution.g;
