@@ -15,14 +15,17 @@ function testWriter(testCases, fileName)
     rrtTimes = 0;
 
     rrtTable = {};
+    
     for i = 1:length(testCases)
         sp = testCases{i};
         tic;
         [path, cost] = searchAlgorithmRRT(sp, rrtConf, false);
         time = toc;
 
-        rrtCosts = rrtCosts + cost;
-        rrtTimes = rrtTimes + time;
+        if ~isempty(path)
+            rrtCosts = rrtCosts + cost;
+            rrtTimes = rrtTimes + time;
+        end
 
         rrtTable = [rrtTable; {rrtConf.numOfNodes, rrtConf.pOfGoal, rrtConf.stepSize, cost, time}];
     end
@@ -34,11 +37,13 @@ function testWriter(testCases, fileName)
     for i = 1:length(testCases)
         sp = testCases{i};
         tic;
-        [path, cost] = searchAlgorithmRRT_star(sp, rrtConf);
+        [path, cost] = searchAlgorithmRRT_star(sp, rrtConf, false);
         time = toc;
 
-        rrtStarCosts = rrtCosts + cost;
-        rrtStarTimes = rrtTimes + time;
+        if ~isempty(path)
+            rrtStarCosts = rrtStarCosts + cost;
+            rrtStarTimes = rrtStarTimes + time;
+        end
 
         rrtStarTable = [rrtStarTable; {rrtConf.numOfNodes, rrtConf.pOfGoal, rrtConf.stepSize, rrtConf.neighbourSize, cost, time}];
     end
@@ -54,8 +59,8 @@ function testWriter(testCases, fileName)
         solution = searchAlgorithm(sp, rrtConf.numOfNodes);
         time = toc;
 
-        aStarCosts = rrtCosts + cost;
-        aStarTimes = rrtTimes + time;
+        aStarCosts = aStarCosts + cost;
+        aStarTimes = aStarTimes + time;
 
         aStarTable = [aStarTable; {aStar.fringeSize, solution.g, time}];
     end
@@ -113,7 +118,7 @@ function testWriter(testCases, fileName)
         titles;
         headers;
         [rrtTable, filler, rrtStarTable, filler, aStarTable];
-        rowFiller
+        rowFiller;
         stats];
 
     writecell(completeTable, fileName, 'Range', 'B2');

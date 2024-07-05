@@ -15,14 +15,18 @@ function testWriter(testCases, fileName)
     rrtTimes = 0;
 
     rrtTable = {};
+    
+    avrLength = length(testCases);
     for i = 1:length(testCases)
         sp = testCases{i};
         tic;
         [path, cost] = searchAlgorithmRRT(sp, rrtConf, false);
         time = toc;
 
-        rrtCosts = rrtCosts + cost;
-        rrtTimes = rrtTimes + time;
+        if isempty(path)
+            rrtCos;
+            rrtTimes = rrtTimes + time;
+        end
 
         rrtTable = [rrtTable; {rrtConf.numOfNodes, rrtConf.pOfGoal, rrtConf.stepSize, cost, time}];
     end
@@ -34,11 +38,11 @@ function testWriter(testCases, fileName)
     for i = 1:length(testCases)
         sp = testCases{i};
         tic;
-        [path, cost] = searchAlgorithmRRT_star(sp, rrtConf);
+        [path, cost] = searchAlgorithmRRT_star(sp, rrtConf, false);
         time = toc;
 
-        rrtStarCosts = rrtCosts + cost;
-        rrtStarTimes = rrtTimes + time;
+        rrtStarCosts = rrtStarCosts + cost;
+        rrtStarTimes = rrtStarTimes + time;
 
         rrtStarTable = [rrtStarTable; {rrtConf.numOfNodes, rrtConf.pOfGoal, rrtConf.stepSize, rrtConf.neighbourSize, cost, time}];
     end
@@ -54,8 +58,8 @@ function testWriter(testCases, fileName)
         solution = searchAlgorithm(sp, rrtConf.numOfNodes);
         time = toc;
 
-        aStarCosts = rrtCosts + cost;
-        aStarTimes = rrtTimes + time;
+        aStarCosts = aStarCosts + cost;
+        aStarTimes = aStarTimes + time;
 
         aStarTable = [aStarTable; {aStar.fringeSize, solution.g, time}];
     end
@@ -86,10 +90,35 @@ function testWriter(testCases, fileName)
     rrtStarStats = {rrtStarCosts / length(testCases), rrtStarTimes / length(testCases)};
     aStarStats = {aStarCosts / length(testCases), aStarTimes / length(testCases)};
 
-    statsFiller = cell(2, size(rrtTable, 2) - size(statsHeaders, 2) + size(filler, 2));
-    stats = {statsHeaders};
+    statsFillerRRT = cell(1, size(rrtTable, 2) - size(statsHeaders, 2) + size(filler, 2));
+    statsFillerRRT(1:end) = {""};
 
-    completeTable = [titles; headers; [rrtTable, filler, rrtStarTable, filler, aStarTable]];
+    statsFillerRRTStar = cell(1, size(rrtStarTable, 2) - size(statsHeaders, 2) + size(filler, 2));
+    statsFillerRRTStar(1:end) = {""};
+
+    statsFillerAStar = cell(1, size(aStarTable, 2) - size(statsHeaders, 2));
+    statsFillerAStar(1:end) = {""};
+   
+    stats = [statsHeaders, statsFillerRRT, ... 
+        statsHeaders, statsFillerRRTStar, ...
+        statsHeaders, statsFillerAStar
+        ];
+    stats = [stats; 
+        rrtStats, statsFillerRRT, ...
+        rrtStarStats, statsFillerRRTStar, ...
+        aStarStats, statsFillerAStar
+        ];
+
+    rowFiller = cell(1, size(rrtTable, 2) + size(filler, 2) ... 
+        + size(rrtStarTable, 2) + size(filler, 2) ...
+        + size(aStarTable, 2));
+
+    completeTable = [
+        titles;
+        headers;
+        [rrtTable, filler, rrtStarTable, filler, aStarTable];
+        rowFiller;
+        stats];
 
     writecell(completeTable, fileName, 'Range', 'B2');
 end

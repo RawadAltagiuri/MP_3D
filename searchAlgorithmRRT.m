@@ -74,8 +74,8 @@ function graphTree = updateTree(sp, rrtConf, graphTree, randomConfig)
     [directPath, ~] = directExpansion(graphTree{closestParent, 1}, randomConfig, sp);
 
     if ~isempty(directPath)
-        newNodeIndex = 0;
-        for j = 1:min(size(directPath, 2), rrtConf.stepSize)
+        newNodeIndex = 1;
+        for j = 1:min(size(directPath, 2) - 1, rrtConf.stepSize)
             newNodeIndex = newNodeIndex + 1;
         end
         newNode = directPath{newNodeIndex};
