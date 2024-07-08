@@ -163,19 +163,20 @@ sp.home_base = [0,0,0];
 
 load envs
 
-sp = envs{5};
-rrtConf.pOfGoal = 0.1;
-rrtConf.numOfNodes = 2000;
-rrtConf.stepSize = 3;
-rrtConf.neighbourSize = rrtConf.stepSize;
-[path, cost] = searchAlgorithmRRT(sp, rrtConf, false);
-solution.path = pathConversion1(path);
-solution.g = cost;
-solution.f = solution.g;
-solution.h = 0;
+% rrtConf.pOfGoal = 0.1;
+% rrtConf.numOfNodes = 2000;
+% rrtConf.stepSize = 3;
+% rrtConf.neighbourSize = rrtConf.stepSize;
+% [path, cost] = searchAlgorithmRRT(sp, rrtConf, false);
+% solution.path = pathConversion1(path);
+% solution.g = cost;
+% solution.f = solution.g;
+% solution.h = 0;
 
+sps = cell(3);
+sps(1:end) = envs(1);
 
-% testWriter(envs(1:5), "results.xls");
+ testWriter(sps, "results.xls");
 
 % Calculate the number of submatrices you will create
 numSubMatrices = size(solution.path, 2) / 3;

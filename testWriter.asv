@@ -6,14 +6,16 @@ function testWriter(testCases, fileName)
 
     aStar.fringeSize = 1000;
 
-    rrtHeaders = {"Problem Name", "Nodes", "P of Goal", "Step Size", "Cost", "Time"};
-    rrtStarHeaders = {"Problem Name", "Nodes", "P of Goal", "Step Size", "Neighbour Size", "Cost", "Time"};
-    aStarHeaders = {"Problem Name", "Fringe Size", "Cost", "Time"};
+    rrtHeaders = {"Nodes", "P of Goal", "Step Size", "Cost", "Time"};
+    rrtStarHeaders = {"Nodes", "P of Goal", "Step Size", "Neighbour Size", "Cost", "Time"};
+    aStarHeaders = {"Fringe Size", "Cost", "Time"};
     
     % RRT
-    rrtCosts = [];
-    rrtTimes = [];
+    rrtCosts = 0;
+    rrtTimes = 0;
+
     rrtTable = {};
+    
     for i = 1:length(testCases)
         sp = testCases{i};
         tic;
@@ -21,16 +23,16 @@ function testWriter(testCases, fileName)
         time = toc;
 
         if ~isempty(path)
-            rrtCosts = [rrtCosts, cost];
+            rrtCosts = rrtCosts + cost;
+            rrtTimes = rrtTimes + time;
         end
 
-        rrtTimes = [rrtTimes, time];
         rrtTable = [rrtTable; {sp.problemName, rrtConf.numOfNodes, rrtConf.pOfGoal, rrtConf.stepSize, cost, time}];
     end
 
     % RRT*
-    rrtStarCosts = [];
-    rrtStarTimes = [];
+    rrtStarCosts = 0;
+    rrtStarTimes = 0;
     rrtStarTable = {};
     for i = 1:length(testCases)
         sp = testCases{i};
@@ -39,16 +41,17 @@ function testWriter(testCases, fileName)
         time = toc;
 
         if ~isempty(path)
-            rrtStarCosts = [rrtStarCosts, cost];
+            rrtStarCosts = rrtStarCosts + cost;
+            rrtStarTimes = rrtStarTimes + time;
         end
 
-        rrtStarTimes = [rrtStarTimes, time];
-        rrtStarTable = [rrtStarTable; {sp.problemName, rrtConf.numOfNodes, rrtConf.pOfGoal, rrtConf.stepSize, rrtConf.neighbourSize, cost, time}];
+        rrtStarTable = [sp.problemName, rrtStarTable; {rrtConf.numOfNodes, rrtConf.pOfGoal, rrtConf.stepSize, rrtConf.neighbourSize, cost, time}];
     end
 
     % A*
-    aStarCosts = [];
-    aStarTimes = [];
+    aStarCosts = 0;
+    aStarTimes = 0;
+
     aStarTable = {};
     for i = 1:length(testCases)
         sp = testCases{i};
@@ -56,12 +59,10 @@ function testWriter(testCases, fileName)
         solution = searchAlgorithm(sp, rrtConf.numOfNodes);
         time = toc;
 
-        if ~isempty(solution)
-            aStarCosts = [aStarCosts, solution.g];
-        end
+        aStarCosts = aStarCosts + cost;
+        aStarTimes = aStarTimes + time;
 
-        aStarTimes = [aStarTimes, time];
-        aStarTable = [aStarTable; {sp.problemName, aStar.fringeSize, solution.g, time}];
+        aStarTable = [aStarTable; {aStar.fringeSize, solution.g, time}];
     end
     rrtTitle = cell(1, size(rrtTable, 2));
     rrtTitle(1:end) = {""};
@@ -86,9 +87,9 @@ function testWriter(testCases, fileName)
 
     statsHeaders = {"AVR_COST", "AVR_TIME"};
 
-    rrtStats = {sum(rrtCosts) / length(rrtCosts), sum(rrtTimes) / length(rrtTimes)};
-    rrtStarStats = {sum(rrtStarCosts) / length(rrtStarCosts), sum(rrtStarTimes) / length(rrtStarTimes)};
-    aStarStats = {sum(aStarCosts) / length(aStarCosts), sum(aStarTimes) / length(aStarTimes)};
+    rrtStats = {rrtCosts / length(testCases), rrtTimes / length(testCases)};
+    rrtStarStats = {rrtStarCosts / length(testCases), rrtStarTimes / length(testCases)};
+    aStarStats = {aStarCosts / length(testCases), aStarTimes / length(testCases)};
 
     statsFillerRRT = cell(1, size(rrtTable, 2) - size(statsHeaders, 2) + size(filler, 2));
     statsFillerRRT(1:end) = {""};

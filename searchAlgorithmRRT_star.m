@@ -23,7 +23,7 @@ function [path, cost] = searchAlgorithmRRT_star(sp, rrtStarConf, SHOW)
     prevTreeSize = size(graphTree, 1);
     graphTree = updateTree(sp, rrtStarConf, graphTree, sp.goal_conf);
     if prevTreeSize ~= size(graphTree, 1)
-        [path, cost] = backtractPath(sp, rrtConf, graphTree);
+        [path, cost] = backtractPath(sp, rrtStarConf, graphTree);
     else
         path = {};
         cost = -1;
