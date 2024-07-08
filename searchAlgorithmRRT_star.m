@@ -23,7 +23,7 @@ function [path, cost] = searchAlgorithmRRT_star(sp, rrtStarConf, SHOW)
     prevTreeSize = size(graphTree, 1);
     graphTree = updateTree(sp, rrtStarConf, graphTree, sp.goal_conf);
     if prevTreeSize ~= size(graphTree, 1)
-        [path, cost] = backtractPath(sp, graphTree);
+        [path, cost] = backtractPath(sp, rrtConf, graphTree);
     else
         path = {};
         cost = -1;
@@ -35,14 +35,14 @@ function heuristic = getHeuristicBridge(sp, conf1, conf2)
     heuristic = getHeuristic(sp.typeOfHeuristic, conf1, sp);
 end
 
-function [fullPath, totalCost] = backtractPath(sp, graphTree)
+function [fullPath, totalCost] = backtractPath(sp, rrtConf, graphTree)
     totalCost = 0;
     curNode = graphTree(end, :);
     fullPath = {};
     paths = {};
     while curNode{2} > 0
         parentNode = graphTree(curNode{2}, :);
-        [path, cost] = directExpansion(parentNode{1}, curNode{1}, sp);
+        [path, cost] = directExpansion(sp, rrtConf.stepSize, parentNode{1}, curNode{1});
 
         if isempty(path)
             fullPath = {};
@@ -64,7 +64,7 @@ function graphTree = updateTree(sp, rrtConf, graphTree, randomConfig)
     neighbours = [];
     for i = 1:size(graphTree, 1)
         if totalStep(graphTree{i, 1}, randomConfig, sp) < rrtConf.neighbourSize
-            [path, cost] = directExpansion(graphTree{i, 1}, randomConfig, sp);
+            [path, cost] = directExpansion(sp, rrtConf.stepSize, graphTree{i, 1}, randomConfig);
             if ~isempty(path) && size(path, 2) < rrtConf.neighbourSize
                 neighbours = [neighbours; i, cost];
             end
@@ -91,7 +91,7 @@ function graphTree = updateTree(sp, rrtConf, graphTree, randomConfig)
         if neighbours(i, 1) == minNeighbour
             continue;
         end
-        [path, cost] = directExpansion(randomConfig, graphTree{neighbours(i, 1), 1}, sp);
+        [path, cost] = directExpansion(sp, rrtConf.stepSize, randomConfig, graphTree{neighbours(i, 1), 1});
         if ~isempty(path) && size(path, 2) < rrtConf.neighbourSize
             realNeighbours = [realNeighbours; neighbours(i, 1), cost + graphTree{end, 3}];
         end
@@ -115,7 +115,7 @@ function graphTree = updateTreeRRT(sp, rrtConf, graphTree, randomConfig)
         end
     end
 
-    [directPath, cost] = directExpansion(graphTree{closestParent, 1}, randomConfig, sp);
+    [directPath, cost] = directExpansion(sp, rrtConf.stepSize, graphTree{closestParent, 1}, randomConfig);
     if ~isempty(directPath)
         newNodeIndex = 1;
         for j = 1:min(size(directPath, 2) - 1, rrtConf.stepSize)

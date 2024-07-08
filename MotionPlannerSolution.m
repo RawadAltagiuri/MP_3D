@@ -48,7 +48,7 @@
 
 clear, clc, close;
 
-%sp.problemName = "plusSign_long";
+sp.problemName = "wall";
 sp.typeOfAlg = 'astar';
 sp.typeOfHeuristic = 'continue';
 
@@ -568,7 +568,6 @@ envs = [envs, {sp}];
 % solution.g = cost;
 % solution.f = solution.g;
 % solution.h = 0;
-
 
 rrtConf.pOfGoal = 0.3;
 rrtConf.numOfNodes = 1000;

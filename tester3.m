@@ -163,17 +163,26 @@ sp.home_base = [0,0,0];
 
 load envs
 
-sp = envs{5};
+sp = envs{1};
+modSp = sp;
+modeSp.steerBounds = [-30, 30];
+modSp.obstacles(:, 4) = sp.obstacles(:, 4) + 25; % increases the radius by 25 so it makes the range that should be considered as collision
+modSp.obstacles(:, 5) = sp.obstacles(:, 5) + 10; % increasing the height by 10 so it makes the range that should be considered as collision
+
 rrtConf.pOfGoal = 0.1;
-rrtConf.numOfNodes = 2000;
+rrtConf.numOfNodes = 1000;
 rrtConf.stepSize = 3;
 rrtConf.neighbourSize = rrtConf.stepSize;
-[path, cost] = searchAlgorithmRRT(sp, rrtConf, false);
+[path, cost] = searchAlgorithmRRT(modSp, rrtConf, false);
 solution.path = pathConversion1(path);
-solution.g = cost;
-solution.f = solution.g;
-solution.h = 0;
 
+cost2 = costOfPath(modSp, path);
+if cost == cost2
+    x = 10;
+else
+    costOfPath(modSp, path)
+    x = 10;
+end
 
 % testWriter(envs(1:5), "results.xls");
 
@@ -181,7 +190,7 @@ solution.h = 0;
 numSubMatrices = size(solution.path, 2) / 3;
 
 % Preallocate the 3D array to store the submatrices
-formattedPathForAnimation = zeros(sp.j, 3, numSubMatrices);
+formattedPathForAnimation = zeros(modSp.j, 3, numSubMatrices);
 
 % Extract the submatrices and store them in the 3D array
 for i = 1:numSubMatrices
@@ -196,8 +205,6 @@ for i=2:size(formattedPathForAnimation,3)
 end
 
  softRobot_animation(formattedPathForAnimation, [0,0,0], true, sp);
-
-
 
 
 

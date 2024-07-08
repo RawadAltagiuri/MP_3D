@@ -1,0 +1,12 @@
+function cost = costOfPath(sp, path)
+    cost = 0;
+    for i = 1:size(path, 2) - 1
+        diff = abs(path{i + 1} - path{i});
+        % Calculate for alfa-x changes.
+        for j = 1:size(path{1}, 1)
+            
+        end
+    end
+
+end
+

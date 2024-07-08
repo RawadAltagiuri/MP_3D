@@ -22,15 +22,15 @@ function [path, cost] = searchAlgorithmRRT(sp, rrtConf, SHOW)
 
         if chosenGoal && prevTreeSize ~= size(graphTree, 1) && ...
                 getHeuristic(sp.typeOfHeuristic, graphTree{end, 1}, sp) < 1
-            [path, cost] = backtractPath(sp, graphTree);
+            [path, cost] = backtractPath(sp, rrtConf, graphTree);
             return;
         end
     end
 
     prevTreeSize = size(graphTree, 1);
     graphTree = updateTree(sp, rrtConf, graphTree, sp.goal_conf);
-    if chosenGoal && prevTreeSize ~= size(graphTree, 1)
-        [path, cost] = backtractPath(sp, graphTree);
+    if prevTreeSize ~= size(graphTree, 1) && getHeuristic(sp.typeOfHeuristic, graphTree{end, 1}, sp) < 1
+        [path, cost] = backtractPath(sp, rrtConf, graphTree);
     else
         path = {};
         cost = -1;
@@ -42,14 +42,15 @@ function heuristic = getHeuristicBridge(sp, conf1, conf2)
     heuristic = getHeuristic(sp.typeOfHeuristic, conf1, sp);
 end
 
-function [fullPath, totalCost] = backtractPath(sp, graphTree)
+function [fullPath, totalCost] = backtractPath(sp, rrtConf, graphTree)
     totalCost = 0;
     curNode = graphTree(end, :);
     fullPath = {};
     paths = {};
     while curNode{2} > 0
         parentNode = graphTree(curNode{2}, :);
-        [path, cost] = directExpansion(parentNode{1}, curNode{1}, sp);
+        [path, cost] = directExpansion(sp, rrtConf.stepSize, parentNode{1}, curNode{1});
+        
         paths = [paths, {path}];
         totalCost = totalCost + cost;
         curNode = parentNode;
@@ -71,7 +72,10 @@ function graphTree = updateTree(sp, rrtConf, graphTree, randomConfig)
         end
     end
 
-    [directPath, ~] = directExpansion(graphTree{closestParent, 1}, randomConfig, sp);
+    % Draws random configuration that is sampled.
+    % drawConfig(randomConfig, sp, 'k');
+    
+    [directPath, ~] = directExpansion(sp, rrtConf.stepSize, graphTree{closestParent, 1}, randomConfig);
 
     if ~isempty(directPath)
         newNodeIndex = 1;
