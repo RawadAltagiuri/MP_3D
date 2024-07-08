@@ -33,8 +33,10 @@ function [child] = RrtExpand(sp)
         end
 
         %generate random angles for the x and y rotations between the sp.SteerBounds, first index is the lower bound, second index is the upper bound
-        randomConf(i, 1) = sp.steerBounds(1) + (sp.steerBounds(2) - sp.steerBounds(1)) * rand();
-        randomConf(i, 2) = sp.steerBounds(1) + (sp.steerBounds(2) - sp.steerBounds(1)) * rand();
+        if i > 1
+            randomConf(i, 1) = sp.steerBounds(1) + (sp.steerBounds(2) - sp.steerBounds(1)) * rand();
+            randomConf(i, 2) = sp.steerBounds(1) + (sp.steerBounds(2) - sp.steerBounds(1)) * rand();
+        end
 
     end
 

@@ -30,7 +30,11 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
         nearest_node = findNearestNode(nodes_map, random_conf, sp);
         sp.random_conf = random_conf;
         greedyChildren = greedyExpand(nearest_node, sp);
-        child = greedyChildren(1);
+        if isempty(greedyChildren)
+            continue; % Skip the rest of the current iteration
+        else
+            child = greedyChildren(1);
+        end
         if ~nodes_map.isKey(mat2str(child.path(:, end-2:end))) %check if the child is already in the tree
             [isColliding, ~] = collisionCheck(child.path(:,end-2:end), sp);%Checking if the greedy children are valid (not colliding)
             if isColliding == false

@@ -48,7 +48,7 @@
 
 clear, clc, close;
 
-sp.problemName = "wall";
+sp.problemName = "hole";
 sp.typeOfAlg = 'astar';
 sp.typeOfHeuristic = 'continue';
 
@@ -85,7 +85,7 @@ switch sp.problemName
             ];
 
 
-    case "wallWithEntrance"
+    case "grabbingTest"
         start.design = [50; 150; 150; 150; 150];
         start.matrix = [0 0 50; 10 0 150; 10 0 150; 0 0 150; 0 0 150];
         sp.steerBounds = [-30 30];
@@ -158,9 +158,9 @@ sp.start_conf = start.matrix;
 sp.j = size(sp.start_conf, 1);
 sp.goal_conf = sp.goals(1:sp.j, 1:3);
 sp.home_base = [0,0,0];
-sp.weight = 0.1;
+sp.weight = 0.3;
 sp.iterations = 10000;
-sp.AcceptedEuclideanDistance = 150;
+sp.AcceptedEuclideanDistance = 25;
 
 
 
