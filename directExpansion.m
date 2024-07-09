@@ -31,8 +31,8 @@ function [path, cost] = directExpansion(sp, step_size, start_conf, end_conf)
         if isempty(node1) || collisionCheck(node1.path(:, end - 2:end), sp) 
             
            % Controls if obstacles in front of the random node is considered or not (Fix this). 
-           % path = {};
-           % cost = -1;
+           path = {};
+           cost = -1;
            return;
         end
 
