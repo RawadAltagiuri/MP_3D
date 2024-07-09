@@ -3,8 +3,27 @@ function [path, cost] = searchAlgorithmRRT_star(sp, rrtStarConf, SHOW)
         drawInit(sp.start_conf, sp.goal_conf, sp);
     end
 
+    prevTreeSize = 0;
+    bestPath = [];
+    bestCost = 10000;
     graphTree = {sp.start_conf, 0, 0, sp.start_conf};
     for i = 1:rrtStarConf.numOfNodes
+        % If size has changed (which means a node is added),
+        % then try to create a direct path from this node to the goal.
+        if prevTreeSize ~= size(graphTree, 1)
+            [path, cost] = directExpansion(sp, 10000, graphTree{end, 1}, sp.goal_conf);
+            if ~isempty(path)
+                [prevPath, prevCost] = backtrackPath(sp, rrtStarConf, graphTree);
+                path = [prevPath, path];
+                cost = cost + prevCost;
+
+                if cost < bestCost
+                    bestPath = path;
+                    bestCost = cost;
+                end
+            end
+        end
+
         if rand(1) > rrtStarConf.pOfGoal
             randomConfig = randomConf(sp);
         else
@@ -20,10 +39,16 @@ function [path, cost] = searchAlgorithmRRT_star(sp, rrtStarConf, SHOW)
         end
     end
 
+    if ~isempty(bestPath)
+        path = bestPath;
+        cost = bestCost;
+        return;
+    end
+
     prevTreeSize = size(graphTree, 1);
     graphTree = updateTree(sp, rrtStarConf, graphTree, sp.goal_conf);
     if prevTreeSize ~= size(graphTree, 1)
-        [path, cost] = backtractPath(sp, rrtStarConf, graphTree);
+        [path, cost] = backtrackPath(sp, rrtStarConf, graphTree);
     else
         path = {};
         cost = -1;
@@ -35,7 +60,7 @@ function heuristic = getHeuristicBridge(sp, conf1, conf2)
     heuristic = getHeuristic(sp.typeOfHeuristic, conf1, sp);
 end
 
-function [fullPath, totalCost] = backtractPath(sp, rrtConf, graphTree)
+function [fullPath, totalCost] = backtrackPath(sp, rrtConf, graphTree)
     totalCost = 0;
     curNode = graphTree(end, :);
     fullPath = {};

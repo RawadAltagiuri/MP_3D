@@ -163,17 +163,17 @@ sp.home_base = [0,0,0];
 
 load envs
 
-sp = envs{5};
+sp = envs{8};
 modSp = sp;
 modeSp.steerBounds = [-30, 30];
 % modSp.obstacles(:, 4) = sp.obstacles(:, 4) + 25; % increases the radius by 25 so it makes the range that should be considered as collision
 % modSp.obstacles(:, 5) = sp.obstacles(:, 5) + 10; % increasing the height by 10 so it makes the range that should be considered as collision
 
-rrtConf.pOfGoal = 0.01;
-rrtConf.numOfNodes = 2000;
+rrtConf.pOfGoal = 0.1;
+rrtConf.numOfNodes = 1000;
 rrtConf.stepSize = 5;
 rrtConf.neighbourSize = rrtConf.stepSize;
-[path, cost] = searchAlgorithmRRT(modSp, rrtConf, false); 
+[path, cost] = searchAlgorithmRRT_star(modSp, rrtConf, false); 
 solution.path = pathConversion1(path);
 
 % testWriter(envs(1:5), "results.xls");
