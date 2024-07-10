@@ -88,7 +88,7 @@ end
 function graphTree = updateTree(sp, rrtConf, graphTree, randomConfig)
     neighbours = [];
     for i = 1:size(graphTree, 1)
-        if totalStep(graphTree{i, 1}, randomConfig, sp) < rrtConf.neighbourSize
+        if calculateCost(graphTree{i, 1}, randomConfig, sp.home_base) < rrtConf.neighbourSize
             [path, cost] = directExpansion(sp, rrtConf.stepSize, graphTree{i, 1}, randomConfig);
             if ~isempty(path) && size(path, 2) < rrtConf.neighbourSize
                 neighbours = [neighbours; i, cost];
@@ -117,7 +117,7 @@ function graphTree = updateTree(sp, rrtConf, graphTree, randomConfig)
             continue;
         end
         [path, cost] = directExpansion(sp, rrtConf.stepSize, randomConfig, graphTree{neighbours(i, 1), 1});
-        if ~isempty(path) && size(path, 2) < rrtConf.neighbourSize
+        if ~isempty(path)
             realNeighbours = [realNeighbours; neighbours(i, 1), cost + graphTree{end, 3}];
         end
     end

@@ -163,16 +163,14 @@ sp.home_base = [0,0,0];
 
 load envs
 
-sp = envs{2};
-% [path, cost] = directExpansion(sp, 10000, sp.start_conf, sp.goal_conf);
-
+sp = envs{8};
 modSp = sp;
 modeSp.steerBounds = [-30, 30];
 % modSp.obstacles(:, 4) = sp.obstacles(:, 4) + 25; % increases the radius by 25 so it makes the range that should be considered as collision
 % modSp.obstacles(:, 5) = sp.obstacles(:, 5) + 10; % increasing the height by 10 so it makes the range that should be considered as collision
 
-rrtConf.pOfGoal = 0.08;
-rrtConf.numOfNodes = 500;
+rrtConf.pOfGoal = 0.1;
+rrtConf.numOfNodes = 1000;
 rrtConf.stepSize = 5;
 
 tempConfig = sp.start_conf;
@@ -183,8 +181,8 @@ end
 
 targetConfig = tempConfig;
 targetConfig(2, 1) = targetConfig(2, 1) + sp.stepSize(1);
-rrtConf.neighbourSize = calculateCost(tempConfig, targetConfig, sp.home_base);
 
+rrtConf.neighbourSize = rrtConf.stepSize;
 [path, cost] = searchAlgorithmRRT_star(modSp, rrtConf, false); 
 solution.path = pathConversion1(path);
 

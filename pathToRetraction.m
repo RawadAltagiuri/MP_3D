@@ -26,7 +26,7 @@ function conf = retract(conf, amountOfRet)
     for i = 1:size(conf, 1)
         if i == size(conf, 1) || conf(i+1, 3) == 0
             conf(i, 3) = conf(i, 3) - amountOfRet;
-            if conf(i, 3) < 0
+            if conf(i, 3) <= 0
                 conf(i - 1, 3) = conf(i - 1, 3) + conf(i, 3);
                 conf(i, :) = 0;
             end
