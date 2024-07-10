@@ -31,7 +31,7 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
         sp.random_conf = random_conf;
         greedyChildren = greedyExpand(nearest_node, sp);
         if isempty(greedyChildren)
-            continue; % Skip the rest of the current iteration
+            continue; % skip the rest of the current iteration
         else
             child = greedyChildren(1);
         end
@@ -51,7 +51,7 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
         end
     end
 
-    if i == 100000 && isempty(finalChild)
+    if i == sp.iterations && isempty(finalChild)
         solution = [];
         exapndedNodes = i;
         return;

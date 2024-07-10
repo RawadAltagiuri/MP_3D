@@ -48,7 +48,7 @@
 
 clear, clc, close;
 
-sp.problemName = "hole";
+sp.problemName = "wall";
 sp.typeOfAlg = 'astar';
 sp.typeOfHeuristic = 'continue';
 
@@ -85,7 +85,7 @@ switch sp.problemName
             ];
 
 
-    case "grabbingTest"
+    case "wallWithEntrance"
         start.design = [50; 150; 150; 150; 150];
         start.matrix = [0 0 50; 10 0 150; 10 0 150; 0 0 150; 0 0 150];
         sp.steerBounds = [-30 30];
@@ -158,9 +158,9 @@ sp.start_conf = start.matrix;
 sp.j = size(sp.start_conf, 1);
 sp.goal_conf = sp.goals(1:sp.j, 1:3);
 sp.home_base = [0,0,0];
-sp.weight = 0.3;
-sp.iterations = 10000;
-sp.AcceptedEuclideanDistance = 25;
+sp.weight= 0.3;
+sp.iterations = 100000;
+sp.AcceptedEuclideanDistance = 100;
 
 
 
@@ -198,8 +198,8 @@ for i=2:size(formattedPathForAnimation,3)
     [growthCount, retractCount, steerCount] = actionCounter(formattedPathForAnimation(:, :, i), formattedPathForAnimation(:, :, i-1), growthCount, retractCount, steerCount);
 end
  
-%  softRobot_animation(formattedPathForAnimation, [0,0,0], true, sp);
-
+softRobot_animation(formattedPathForAnimation, [0,0,0], true, sp);
+plotConfigTree(solution.map, sp)
 
 
 
