@@ -18,11 +18,13 @@ function [nodes_map] = rewireTree(nodes_map, sp)
         % Check if BestParent is an ancestor of child_node to prevent cycles
         if ~isAncestor(BestParent, child_node, nodes_map, sp) && ~isAncestor(child_node, BestParent, nodes_map, sp)
             % Update the child node in the map if the parent has changed and no cycle is created.
-            if ~isequal(BestParent.path, eval(child_key))
+            if ~isequal(BestParent.path, eval(child_key)) || ~isequal(BestParent.path, nearest_node.path)
+                disp("Rewiring")
                 nodes_map(child_key) = BestParent;
             end
         end
     end
+    disp("Rewiring Done");
 end
 
 function is_ancestor = isAncestor(possible_ancestor, child_node, nodes_map, sp)
@@ -35,6 +37,9 @@ function is_ancestor = isAncestor(possible_ancestor, child_node, nodes_map, sp)
             return;
         end
         parent = nodes_map(mat2str(path(:, end-2:end)));
+        %if ~isempty(path) && isequal(path, parent.path)
+         %   is_ancestor = true;
+        %end
         path = parent.path;
         counter = counter + 1;
     end

@@ -43,6 +43,8 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
 
                 %check if the the difference between all cells in the child configuration and the goal configuration is less than 100
                 if calculateCost(child.path(:, end-2:end), sp.goal_conf, sp.home_base) < sp.AcceptedEuclideanDistance
+                    disp("Goal Reached");
+                    solution.mapBeforeRewire = nodes_map;
                     [nodes_map] = rewireTree(nodes_map, sp);
                     finalChild = child;
                     break;
@@ -54,8 +56,8 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
     end
 
     if i == sp.iterations && isempty(finalChild)
-        solution = [];
-        exapndedNodes = i;
+        disp("Goal not reached, re-running MotionPlannerSolution");
+        [solution, exapndedNodes] = searchAlgorithm(sp);
         return;
     end
         

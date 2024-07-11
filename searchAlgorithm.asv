@@ -38,11 +38,14 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
         if ~nodes_map.isKey(mat2str(child.path(:, end-2:end))) %check if the child is already in the tree
             [isColliding, ~] = collisionCheck(child.path(:,end-2:end), sp);%Checking if the greedy children are valid (not colliding)
             if isColliding == false
-                
-                nodes_map(mat2str(child.path(:, end-2:end))) = nearest_node;
+                [BestParent, child] = findBestParent(child, nearest_node, nodes_map, sp);
+                nodes_map(mat2str(child.path(:, end-2:end))) = BestParent;
 
                 %check if the the difference between all cells in the child configuration and the goal configuration is less than 100
                 if calculateCost(child.path(:, end-2:end), sp.goal_conf, sp.home_base) < sp.AcceptedEuclideanDistance
+                    disp("Goal Reached");
+                    solution.mapBeforeRewire = nodes_map;
+                    [nodes_map] = rewireTree(nodes_map, sp);
                     finalChild = child;
                     break;
                 end
@@ -53,13 +56,13 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
     end
 
     if i == sp.iterations && isempty(finalChild)
-        solution = [];
-        exapndedNodes = i;
+        disp("Goal not reached, re-running MotionPlannerSolution");
+        [solution, exapndedNodes] = searchAlgorithm(sp);
         return;
     end
         
 
-    exapndedNodes = nodes_map.Count;
+    exapndedNodes = i;
     solution.map = nodes_map;
 
     %create the path beginning from the final child to the root, then reverse it, we retrieve the parent of the last (:, end-2:end) from the map and then add it to the right of the path
