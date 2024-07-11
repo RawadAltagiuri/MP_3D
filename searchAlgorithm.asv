@@ -38,8 +38,8 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
         if ~nodes_map.isKey(mat2str(child.path(:, end-2:end))) %check if the child is already in the tree
             [isColliding, ~] = collisionCheck(child.path(:,end-2:end), sp);%Checking if the greedy children are valid (not colliding)
             if isColliding == false
-                [BestParent, child] = findBestParent(child, nearest_node, nodes_map, sp);
-                nodes_map(mat2str(child.path(:, end-2:end))) = BestParent;
+                
+                nodes_map(mat2str(child.path(:, end-2:end))) = nearest_node;
 
                 %check if the the difference between all cells in the child configuration and the goal configuration is less than 100
                 if calculateCost(child.path(:, end-2:end), sp.goal_conf, sp.home_base) < sp.AcceptedEuclideanDistance
