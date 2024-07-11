@@ -12,20 +12,25 @@ function [children] = greedyExpand(node, searchProblem)
     % check if the steering child is colliding with the obstacles
     if isValid % only check for collision if the child was initially considered valid
         [isColliding, ~] = collisionCheck(greedyChild.path(:,end-2:end), searchProblem);
-        if isColliding
-            isValid = false; % set isValid to false if there's a collision
-        end
-    end
-
-    if isValid % if the child is valid and not colliding, add it to the children
-        children = [children ; greedyChild];
-    end
-
-    if ~isValid % if we have a steering child we do not generate an eversion child, this way we prioritize steering first
-        [greedyChild, isValid] = eversionChild(node, searchProblem); % Produce the eversion child
-        if isValid % If the eversion child is valid, add it to the children
+        if ~isColliding
             children = [children ; greedyChild];
         end
+    end
+
+    [greedyChild, isValid] = eversionChild(node, searchProblem); % Produce the eversion child
+    % check if the eversion child is colliding with the obstacles
+    if isValid % only check for collision if the child was initially considered valid
+        [isColliding, ~] = collisionCheck(greedyChild.path(:,end-2:end), searchProblem);
+        if ~isColliding
+            children = [children ; greedyChild];
+        end
+    end
+
+    %sort the children based on the heuristic value
+    if size(children, 1) > 1 && children(2).h < children(1).h
+        temp = children(1);
+        children(1) = children(2);
+        children(2) = temp;
     end
 end
 

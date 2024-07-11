@@ -158,9 +158,9 @@ sp.start_conf = start.matrix;
 sp.j = size(sp.start_conf, 1);
 sp.goal_conf = sp.goals(1:sp.j, 1:3);
 sp.home_base = [0,0,0];
-sp.weight= 0.3;
+sp.weight= 0.1;
 sp.iterations = 100000;
-sp.AcceptedEuclideanDistance = 100;
+sp.AcceptedEuclideanDistance = 10;
 
 
 
