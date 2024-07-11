@@ -88,7 +88,7 @@ function testWriter(testCases, fileName)
 
     rrtStats = {sum(rrtCosts) / length(rrtCosts), sum(rrtTimes) / length(rrtTimes), min(rrtCosts)};
     rrtStarStats = {sum(rrtStarCosts) / length(rrtStarCosts), sum(rrtStarTimes) / length(rrtStarTimes), min(rrtStarCosts)};
-    aStarStats = {sum(aStarCosts) / length(aStarCosts), sum(aStarTimes) / length(aStarTimes), min(aStarCosts)};
+    aStarStats = {sum(aStarCosts) / length(aStarCosts), sum(aStarTimes) / length(aStarTimes)};
 
     statsFillerRRT = cell(1, size(rrtTable, 2) - size(statsHeaders, 2) + size(filler, 2));
     statsFillerRRT(1:end) = {""};
