@@ -6,6 +6,9 @@ function [BestParent, child] = findBestParent(child, nearest_node, nodes_map, sp
     keys = nodes_map.keys;
     for i = 1:length(keys)
         parent_key = keys{i};
+        if isequal(parent_key, mat2str(nearest_node.path(:, end-2:end))) || isequal(parent_key, mat2str(child.path(:, end-2:end)))
+            continue; % Skip the nearest_node
+        end
         grandparent_node = nodes_map(parent_key);
         parent_node.path = eval(parent_key);
         parent_node.g = grandparent_node.g + calculateCost(parent_node.path(:, end-2:end), grandparent_node.path(:, end-2:end), sp.home_base);

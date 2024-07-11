@@ -43,6 +43,7 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
 
                 %check if the the difference between all cells in the child configuration and the goal configuration is less than 100
                 if calculateCost(child.path(:, end-2:end), sp.goal_conf, sp.home_base) < sp.AcceptedEuclideanDistance
+                    [nodes_map] = rewireTree(nodes_map, sp);
                     finalChild = child;
                     break;
                 end
@@ -59,7 +60,7 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
     end
         
 
-    exapndedNodes = nodes_map.Count;
+    exapndedNodes = i;
     solution.map = nodes_map;
 
     %create the path beginning from the final child to the root, then reverse it, we retrieve the parent of the last (:, end-2:end) from the map and then add it to the right of the path
