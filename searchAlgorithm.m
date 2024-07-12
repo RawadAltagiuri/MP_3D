@@ -71,7 +71,12 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
     solution.g = 0;
     %calculate the cost of the path using the cost function, every three columns represent a configuration matrix
     for i = 1:size(path, 2)/3
-        solution.g = solution.g + calculateCost(path(:, (i-1)*3 + 1 : i*3), sp.goal_conf, sp.home_base);
+        if i*3 + 1 > size(path, 2)
+            break; % Break the loop if the next index exceeds the bounds of path
+        end
+        first = path(:, (i-1)*3 + 1 : i*3);
+        second = path(:, i*3 + 1 : (i+1)*3);
+        solution.g = solution.g + calculateCost(first, second, sp.home_base);
     end
     solution.h = getHeuristic(sp.typeOfHeuristic, path(:, 1:3), sp);
     solution.f = calculateCostBasedOnAlgorithm(solution.g, solution.h, sp.typeOfAlg);
