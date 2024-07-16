@@ -1,0 +1,50 @@
+function testWriterA_star(aStarConf, testCase, numOfTest, fileName)
+    sp = testCase;
+
+    aStarHeaders = {"Problem Name", "Fringe Size", "Cost", "Time"};
+
+    aStarCosts = 
+    aStarTable = {};
+    % Titles of the algorithm
+    titles = [rrtTitle, {"", ""}, rrtStarTitle, {"", ""}];
+
+    % Headers of the algorithms (parameter and results)
+    headers = [rrtHeaders, {"", ""}, rrtStarHeaders, {"", ""}];
+
+    filler = cell(numOfTest, 2);
+    filler(1:end) = {""};
+
+    statsHeaders = {"AVR_COST", "AVR_TIME", "MIN_COST"};
+
+    rrtStats = {sum(rrtCosts) / length(rrtCosts), sum(rrtTimes) / length(rrtTimes), min(rrtCosts)};
+    rrtStarStats = {sum(rrtStarCosts) / length(rrtStarCosts), sum(rrtStarTimes) / length(rrtStarTimes), min(rrtStarCosts)};
+
+    statsFillerRRT = cell(1, size(rrtTable, 2) - size(statsHeaders, 2) + size(filler, 2));
+    statsFillerRRT(1:end) = {""};
+
+    statsFillerRRTStar = cell(1, size(rrtStarTable, 2) - size(statsHeaders, 2) + size(filler, 2));
+    statsFillerRRTStar(1:end) = {""};
+   
+    stats = [statsHeaders, statsFillerRRT, ... 
+        statsHeaders, statsFillerRRTStar, ...
+        ];
+    stats = [stats; 
+        rrtStats, statsFillerRRT, ...
+        rrtStarStats, statsFillerRRTStar, ...
+        ];
+
+    rowFiller = cell(1, size(rrtTable, 2) + size(filler, 2) ... 
+        + size(rrtStarTable, 2) + size(filler, 2) ...
+        );
+
+    completeTable = [
+        titles;
+        headers;
+        [rrtTable, filler, rrtStarTable, filler];
+        rowFiller;
+        stats
+        ];
+
+    writecell(completeTable, fileName, 'Range', 'B2');
+end
+

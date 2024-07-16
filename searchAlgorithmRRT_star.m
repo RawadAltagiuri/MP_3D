@@ -1,4 +1,6 @@
-function [path, cost] = searchAlgorithmRRT_star(sp, rrtStarConf, SHOW)
+function [path, cost, tree] = searchAlgorithmRRT_star(sp, rrtStarConf, SHOW)
+    tree = {};
+    
     if SHOW
         drawInit(sp.start_conf, sp.goal_conf, sp);
     end
@@ -42,6 +44,7 @@ function [path, cost] = searchAlgorithmRRT_star(sp, rrtStarConf, SHOW)
     if ~isempty(bestPath)
         path = bestPath;
         cost = bestCost;
+        tree = graphTree;
         return;
     end
 
@@ -53,6 +56,8 @@ function [path, cost] = searchAlgorithmRRT_star(sp, rrtStarConf, SHOW)
         path = {};
         cost = -1;
     end
+
+    tree = graphTree;
 end
 
 function heuristic = getHeuristicBridge(sp, conf1, conf2)

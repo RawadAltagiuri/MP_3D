@@ -1,4 +1,6 @@
-function [path, cost] = searchAlgorithmRRT(sp, rrtConf, SHOW)
+function [path, cost, tree] = searchAlgorithmRRT(sp, rrtConf, SHOW)
+    tree = {};
+    
     if SHOW
         drawInit(sp.start_conf, sp.goal_conf, sp)
     end
@@ -21,6 +23,7 @@ production.
                 [prevPath, prevCost] = backtrackPath(sp, rrtConf, graphTree);
                 path = [prevPath, path];
                 cost = cost + prevCost;
+                tree = graphTree;
                 return;
             end
         end
@@ -48,6 +51,7 @@ production.
         if chosenGoal && prevTreeSize ~= size(graphTree, 1) && ...
                 getHeuristic(sp.typeOfHeuristic, graphTree{end, 1}, sp) < 1
             [path, cost] = backtrackPath(sp, rrtConf, graphTree);
+            tree = graphTree;
             return;
         end
     end
@@ -56,6 +60,7 @@ production.
     graphTree = updateTree(sp, rrtConf, graphTree, sp.goal_conf);
     if prevTreeSize ~= size(graphTree, 1) && getHeuristic(sp.typeOfHeuristic, graphTree{end, 1}, sp) < 1
         [path, cost] = backtrackPath(sp, rrtConf, graphTree);
+        tree = graphTree;
     else
         path = {};
         cost = -1;

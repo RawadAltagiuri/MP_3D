@@ -173,10 +173,15 @@ load envs
 % solution.f = solution.g;
 % solution.h = 0;
 
-sps = cell(3);
-sps(1:end) = envs(1);
 
- testWriter(sps, "results.xls");
+rrtConf.pOfGoal = 0.1;
+rrtConf.numOfNodes = 100;
+rrtConf.stepSize = 5;
+
+% testWriterRRTs(rrtConf, envs{2}, 1, "results.xls");
+
+aStarConf.fringeSize = 1000;
+testWriterA_star(aStarConf, envs{2}, 1, "results.xls");
 
 % Calculate the number of submatrices you will create
 numSubMatrices = size(solution.path, 2) / 3;
