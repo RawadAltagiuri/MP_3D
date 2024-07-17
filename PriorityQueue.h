@@ -65,6 +65,13 @@ void PriorityQueue<T>::setMaxSize(size_t maxSizeA) {
 
 template<typename T>
 void PriorityQueue<T>::insert(const T& element) {
+    if (full() && v.size() > 2) {
+        size_t max {v[1] < v[2] ? size_t{1} : size_t{2}};
+        v[max] = v[v.size() - 1];
+        v.erase(v.end() - 1);
+        bubbleDown(max);
+    }
+
     v.push_back(element);
     bubbleUp(v.size() - 1);
 }
