@@ -13,84 +13,61 @@
 %'expandedNodes': the number of expanded nodes to find the optimal solution
 %
 
-function [solution, expandedNodes] = searchAlgorithm(sp, fringeSize)
-    expandedNodes = 0;
+function [solution, exapndedNodes] = searchAlgorithm_Sto(sp)
+    exapndedNodes = 0;
     root.g = 0;
     root.h = getHeuristic(sp.typeOfHeuristic, sp.start_conf, sp);
     root.f = calculateCostBasedOnAlgorithm(root.g, root.h, sp.typeOfAlg);
     root.path = sp.start_conf;
-
-    instanceId = PDQ_test("init", fringeSize);
-    PDQ_test("insertAny", instanceId, root.path, [root.g, root.h, root.f]);
+    fringe = PDQ('init');
+    PDQ('add', fringe, {[root.f, root.g, root.h], root.path}); %Initiating the the priority deque which is a custom class implemented in c++ and used with a wrapper in matlab
+    PDQ('setMaxSize', fringe, sp.pdqSize); %Set the max size of the priority deque
     set = java.util.HashSet; %A hashset used from the Java library to prevent cycles
-    set.add(mat2str(root.path(:,end-2:end)));
-    while ~(PDQ_test("size", instanceId) == 0)
-        [path, priority] = PDQ_test("peek", instanceId);
-        fringeNode.g = priority(1);
-        fringeNode.h = priority(2);
-        fringeNode.f = priority(3);
+    while ~PDQ('empty', fringe)
+        [priority, path] = PDQ('poll', fringe);
+        fringeNode.f = priority(1);
+        fringeNode.g = priority(2);
+        fringeNode.h = priority(3);
         fringeNode.path = path;
-
-        expandedNodes = expandedNodes + 1;
-
-        % set.add(mat2str(fringeNode.path(:,end-2:end))); %Getting the last configuration from the polled path
-
+        set.add(mat2str(fringeNode.path(:,end-2:end))); %Getting the last configuration from the polled path
+        exapndedNodes = exapndedNodes +1;
         if(fringeNode.h < 1)
             if size(sp.goals, 1) ~= 0
                 sp.goals(1:sp.j, :) = [];
             end
             if size(sp.goals, 1) == 0 %Found the optimal path
-                [path, costs] = PDQ_test("extractHead", instanceId);
-                solution.path = [];
-                for config = path
-                    solution.path = [solution.path, config{1}];
-          
-                    solution.g = costs(1);
-                    solution.h = costs(2);
-                    solution.f = costs(3);
-                end
-                break;
+                solution = fringeNode;
+                return;
             else 
-                
-                % PDQ('clear', fringe);
-                % set.clear;
-                % sp.goal_conf = sp.goals(1:sp.j, 1:3);
-                % fringeNode.h = getHeuristic(sp.typeOfHeuristic, sp.start_conf, sp);
+                PDQ('clear', fringe);
+                set.clear;
+                sp.goal_conf = sp.goals(1:sp.j, 1:3);
+                fringeNode.h = getHeuristic(sp.typeOfHeuristic, sp.start_conf, sp);
             end
-        end        
-
-        nextChildren = {};
-
+        end
         [greedyChildren] = greedyExpand(fringeNode, sp); %Generating children of the current node according to greedy algorithm
         validGreedyFound = false;
         for i = 1 :size(greedyChildren, 1)
             child = greedyChildren(i);
-            child.path = child.path(:, end-2:end);
-
             [isColliding, ~] = collisionCheck(child.path(:,end-2:end), sp);%Checking if the greedy children are valid (not colliding), if not we will generate children according to the current algorithm [Astar, UCS, greedy]
             if ~set.contains(mat2str(child.path(:,end-2:end)))
                 if isColliding == false
-                    nextChildren(size(nextChildren, 1) + 1, 1) = {{child.path, [child.g, child.h, child.f]}};
-
-                    set.add(mat2str(child.path(:,end-2:end)));
-                    
                     validGreedyFound = true;
+                    PDQ('add', fringe, {[child.f child.g child.h], child.path});
+                    set.add(mat2str(child.path(:,end-2:end)));
                 else
                     set.add(mat2str(child.path(:,end-2:end)));
                 end
             end
         end
-
         if validGreedyFound == false %If no valid greedy children were found, we generate children according to the current algorithm [Astar, UCS, Greedy]
             children = FullExpand(fringeNode, sp);
             for i = 1 :size(children, 1)
                 child = children(i);
-                child.path = child.path(:, end-2:end); 
-
                 [isColliding, ~] = collisionCheck(child.path(:,end-2:end), sp);
                 if ~set.contains(mat2str(child.path(:,end-2:end)))
                     if isColliding == false
-                        nextChildren(size(nextChildren, 1) + 1, 1) = {{child.path, [child.g, child.h, child.f]}};
+                        PDQ('add', fringe, {[child.f child.g child.h], child.path});
                         set.add(mat2str(child.path(:,end-2:end)));
                     else
                         set.add(mat2str(child.path(:,end-2:end)));
@@ -98,14 +75,12 @@ function [solution, expandedNodes] = searchAlgorithm(sp, fringeSize)
                 end
             end
         end
-        PDQ_test("expandHead", instanceId, nextChildren);        
-
-        if PDQ_test("size", instanceId) == 0
+        if PDQ('empty', fringe)
             disp('no path found');
             solution = [];
         end
     end
-    PDQ_test("destroyAll", instanceId);
+    PDQ('delete', fringe);
 end
 
 

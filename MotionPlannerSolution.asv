@@ -174,10 +174,8 @@ numRuns = 10;
 taskName = sp.problemName;  % Set your task name
 sheetSizes = [100, 1000, 5000, 10000, 50000, 100000];  % Specify sheet sizes
 
-sp.pdqSize = 100;
 tic
-solution = searchAlgorithm_Det(sp, sp.pdqSize);
-toc
+searchAlgorithm(sp, 10)
 
 % Create Excel file
 fileName = 'MPTestPDQ_Wall_Deterministic.xlsx' ;
@@ -198,7 +196,7 @@ for sizeIdx = 1:length(sheetSizes)
             zzz = 0;
         end
         tic;
-        [solution, expandedNodes] = searchAlgorithm_Det(sp, sp.pdqSize); % Assuming sp is already defined
+        [solution, expandedNodes] = searchAlgorithm(sp, sp.pdqSize); % Assuming sp is already defined
         time = toc;
 
         AllExpanded(i) = expandedNodes;

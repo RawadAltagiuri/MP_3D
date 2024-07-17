@@ -304,7 +304,7 @@ class MexFunction : public matlab::mex::Function {
             Array config = std::move(path[0]);
             std::vector<std::vector<double>> configVector {Util::matrixToVector(config)};
             Solution<CT>* prevSolution = new Solution<CT>{nullptr, {costs[0], costs[1], costs[2]}, configVector};
-            duplicateSet.insert(configVector);
+            //duplicateSet.insert(configVector);
             for (int i = 1; i < path.getDimensions()[0]; i++) {
                 config = std::move(path[i]);
                 configVector = Util::matrixToVector(config);
@@ -317,7 +317,7 @@ class MexFunction : public matlab::mex::Function {
             }
 
             heap.insert({prevSolution});
-            duplicateSet.insert(configVector);
+            //duplicateSet.insert(configVector);
         }
 
         void addInvalidConfig(matlab::mex::ArgumentList& outputs, matlab::mex::ArgumentList& inputs) {
@@ -326,7 +326,7 @@ class MexFunction : public matlab::mex::Function {
             auto& duplicateSet {activeSets[instanceId]};
 
             auto config {std::move(inputs[2])};
-            duplicateSet.insert({Util::matrixToVector(config)});
+            //duplicateSet.insert({Util::matrixToVector(config)});
         }
 
         void expandHead(matlab::mex::ArgumentList& outputs, matlab::mex::ArgumentList& inputs) {
@@ -351,12 +351,12 @@ class MexFunction : public matlab::mex::Function {
                 Array childCost = std::move(child[1]);
 
                 auto cv {Util::matrixToVector(childConfig)};
-                if (duplicateSet.find({cv}) == duplicateSet.end()) {
+                //if (duplicateSet.find({cv}) == duplicateSet.end()) {
                     SolutionHandle<CT> solHandle {new Solution<CT>(headSolution.sol, {childCost[0], childCost[1], childCost[2]}, cv)};
                     heap.insert(solHandle);
                     headSolution.sol->addChildren();
-                    duplicateSet.insert({cv});
-                }
+                    //duplicateSet.insert({cv});
+                //}
             }
 
             

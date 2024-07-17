@@ -13,8 +13,8 @@
 %'expandedNodes': the number of expanded nodes to find the optimal solution
 %
 
-function [solution, exapndedNodes] = searchAlgorithm(sp, fringeSize)
-    exapndedNodes = 0;
+function [solution, expandedNodes] = searchAlgorithm_Det(sp, fringeSize)
+    expandedNodes = 0;
     root.g = 0;
     root.h = getHeuristic(sp.typeOfHeuristic, sp.start_conf, sp);
     root.f = calculateCostBasedOnAlgorithm(root.g, root.h, sp.typeOfAlg);
@@ -31,7 +31,7 @@ function [solution, exapndedNodes] = searchAlgorithm(sp, fringeSize)
         fringeNode.f = priority(3);
         fringeNode.path = path;
 
-        exapndedNodes = exapndedNodes + 1;
+        expandedNodes = expandedNodes + 1;
 
         % set.add(mat2str(fringeNode.path(:,end-2:end))); %Getting the last configuration from the polled path
 
