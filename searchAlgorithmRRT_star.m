@@ -1,4 +1,4 @@
-function [path, cost, tree] = searchAlgorithmRRT_star(sp, rrtStarConf, SHOW)
+function [path, cost, tree, final_child] = searchAlgorithmRRT_star(sp, rrtStarConf, SHOW)
     tree = {};
     
     if SHOW
@@ -22,6 +22,7 @@ function [path, cost, tree] = searchAlgorithmRRT_star(sp, rrtStarConf, SHOW)
                 if cost < bestCost
                     bestPath = path;
                     bestCost = cost;
+                    final_child = graphTree{end, 1};
                 end
             end
         end

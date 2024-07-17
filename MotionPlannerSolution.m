@@ -3,7 +3,6 @@
 % •Rawad E. H. Altagiuri (Algorithms)
 % •Omar H. A. Zaghloul (Algorithms)
 
-
 %Start of the motion planner
 %
 % 'SP' is the search problem and its attributes are:
@@ -44,7 +43,6 @@
 % 'solution': Contains the path matrix, and the total cost of the path
 % [path, h, g, f]
 % 
-
 
 clear, clc, close;
 

@@ -1,4 +1,4 @@
-function [path, cost, tree] = searchAlgorithmRRT(sp, rrtConf, SHOW)
+function [path, cost, tree, final_child] = searchAlgorithmRRT(sp, rrtConf, SHOW)
     tree = {};
     
     if SHOW
@@ -24,6 +24,7 @@ production.
                 path = [prevPath, path];
                 cost = cost + prevCost;
                 tree = graphTree;
+                final_child = tree{end, 1};
                 return;
             end
         end
@@ -52,6 +53,7 @@ production.
                 getHeuristic(sp.typeOfHeuristic, graphTree{end, 1}, sp) < 1
             [path, cost] = backtrackPath(sp, rrtConf, graphTree);
             tree = graphTree;
+            final_child = tree{end, 1};
             return;
         end
     end
@@ -61,6 +63,7 @@ production.
     if prevTreeSize ~= size(graphTree, 1) && getHeuristic(sp.typeOfHeuristic, graphTree{end, 1}, sp) < 1
         [path, cost] = backtrackPath(sp, rrtConf, graphTree);
         tree = graphTree;
+        final_child = tree{end, 1};
     else
         path = {};
         cost = -1;
