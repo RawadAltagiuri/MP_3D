@@ -189,15 +189,11 @@ rrtConf.neighbourSize = calculateCost(tempConfig, targetConfig, sp.home_base);
 solution.path = pathConversion1(path);
 
 % testWriter(envs(1:5), "results.xls");
-
-animate(sp, solution);
-
-pause
+animate(solution);
 
 [path, cutCost] = cutPath(sp, path);
-path = pathConversion1(path);
-solution.path = path;
-animate(sp, solution)
+solution.path = pathConversion1();
+animate(solution)
 
 
 
