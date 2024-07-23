@@ -1,8 +1,8 @@
 function [path, cost] = pathToRetraction(sp, conf, finalLength)
     path = {conf};
+    cost = 0;
     length = sum(conf(:, 3));
     if finalLength >= length
-        cost = 0;
         return;
     end
 
@@ -10,14 +10,20 @@ function [path, cost] = pathToRetraction(sp, conf, finalLength)
     reminder = mod(length - finalLength, sp.stepSize(2));
     for i = 1:numOfIter
         conf = retract(conf, sp.stepSize(2));
+        
+        % Alternative cost:
+        cost = cost + calculateCost(path{end}, conf, sp.home_base);
         path = [path, conf];
     end
 
     if reminder ~= 0
-        path = [path, retract(conf, reminder)];
+        conf = retract(conf, reminder);
+        cost = cost + calculateCost(path{end}, conf, sp.home_base);
+        path = [path, conf];
     end
 
-    cost = (length - finalLength) * sp.costArray(3);
+    % True cost:
+    % cost = (length - finalLength) * sp.costArray(3);
 end
 
 % Assumes that minimum link length of the design is larger than amount of

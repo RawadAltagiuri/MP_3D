@@ -163,13 +163,60 @@ sp.home_base = [0,0,0];
 
 load envs
 
-sp = envs{11};
+sp = envs{1};
+sp.eps = 0.0001;
+sp.heuristicLimit = 0.2;
 % [path, cost] = directExpansion(sp, 10000, sp.start_conf, sp.goal_conf);
 
 modSp = sp;
 modeSp.steerBounds = [-30, 30];
 % modSp.obstacles(:, 4) = sp.obstacles(:, 4) + 25; % increases the radius by 25 so it makes the range that should be considered as collision
 % modSp.obstacles(:, 5) = sp.obstacles(:, 5) + 10; % increasing the height by 10 so it makes the range that should be considered as collision
+
+
+sp.start_conf = [0	0	50
+-11.5677253573112	-5.55780331862548	150
+21.6705869953666	5.55464432667828	150
+-21.4265211504058	-12.5172175450550	150
+19.7158193976004	0.786392819752461	58.2892437336084];
+
+sp.goal_conf = [
+ 0	0	50
+-6.23437503392334	1.44895766727893	150
+22.0093912959991	-5.46351479915721	150
+-18.6878436557810	3.82667908835082	150
+15.9014484167093	25.3837737489811	5.34083839838058
+    ];
+
+sp.start_conf = [
+    0	0	50
+0	0	150
+0	0	150
+0	0	150
+0	0	5];
+
+sp.goal_conf = [
+0	0	50
+0	0	150
+0	0	150
+0	0	150
+20	20	5
+    ];
+
+path = directExpansion(sp, realmax, sp.start_conf, sp.goal_conf)
+calculateCost(sp.start_conf, sp.goal_conf, sp.home_base);
+
+
+
+% sp.goal_conf = [
+%     0	0	50
+% -6.23437503392334	1.44895766727893	150
+% 22.0093912959991	-5.46351479915721	150
+% -18.6878436557810	3.82667908835082	150
+% 19.7158193976004	0.786392819752461	5.34083839838058
+%     ];
+
+path = directExpansion(sp, realmax, sp.start_conf, sp.goal_conf);
 
 rrtConf.pOfGoal = 0.08;
 rrtConf.numOfNodes = 200;
@@ -185,15 +232,6 @@ targetConfig = tempConfig;
 targetConfig(2, 1) = targetConfig(2, 1) + sp.stepSize(1);
 rrtConf.neighbourSize = calculateCost(tempConfig, targetConfig, sp.home_base);
 
-[path, cost] = searchAlgorithmRRT(modSp, rrtConf, false);
-solution.path = pathConversion1(path);
-
-% testWriter(envs(1:5), "results.xls");
-animate(solution);
-
-[path, cutCost] = cutPath(sp, path);
-solution.path = pathConversion1();
-animate(solution)
 
 
 

@@ -163,7 +163,9 @@ sp.home_base = [0,0,0];
 
 load envs
 
-sp = envs{11};
+sp = envs{1};
+sp.eps = 0.0001;
+sp.heuristicLimit = 0.2;
 % [path, cost] = directExpansion(sp, 10000, sp.start_conf, sp.goal_conf);
 
 modSp = sp;
@@ -172,7 +174,7 @@ modeSp.steerBounds = [-30, 30];
 % modSp.obstacles(:, 5) = sp.obstacles(:, 5) + 10; % increasing the height by 10 so it makes the range that should be considered as collision
 
 rrtConf.pOfGoal = 0.08;
-rrtConf.numOfNodes = 200;
+rrtConf.numOfNodes = 500;
 rrtConf.stepSize = 5;
 
 tempConfig = sp.start_conf;
@@ -185,18 +187,23 @@ targetConfig = tempConfig;
 targetConfig(2, 1) = targetConfig(2, 1) + sp.stepSize(1);
 rrtConf.neighbourSize = calculateCost(tempConfig, targetConfig, sp.home_base);
 
-[path, cost] = searchAlgorithmRRT(modSp, rrtConf, false);
+[path, cost] = searchAlgorithmRRT_star(modSp, rrtConf, false);
 solution.path = pathConversion1(path);
+
+wrongIndex = checkPath(sp, path);
+realCost = costOfPath(sp, path);
 
 % testWriter(envs(1:5), "results.xls");
 
 animate(sp, solution);
 
-pause
+pause(1)
 
 [path, cutCost] = cutPath(sp, path);
-path = pathConversion1(path);
-solution.path = path;
+solution.path = pathConversion1(path);
+
+wrongIndexCut = checkPath(sp, path);
+
 animate(sp, solution)
 
 

@@ -16,7 +16,9 @@ function [children] = greedyExpand(node, searchProblem)
     if ~isValid %if we have a steering child we do not generate an eversion child, this way we prioritize steering first
         [greedyChild, isValid] = eversionChild(node, searchProblem); %Produce the eversion child
         if isValid == true %if the child is not valid then we do not account for it
-            children = [children ; greedyChild];            
+            children = [children ; greedyChild];
+        else
+            
         end
     end
 end
@@ -112,21 +114,19 @@ function [greedyChild, isValid] = steeringChild(node, searchProblem)
 
     %check if the child configuration is the same as the parent's configuration
     if isequal(child_conf, parent_conf)
-        childAngles = child_conf(:, 1:2);
-        goalAngles = searchProblem.goal_conf(:, 1:2);
+        childAngles = child_conf(1:2, :);
+        goalAngles = searchProblem.goal_conf(1:2, :);
         if ~isequal(childAngles, goalAngles)
             growConf = child_conf;
             growConf(r, 3) = searchProblem.lengthMin;
             modSp = searchProblem;
             modSp.goal_conf = growConf;
             [greedyChild, isValid] = eversionChild(node, modSp);
-            greedyChild.h = getHeuristic(searchProblem.typeOfHeuristic, child_conf, searchProblem);
-            greedyChild.f = calculateCostBasedOnAlgorithm(greedyChild.g, greedyChild.h, searchProblem.typeOfAlg);
-        else
-            greedyChild = [];
-            isValid = false;
+            
         end
 
+        greedyChild = [];
+        isValid = false;
         return;
     end
     isValid = true;
