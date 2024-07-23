@@ -18,7 +18,7 @@ function [] = softRobot_animation(commands, home_base, drawPath, sp)
     f = figure;
     n_obstacles = size(sp.obstacles,1);
 
-    
+
     for k=1:1:steps
         clf;
         hold on;
