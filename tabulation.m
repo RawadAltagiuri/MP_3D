@@ -1,5 +1,5 @@
-% Write the experiment results for a specific test environment. Runs each
-% combination for run_num times
+% Write the experiment results for a specific test environment.
+% Runs first comb_num combinations for run_num times
 function tabulation(sp, run_num, comb_num)
     % Get the combinations
     load combinations_RRT.mat
@@ -28,13 +28,13 @@ function tabulation(sp, run_num, comb_num)
         end
         filename = [sp.problemName, '.xlsx'];
         excel_cell_idx = ['F', num2str(idx)];
-        idx = idx+6;
         writetable(T, filename, 'Sheet', 'RRT', 'Range', excel_cell_idx);
 
         T2 = struct2table(combinations_RRT{1, i});
         excel_cell_idx = ['B', num2str(idx)];
         writetable(T2, filename, 'Sheet', 'RRT', 'Range', excel_cell_idx)
-        T = table();
+        idx = idx+6;
+        % T = table();
     end
     
     
@@ -52,13 +52,13 @@ function tabulation(sp, run_num, comb_num)
         end
         filename = [sp.problemName, '.xlsx'];
         excel_cell_idx = ['G', num2str(idx)];
-        idx = idx+6;
         writetable(T, filename, 'Sheet', 'RRT_star', 'Range', excel_cell_idx);
 
         T2 = struct2table(combinations_RRT_star{1, i});
         excel_cell_idx = ['B', num2str(idx)];
         writetable(T2, filename, 'Sheet', 'RRT_star', 'Range', excel_cell_idx);
-        T = table();
+        idx = idx+6;
+        % T = table();
     end
 
 
@@ -75,13 +75,13 @@ function tabulation(sp, run_num, comb_num)
         end
         filename = [sp.problemName, '.xlsx'];
         excel_cell_idx = ['D', num2str(idx)];
-        idx = idx+6;
         writetable(T, filename, 'Sheet', 'A_star_Det', 'Range', excel_cell_idx);
 
         T2 = struct2table(combinations_Astar{1, i});
         excel_cell_idx = ['B', num2str(idx)];
         writetable(T2, filename, 'Sheet', 'A_star_Det', 'Range', excel_cell_idx);
-        T = table();
+        idx = idx+6;
+        % T = table();
     end
 
     % Run for A*_sto
@@ -97,12 +97,12 @@ function tabulation(sp, run_num, comb_num)
         end
         filename = [sp.problemName, '.xlsx'];
         excel_cell_idx = ['D', num2str(idx)];
-        idx = idx+6;
         writetable(T, filename, 'Sheet', 'A_star_Sto', 'Range', excel_cell_idx);
 
         T2 = struct2table(combinations_Astar{1, i});
         excel_cell_idx = ['B', num2str(idx)];
         writetable(T2, filename, 'Sheet', 'A_star_Sto', 'Range', excel_cell_idx);
-        T = table();
+        idx = idx+6;
+        % T = table();
     end
 end

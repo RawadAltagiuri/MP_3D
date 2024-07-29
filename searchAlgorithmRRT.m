@@ -97,6 +97,6 @@ function graphTree = updateTreeRRT(sp, rrtConf, graphTree, randomConfig)
         % drawConfig(graphTree{closestParent, 1}, sp, 'k');
         
         newNode = directPath{end};
-        graphTree = [graphTree; {directPath{end}, closestParent, randomConfig}];
+        graphTree = [graphTree; {newNode, closestParent, randomConfig}];
     end
 end

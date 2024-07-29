@@ -41,9 +41,4 @@ function [path, cost] = directExpansion(sp, step_size, start_conf, end_conf)
         cost = node1.g;
         path = [path, node1.path];
     end
-
-    cost = cost + calculateCost(path{end}, end_conf, sp.home_base);
-    if ~isequal(path{end}, end_conf)
-        path = [path, end_conf];
-    end
 end

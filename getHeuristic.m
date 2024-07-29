@@ -10,6 +10,7 @@ function [h] = getHeuristic(typeOfHeuristic, currentMat, searchProblem)
           case 'discrete'
             h = calculateHeuristic(currentMat, searchProblem);
           case 'continue'
-            h = calculateCost(currentMat, searchProblem.goal_conf, searchProblem.home_base);
+            % h = calculateCost(searchProblem, currentMat, searchProblem.goal_conf);
+            h = calculateCost_old(currentMat, searchProblem.goal_conf, searchProblem.home_base);
       end
 end

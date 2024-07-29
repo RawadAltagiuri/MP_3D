@@ -13,7 +13,7 @@ function [fullPath, totalCost] = backtrackPath(sp, graphTree)
             return;
         end
 
-        path(1) = [];
+        % path(1) = [];
 
         paths = [paths, {path}];
         totalCost = totalCost + cost;

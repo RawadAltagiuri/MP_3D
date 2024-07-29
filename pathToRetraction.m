@@ -12,13 +12,15 @@ function [path, cost] = pathToRetraction(sp, conf, finalLength)
         conf = retract(conf, sp.stepSize(2));
         
         % Alternative cost:
-        cost = cost + calculateCost(path{end}, conf, sp.home_base);
+        % cost = cost + calculateCost(sp, path{end}, conf);
+        cost = cost + calculateCost_old(path{end}, conf, sp.home_base);
         path = [path, conf];
     end
 
     if reminder ~= 0
         conf = retract(conf, reminder);
-        cost = cost + calculateCost(path{end}, conf, sp.home_base);
+        % cost = cost + calculateCost(sp, path{end}, conf);
+        cost = cost + calculateCost_old(path{end}, conf, sp.home_base);
         path = [path, conf];
     end
 

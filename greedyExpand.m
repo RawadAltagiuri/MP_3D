@@ -65,7 +65,8 @@ function [greedyChild, isValid] = eversionChild(node, searchProblem)
     end
     isValid = true;
     greedyChild.label = 'eversion';
-    greedyChild.g = node.g + calculateCost(node.path(:,end-2:end), child_conf, searchProblem.home_base);
+    % greedyChild.g = node.g + calculateCost(searchProblem, node.path(:,end-2:end), child_conf);
+    greedyChild.g = node.g + calculateCost_old(node.path(:,end-2:end), child_conf, searchProblem.home_base);
     greedyChild.h = getHeuristic(searchProblem.typeOfHeuristic, child_conf, searchProblem);
     greedyChild.f = calculateCostBasedOnAlgorithm(greedyChild.g, greedyChild.h, searchProblem.typeOfAlg);
     greedyChild.path = [node.path , child_conf];
@@ -131,7 +132,8 @@ function [greedyChild, isValid] = steeringChild(node, searchProblem)
     end
     isValid = true;
     greedyChild.label = 'steering';
-    greedyChild.g = node.g + calculateCost(node.path(:,end-2:end), child_conf, searchProblem.home_base);
+    % greedyChild.g = node.g + calculateCost(searchProblem, node.path(:,end-2:end), child_conf);
+    greedyChild.g = node.g + calculateCost_old(node.path(:,end-2:end), child_conf, searchProblem.home_base);
     greedyChild.h = getHeuristic(searchProblem.typeOfHeuristic, child_conf, searchProblem);
     greedyChild.f = calculateCostBasedOnAlgorithm(greedyChild.g, greedyChild.h, searchProblem.typeOfAlg);
     greedyChild.path = [node.path , child_conf];

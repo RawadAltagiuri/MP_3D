@@ -204,7 +204,7 @@ sp.goal_conf = [
     ];
 
 path = directExpansion(sp, realmax, sp.start_conf, sp.goal_conf)
-calculateCost(sp.start_conf, sp.goal_conf, sp.home_base);
+calculateCost(sp, sp.start_conf, sp.goal_conf);
 
 
 
@@ -230,7 +230,7 @@ end
 
 targetConfig = tempConfig;
 targetConfig(2, 1) = targetConfig(2, 1) + sp.stepSize(1);
-rrtConf.neighbourSize = calculateCost(tempConfig, targetConfig, sp.home_base);
+rrtConf.neighbourSize = calculateCost(sp, tempConfig, targetConfig);
 
 
 

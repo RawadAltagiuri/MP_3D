@@ -185,7 +185,7 @@ end
 
 targetConfig = tempConfig;
 targetConfig(2, 1) = targetConfig(2, 1) + sp.stepSize(1);
-rrtConf.neighbourSize = calculateCost(tempConfig, targetConfig, sp.home_base);
+rrtConf.neighbourSize = calculateCost(sp, tempConfig, targetConfig);
 
 [path, cost] = searchAlgorithmRRT_star(modSp, rrtConf, false);
 solution.path = pathConversion1(path);

@@ -131,7 +131,7 @@ function [child, isValid] = doEversion(node, operation, sp)
         end
     end
     % ---- calculate cost -----
-    child.g = node.g + calculateCost(node.path(:,end-2:end), conf, sp.home_base);
+    child.g = node.g + calculateCost(sp, node.path(:,end-2:end), conf);
     if(operation==0)
         child.label = 'e+';
     else
@@ -195,7 +195,7 @@ function [child, isValid] = doSteering(node, operation, row, col, sp)
         end
     end
     isValid = true;
-    child.g = node.g + calculateCost(node.path(:,end-2:end), conf, sp.home_base);
+    child.g = node.g + calculateCost(sp, node.path(:,end-2:end), conf);
 %     child.h = calculateHeuristic(conf, sp);
     child.h = getHeuristic(sp.typeOfHeuristic, conf, sp);
     child.f = calculateCostBasedOnAlgorithm(child.g, child.h, sp.typeOfAlg);
@@ -266,7 +266,7 @@ function [child, isValid] = combineSteering(node, operationFirstCol, operationSe
     %Calculate the cost and fill the child information
     child.label = "a" + row + opArray(1, operationFirstCol+1) + ", b" + row + opArray(1, operationSecondCol+1);
     isValid = true;
-    child.g = node.g + calculateCost(node.path(:,end-2:end), conf, sp.home_base);
+    child.g = node.g + calculateCost(sp, node.path(:,end-2:end), conf);
     child.h = getHeuristic(sp.typeOfHeuristic, conf, sp);
     child.f = calculateCostBasedOnAlgorithm(child.g, child.h, sp.typeOfAlg);
     child.path = [node.path , conf];

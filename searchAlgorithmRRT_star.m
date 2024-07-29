@@ -1,5 +1,6 @@
 function [path, cost, tree, final_child] = searchAlgorithmRRT_star(sp, rrtStarConf, SHOW)
     tree = {};
+    final_child = [];
     
     if SHOW
         drawInit(sp.start_conf, sp.goal_conf, sp);
@@ -71,7 +72,8 @@ end
 function graphTree = updateTreeRRT_star(sp, rrtConf, graphTree, randomConfig)
     neighbours = [];
     for i = 1:size(graphTree, 1)
-        cost = calculateCost(graphTree{i, 1}, randomConfig, sp.home_base);
+        % cost = calculateCost(sp, graphTree{i, 1}, randomConfig);
+        cost = calculateCost_old(graphTree{i, 1}, randomConfig, sp.home_base);
         if cost < rrtConf.neighbourSize
             neighbours = [neighbours; i, cost];
         end
@@ -131,7 +133,7 @@ function graphTree = updateTreeRRT(sp, rrtConf, graphTree, randomConfig)
     [directPath, cost] = directExpansion(sp, rrtConf.stepSize, graphTree{closestParent, 1}, randomConfig);
     if ~isempty(directPath)
         newNode = directPath{end};
-        graphTree = [graphTree; {directPath{end}, closestParent, cost + graphTree{closestParent, 3}, randomConfig}];
+        graphTree = [graphTree; {newNode, closestParent, cost + graphTree{closestParent, 3}, randomConfig}];
     end
 end
 

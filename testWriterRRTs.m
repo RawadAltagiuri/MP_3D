@@ -9,7 +9,7 @@ function testWriterRRTs(rrtConf, testCase, numOfTest, fileName, sheetName)
 
     targetConfig = tempConfig;
     targetConfig(2, 1) = targetConfig(2, 1) + sp.stepSize(1);
-    rrtConf.neighbourSize = calculateCost(tempConfig, targetConfig, sp.home_base);
+    rrtConf.neighbourSize = calculateCost(sp, tempConfig, targetConfig);
 
     rrtHeaders = {"Problem Name", "Nodes", "P of Goal", "Step Size", "Cost", "Time", "Tree Size"};
     rrtStarHeaders = {"Problem Name", "Nodes", "P of Goal", "Step Size", "Neighbour Size", "Cost", "Time", "Tree Size"};

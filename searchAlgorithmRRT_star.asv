@@ -100,7 +100,7 @@ end
 function graphTree = updateTree(sp, rrtConf, graphTree, randomConfig)
     neighbours = [];
     for i = 1:size(graphTree, 1)
-        cost = calculateCost(graphTree{i, 1}, randomConfig, sp.home_base);
+        cost = calculateCost(sp, graphTree{i, 1}, randomConfig);
         if cost < rrtConf.neighbourSize
             neighbours = [neighbours; i, cost];
         end

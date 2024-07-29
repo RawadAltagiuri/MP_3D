@@ -49,21 +49,22 @@
 clear, clc, close;
 
 load envs
-sp = envs{5};
+sp = envs{2};
 sp.baseRotate = false;
-sp.heuristicLimit = 1;
+sp.heuristicLimit = 0.1;
 
-
+sp.start_conf = [0 0 50; 0 0 150; 0 30 50; 0 0 0; 0 0 0];
+sp.goal_conf = [0 0 50; 0 0 150; 0 0 0; 0 0 0; 0 0 0];
 
 rrtConf.pOfGoal = 0.1;
-rrtConf.numOfNodes = 500;
+rrtConf.numOfNodes = 1500;
 rrtConf.stepSize = 1;
 rrtConf.neighbourSize = calculateNeighbourSize(sp.start_conf, sp.goal_conf, sp);
 tic
 [path, cost, tree, final_child] = searchAlgorithmRRT(sp, rrtConf, false);
 % [path, cost] = directExpansion(sp, 10000, sp.start_conf, sp.goal_conf);
 % [solution, exapndedNodes] = searchAlgorithm_Sto(sp, 100000);
-time = toc
+time = toc;
 solution.path = pathConversion1(path);
 solution.g = cost;
 solution.f = solution.g;
@@ -95,11 +96,3 @@ for i=2:size(formattedPathForAnimation,3)
 end
 
  softRobot_animation(formattedPathForAnimation, [0,0,0,0,0], true, sp);
-
-
-
-
-
-
-
-

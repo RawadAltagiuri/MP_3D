@@ -20,7 +20,7 @@ function plotConfigTreeNM(graphTree, sp)
     for i = 1:numConfigs
         for j = 1:numConfigs
             if i ~= j
-                distanceMatrix(i, j) = calculateCost(eval(allConfigs{i}), eval(allConfigs{j}), sp.home_base);
+                distanceMatrix(i, j) = calculateCost(sp, eval(allConfigs{i}), eval(allConfigs{j}));
             end
         end
     end
