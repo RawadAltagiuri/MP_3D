@@ -1,14 +1,15 @@
 clear, clc, close;
 
 load envs
-sp = envs{5};
+sp = envs{1};
 sp.baseRotate = false;
 sp.heuristicLimit = 1;
 
 
-rrtConf.pOfGoal = 0.1;
-rrtConf.numOfNodes = 1000;
+rrtConf.pOfGoal = 1;
+rrtConf.numOfNodes = 100;
 rrtConf.stepSize = 1;
+rrtConf.neighbourSize = calculateNeighbourSize(sp.start_conf, sp.goal_conf, sp);
 
 tic;
 [path, cost, tree, final_child] = searchAlgorithmRRT_star(sp, rrtConf, false);
@@ -17,6 +18,10 @@ solution.path = pathConversion1(path);
 solution.g = cost;
 solution.f = solution.g;
 solution.h = 0;
+
+
+% solution.path = pathToRetraction(sp, sp.goal_conf, 125);
+% solution.path = pathConversion1(solution.path);
 
 % testWriterRRTs(rrtConf, envs{2}, 1, "results.xls");
 
