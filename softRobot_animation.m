@@ -31,8 +31,8 @@ function [] = softRobot_animation(commands, home_base, drawPath, sp)
         ylim([-400 400]);
         zlim([-100 1000]);
         plot3(home_base(1),home_base(2),home_base(3),'--gs','LineWidth',2,'MarkerSize',10,'MarkerEdgeColor','b'); %draw home
-        [startConf,~] = solveForwardKinematics_3D(commands(:,:,1),home_base,false);
-        [robot_CC,~] = solveForwardKinematics_3D(commands(:,:,k),home_base,false); %solve the forward kinematics for a given robot configuration
+        startConf = solveForwardKinematics_3D(commands(:,:,1),home_base,false);
+        robot_CC = solveForwardKinematics_3D(commands(:,:,k),home_base,false); %solve the forward kinematics for a given robot configuration
         
         % collect the end effector coordinates for each step of motion to draw the path of the robot 
         end_effectors(k,:) = robot_CC(n_joints+1,:); 

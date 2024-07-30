@@ -49,14 +49,14 @@
 clear, clc, close;
 
 load envs
-sp = envs{5};
+sp = envs{3};
 sp.baseRotate = false;
 sp.heuristicLimit = 1;
 
 
 
 rrtConf.pOfGoal = 0.1;
-rrtConf.numOfNodes = 500;
+rrtConf.numOfNodes = 300;
 rrtConf.stepSize = 1;
 rrtConf.neighbourSize = calculateNeighbourSize(sp.start_conf, sp.goal_conf, sp);
 tic

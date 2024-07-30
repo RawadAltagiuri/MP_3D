@@ -98,7 +98,7 @@
 
 
 
-function [coordinates, u] = solveForwardKinematics_3D(conf, home_base, draw)
+function coordinates = solveForwardKinematics_3D(conf, home_base, draw)
     % Input:
     % transformations: Nx3 matrix where each row is [rotX, rotY, extZ]
     % Output:

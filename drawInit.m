@@ -17,8 +17,8 @@ function drawInit(startConfig, goalConfig, sp)
     ylim([-400 400]);
     zlim([-100 1000]);
     plot3(home_base(1),home_base(2),home_base(3),'--gs','LineWidth',2,'MarkerSize',10,'MarkerEdgeColor','b'); %draw home
-    [startConf,~] = solveForwardKinematics_3D(startConfig,home_base,false);
-    [goalConf,~] = solveForwardKinematics_3D(goalConfig,home_base,false);
+    startConf = solveForwardKinematics_3D(startConfig,home_base,false);
+    goalConf = solveForwardKinematics_3D(goalConfig,home_base,false);
 
     n_joints = size(startConfig,1);
 

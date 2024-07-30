@@ -1,6 +1,6 @@
 function drawConfig(config, sp, color)
     n_joints = size(config, 1);
-    [robot_CC,~] = solveForwardKinematics_3D(config, sp.home_base, false); %solve the forward kinematics for a given robot configuration
+    robot_CC = solveForwardKinematics_3D(config, sp.home_base, false); %solve the forward kinematics for a given robot configuration
 
     % draws the soft robot
     for i=2:1:n_joints+1

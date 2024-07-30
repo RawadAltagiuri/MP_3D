@@ -10,8 +10,8 @@
 % 'cost' the cost, expressed as the sum of euclidean distances between each joint (including the end effector)
 function [cost] = calculateCost_old(conf_a, conf_b, home_base)
     j = size(conf_a,1);
-    [conf_a_cc, ~] = solveForwardKinematics_3D(conf_a, home_base, false);
-    [conf_b_cc, ~] = solveForwardKinematics_3D(conf_b, home_base, false);
+    conf_a_cc = solveForwardKinematics_3D(conf_a, home_base, false);
+    conf_b_cc = solveForwardKinematics_3D(conf_b, home_base, false);
     
     % find the index of the end effector
     ee_a = j;
