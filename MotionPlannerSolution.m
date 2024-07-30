@@ -157,7 +157,7 @@ sp.baseRotate = false;
 sp.start_conf = start.matrix;
 sp.j = size(sp.start_conf, 1);
 sp.goal_conf = sp.goals(1:sp.j, 1:3);
-sp.home_base = [0,0,0];
+sp.home_base = [0,0,0,0,0];
 
 
 
