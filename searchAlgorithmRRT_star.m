@@ -9,7 +9,7 @@ function [path, cost, tree, final_child] = searchAlgorithmRRT_star(sp, rrtStarCo
     prevTreeSize = 0;
     bestPath = [];
     bestCost = 10000;
-    graphTree = {sp.start_conf, 0, 0, sp.start_conf};
+    graphTree = {sp.start_conf, 0, {}, 0, sp.start_conf};
     for i = 1:rrtStarConf.numOfNodes
         % If size has changed (which means a node is added),
         % then try to create a direct path from this node to the goal.
@@ -17,10 +17,9 @@ function [path, cost, tree, final_child] = searchAlgorithmRRT_star(sp, rrtStarCo
             [path, cost] = directExpansion(sp, realmax, graphTree{end, 1}, sp.goal_conf);
             if ~isempty(path)
                 [prevPath, prevCost] = backtrackPath(sp, graphTree);
-                [midPath, midCost] = directExpansion(sp, realmax, prevPath{end}, path{1});
                 
-                path = [prevPath, midPath, path];
-                cost = prevCost + midCost + cost;
+                path = [prevPath, path];
+                cost = prevCost + cost;
 
                 if cost < bestCost
                     bestPath = path;
@@ -89,7 +88,7 @@ function graphTree = updateTreeRRT_star(sp, rrtConf, graphTree, randomConfig)
     for i = 1:size(neighbours, 1)
         [path, cost] = directExpansion(sp, realmax, graphTree{neighbours(i, 1), 1}, randomConfig);
         if ~isempty(path)
-            graphTree = [graphTree; {path{end}, neighbours(i, 1), cost + graphTree{neighbours(i, 1), 3}, randomConfig}];
+            graphTree = [graphTree; {path{end}, neighbours(i, 1), path, cost + graphTree{neighbours(i, 1), 4}, randomConfig}];
             minNeighbour = neighbours(i, 1);
             break;
         end
@@ -107,14 +106,14 @@ function graphTree = updateTreeRRT_star(sp, rrtConf, graphTree, randomConfig)
         end
         [path, cost] = directExpansion(sp, realmax, randomConfig, graphTree{neighbours(i, 1), 1});
         if ~isempty(path)
-            realNeighbours = [realNeighbours; neighbours(i, 1), cost + graphTree{end, 3}];
+            realNeighbours = [realNeighbours; neighbours(i, 1), cost + graphTree{end, 4}];
         end
     end
 
     for i = 1:size(realNeighbours, 1)
-        if realNeighbours(i, 2) < graphTree{realNeighbours(i, 1), 3}
+        if realNeighbours(i, 2) < graphTree{realNeighbours(i, 1), 4}
             graphTree{realNeighbours(i, 1), 2} = size(graphTree, 1);
-            graphTree{realNeighbours(i, 1), 3} = realNeighbours(i, 2);
+            graphTree{realNeighbours(i, 1), 4} = realNeighbours(i, 2);
         end
     end
 end
@@ -133,7 +132,7 @@ function graphTree = updateTreeRRT(sp, rrtConf, graphTree, randomConfig)
     [directPath, cost] = directExpansion(sp, rrtConf.stepSize, graphTree{closestParent, 1}, randomConfig);
     if ~isempty(directPath)
         newNode = directPath{end};
-        graphTree = [graphTree; {newNode, closestParent, cost + graphTree{closestParent, 3}, randomConfig}];
+        graphTree = [graphTree; {newNode, closestParent, directPath, cost + graphTree{closestParent, 4}, randomConfig}];
     end
 end
 

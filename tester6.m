@@ -23,6 +23,24 @@ solution.h = 0;
 % solution.path = pathToRetraction(sp, sp.goal_conf, 125);
 % solution.path = pathConversion1(solution.path);
 
+sp.start_conf = [
+    0	0	50
+-45	45	175
+0	0	175
+25	-25	175
+20	0	10
+    ];
+sp.goal_conf = [
+    0	0	50
+-45	45	175
+0	0	175
+25	-25	175
+-20	20	20
+    ];
+
+[path, cost] = directExpansion(sp, realmax, sp.start_conf, sp.goal_conf);
+solution.path = pathConversion1(path);
+
 % testWriterRRTs(rrtConf, envs{2}, 1, "results.xls");
 
 % Calculate the number of submatrices you will create

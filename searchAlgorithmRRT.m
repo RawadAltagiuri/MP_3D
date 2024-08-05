@@ -13,7 +13,7 @@ Respectively:
 production.
     %}
     prevTreeSize = 0;
-    graphTree = {sp.start_conf, 0, sp.start_conf};
+    graphTree = {sp.start_conf, 0, {}, sp.start_conf};
     for i = 1:rrtConf.numOfNodes
         % If size has changed (which means a node is added),
         % then try to create a direct path from this node to the goal.
@@ -21,8 +21,10 @@ production.
             [path, cost] = directExpansion(sp, realmax, graphTree{end, 1}, sp.goal_conf);
             if ~isempty(path)
                 [prevPath, prevCost] = backtrackPath(sp, graphTree);
+
                 path = [prevPath, path];
-                cost = cost + prevCost;
+                cost = prevCost + cost;
+
                 tree = graphTree;
                 final_child = tree{end, 1};
                 return;
@@ -97,6 +99,6 @@ function graphTree = updateTreeRRT(sp, rrtConf, graphTree, randomConfig)
         % drawConfig(graphTree{closestParent, 1}, sp, 'k');
         
         newNode = directPath{end};
-        graphTree = [graphTree; {newNode, closestParent, randomConfig}];
+        graphTree = [graphTree; {newNode, closestParent, directPath, randomConfig}];
     end
 end

@@ -5,7 +5,7 @@ function [fullPath, totalCost] = backtrackPath(sp, graphTree)
     paths = {};
     while curNode{2} > 0
         parentNode = graphTree(curNode{2}, :);
-        path = curNode{3};
+        path = curNode(3);
         
         if isempty(path)
             fullPath = {};
@@ -20,7 +20,7 @@ function [fullPath, totalCost] = backtrackPath(sp, graphTree)
 
         % path(1) = [];
 
-        paths = [paths, {path}];
+        paths = [paths, path];
         totalCost = totalCost + cost;
         curNode = parentNode;
     end
@@ -28,4 +28,6 @@ function [fullPath, totalCost] = backtrackPath(sp, graphTree)
     for i = 1:size(paths, 2)
         fullPath = [fullPath, paths{i}];
     end
+
+    % fullPath = [sp.start_conf, fullPath];
 end
