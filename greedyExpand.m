@@ -36,13 +36,10 @@ function [greedyChild, isValid] = eversionChild(node, sp)
     amountOfEversion = sum(sp.goal_conf(:, 3)) - sum(parent_conf(:, 3));
     if amountOfEversion > 0
         amountOfEversion = min(amountOfEversion, sp.stepSize(2));
+        child_conf = grow(sp, parent_conf, amountOfEversion);
+
     else
         amountOfEversion = max(amountOfEversion, -sp.stepSize(2));
-    end
-
-    if amountOfEversion > 0
-        child_conf = grow(sp, parent_conf, amountOfEversion);
-    else
         child_conf = retract(parent_conf, amountOfEversion);
     end
     
@@ -74,19 +71,14 @@ function [greedyChild, isValid] = steeringChild(node, sp)
     child_conf = parent_conf;
     
     child_conf(:, 1) = sp.goal_conf(:, 1) - parent_conf(:, 1);
+    child_conf(:, 2) = sp.goal_conf(:, 2) - parent_conf(:, 2);
+
     for i = 1:size(child_conf, 1)
         if child_conf(i, 1) > 0
             child_conf(i, 1) = parent_conf(i, 1) + min(child_conf(i, 1), sp.stepSize(1));
-        else
-            child_conf(i, 1) = parent_conf(i, 1) + max(child_conf(i, 1), -sp.stepSize(1));
-        end
-    end
-
-    child_conf(:, 2) = sp.goal_conf(:, 2) - parent_conf(:, 2);
-    for i = 1:size(child_conf, 1)
-        if child_conf(i, 2) > 0
             child_conf(i, 2) = parent_conf(i, 2) + min(child_conf(i, 2), sp.stepSize(1));
         else
+            child_conf(i, 1) = parent_conf(i, 1) + max(child_conf(i, 1), -sp.stepSize(1));
             child_conf(i, 2) = parent_conf(i, 2) + max(child_conf(i, 2), -sp.stepSize(1));
         end
     end
@@ -95,7 +87,7 @@ function [greedyChild, isValid] = steeringChild(node, sp)
     % MODIFIED:
     % If there is a min length constraint violation, then grow.
     for r = 1 : sp.j
-        if child_conf(r, 3) < sp.lengthMin
+        if child_conf(r, 3) < sp.lengthMin - 0.0001
             child_conf(r:end, 1:2) = parent_conf(r:end, 1:2);
             break;
         end
