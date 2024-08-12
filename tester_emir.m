@@ -71,15 +71,18 @@ counter = 0;
 % [solution, exapndedNodes] = searchAlgorithm_Sto(sp, 100000);
 % time = toc 
 rrtConf.pOfGoal = 0.3;
-rrtConf.numOfNodes = 100;
+rrtConf.numOfNodes = 1000;
 rrtConf.stepSize = 3;
 
 [path, cost, tree, final_child] = searchAlgorithmRRT_star(sp, rrtConf, false);
+
+% sp.lengthMin = 45;
+% sp.goal_conf(end-2:end, :) = 0;
+% [path, cost] = directExpansion(sp, realmax, sp.start_conf, sp.goal_conf);
+
 solution.g = cost;
 solution.f = solution.g;
 solution.h = 0;
-
-cutPath(sp, path);
 
 animate(sp, path);
 

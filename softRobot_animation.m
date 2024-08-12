@@ -7,9 +7,6 @@
 % DISCLAIMER:
 % It must me updated to draw obstacles when we will add any in the future
 function [] = softRobot_animation(commands, home_base, drawPath, sp)
-
- 
-    
     steps = size(commands,3);       % number of steps of motion
     n_joints = size(commands,1);    % number of joints of the robot
     
@@ -81,6 +78,5 @@ function [] = softRobot_animation(commands, home_base, drawPath, sp)
 
         pause(0.1); %change this to make the animation faster/slower
     end
-    
 end
 
