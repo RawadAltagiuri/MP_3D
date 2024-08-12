@@ -99,21 +99,22 @@ function graphTree = updateTreeRRT_star(sp, rrtConf, graphTree, randomConfig)
         return;
     end
 
-    realNeighbours = [];
+    realNeighbours = {};
     for i = 1:size(neighbours, 1)
         if neighbours(i, 1) == minNeighbour
             continue;
         end
         [path, cost] = directExpansion(sp, realmax, randomConfig, graphTree{neighbours(i, 1), 1});
         if ~isempty(path)
-            realNeighbours = [realNeighbours; neighbours(i, 1), cost + graphTree{end, 4}];
+            realNeighbours(end + 1, :) = {neighbours(i, 1), path, cost + graphTree{end, 4}};
         end
     end
 
     for i = 1:size(realNeighbours, 1)
-        if realNeighbours(i, 2) < graphTree{realNeighbours(i, 1), 4}
-            graphTree{realNeighbours(i, 1), 2} = size(graphTree, 1);
-            graphTree{realNeighbours(i, 1), 4} = realNeighbours(i, 2);
+        if realNeighbours{i, 3} < graphTree{realNeighbours{i, 1}, 4}
+            graphTree{realNeighbours{i, 1}, 2} = size(graphTree, 1);
+            graphTree{realNeighbours{i, 1}, 3} = realNeighbours{i, 2};
+            graphTree{realNeighbours{i, 1}, 4} = realNeighbours{i, 3};
         end
     end
 end

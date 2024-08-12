@@ -49,16 +49,12 @@ function [solution, exapndedNodes] = searchAlgorithm_Sto(sp, fringeSize)
         [path, cost] = directExpansion(sp, 1, fringeNode.path(:,end-2:end), sp.goal_conf);
         if ~isempty(path)
             greedyChildren.path = [];
-            % for i=1:size(path,2)
             greedyChildren.path = [fringeNode.path, path{1, 2}];
-            % end
 
             greedyChildren.g = fringeNode.g + cost;
             greedyChildren.h = getHeuristic(sp.typeOfHeuristic, greedyChildren.path(:,end-2:end), sp);
             greedyChildren.f = calculateCostBasedOnAlgorithm(root.g, root.h, sp.typeOfAlg);
-    
-    
-            % [greedyChildren] = greedyExpand(fringeNode, sp); %Generating children of the current node according to greedy algorithm
+
             validGreedyFound = false;
             for i = 1 :size(greedyChildren, 1)
                 child = greedyChildren(i);
@@ -76,6 +72,24 @@ function [solution, exapndedNodes] = searchAlgorithm_Sto(sp, fringeSize)
         else
             validGreedyFound = false;
         end
+
+
+        % [greedyChildren] = greedyExpand(fringeNode, sp); %Generating children of the current node according to greedy algorithm
+        % validGreedyFound = false;
+        % for i = 1 :size(greedyChildren, 1)
+        %     child = greedyChildren(i);
+        %     [isColliding, ~] = collisionCheck(child.path(:,end-2:end), sp);%Checking if the greedy children are valid (not colliding), if not we will generate children according to the current algorithm [Astar, UCS, greedy]
+        %     if ~set.contains(mat2str(child.path(:,end-2:end)))
+        %         if isColliding == false
+        %             validGreedyFound = true;
+        %             PDQ('add', fringe, {[child.f child.g child.h], child.path});
+        %             set.add(mat2str(child.path(:,end-2:end)));
+        %         else
+        %             set.add(mat2str(child.path(:,end-2:end)));
+        %         end
+        %     end
+        % end
+
         if validGreedyFound == false %If no valid greedy children were found, we generate children according to the current algorithm [Astar, UCS, Greedy]
             children = FullExpand(fringeNode, sp);
             for i = 1 :size(children, 1)
@@ -98,5 +112,3 @@ function [solution, exapndedNodes] = searchAlgorithm_Sto(sp, fringeSize)
     end
     PDQ('delete', fringe);
 end
-
-

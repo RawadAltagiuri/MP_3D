@@ -1,5 +1,8 @@
 function [path, cost, tree, final_child] = searchAlgorithmRRT(sp, rrtConf, SHOW)
+    path = {};
+    cost = 0;
     tree = {};
+    final_child = [];
     
     if SHOW
         drawInit(sp.start_conf, sp.goal_conf, sp)

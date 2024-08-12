@@ -19,7 +19,7 @@ function [] = softRobot_animation(commands, home_base, drawPath, sp)
     n_obstacles = size(sp.obstacles,1);
 
 
-    for k=1:1:steps
+    for k=1:1:steps        
         clf;
         hold on;
         axis equal;
@@ -79,7 +79,7 @@ function [] = softRobot_animation(commands, home_base, drawPath, sp)
         cameratoolbar('SetCoordSys','x');
         view(60, 30)
 
-        pause(0); %change this to make the animation faster/slower
+        pause(0.1); %change this to make the animation faster/slower
     end
     
 end

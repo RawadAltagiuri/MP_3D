@@ -103,45 +103,56 @@ function coordinates = solveForwardKinematics_3D(conf, home_base, draw)
     % transformations: Nx3 matrix where each row is [rotX, rotY, extZ]
     % Output:
     % coordinates: Nx3 matrix where each row is [x, y, z]
-    u = 1;
+    
     % Number of transformations
     num_links = size(conf, 1);
-
+    
     % Initialize coordinates matrix
     coordinates = zeros(num_links+1, 3);
-
+    
+    R = eye(3);
     % Initial position
-    accXcor = home_base(1);
-    accYcor = home_base(2);
-    accZcor = home_base(3);
-    accRotX = home_base(4);
-    accRotY = home_base(5);
+    x = home_base(1);
+    y = home_base(2);
+    z = home_base(3);
+
+    rotx = home_base(4);
+    roty = home_base(5);
+
+    Rx = [1, 0, 0; 0, cosd(rotx), -sind(rotx); 0, sind(rotx), cosd(rotx)];
+    Ry = [cosd(roty), 0, sind(roty); 0, 1, 0; -sind(roty), 0, cosd(roty)];
+    R = Ry*Rx*R;
+    % Apply rotations
+    tcp_coordinates = (R * [0 0 0]')';
+    
+    % Apply extension
+    new_coordinates = tcp_coordinates + [x, y, z];
+    
+    % Store new position in coordinates matrix
+    coordinates(1, :) = new_coordinates;
+
+
+
     for i = 1:num_links
-        % Extract current transformation
-        accRotX = conf(i, 1) + accRotX;
-        accRotY = conf(i, 2) + accRotY;
-        extZ = conf(i, 3);
-        pointFromZero = [0 0 extZ];
-        % Create rotation matrices
-        Rx = [1, 0, 0; 0, cosd(accRotX), -sind(accRotX); 0, sind(accRotX), cosd(accRotX)];
-        Ry = [cosd(accRotY), 0, sind(accRotY); 0, 1, 0; -sind(accRotY), 0, cosd(accRotY)];
+        rotx = conf(i,1);
+        roty = conf(i,2);
+        growth = conf(i,3);
 
+        Rx = [1, 0, 0; 0, cosd(rotx), -sind(rotx); 0, sind(rotx), cosd(rotx)];
+        Ry = [cosd(roty), 0, sind(roty); 0, 1, 0; -sind(roty), 0, cosd(roty)];
+        R = Ry*Rx*R;
         % Apply rotations
-        newPointFromZero = (Rx * Ry * pointFromZero')';
-
+        tcp_coordinates = (R * [0 0 growth]')';
+        
         % Apply extension
-        newPoint = newPointFromZero + [accXcor, accYcor, accZcor];
-        accXcor = newPoint(1);
-        accYcor = newPoint(2);
-        accZcor = newPoint(3);
+        new_coordinates = tcp_coordinates + [x, y, z];
+        x = new_coordinates(1);
+        y = new_coordinates(2);
+        z = new_coordinates(3);
 
-
+        
         % Store new position in coordinates matrix
-        coordinates(i+1, :) = newPoint;
-    end
-
-    if draw
-        drawProblem3D(sp, sp.start_conf, sp.home_base)
+        coordinates(i+1, :) = new_coordinates;
     end
 end
 

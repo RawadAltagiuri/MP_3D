@@ -6,9 +6,9 @@ function firstWrong = checkPath(sp, path)
         diffConfig = abs(conf1 - conf2);
         % Check length.
         for j = 1:size(conf1, 1)
-            if lesser(sp.stepSize(2), diffConfig(j, 3), sp.eps) || ...
+            if lesser(sp.stepSize(2), diffConfig(j, 3), 0.0001) || ...
                 (conf2(j, 3) ~= 0 && ...
-                    (lesser(sp.stepSize(1), diffConfig(j, 1), sp.eps) || lesser(sp.stepSize(1), diffConfig(j, 2), sp.eps)))
+                    (lesser(sp.stepSize(1), diffConfig(j, 1), 0.0001) || lesser(sp.stepSize(1), diffConfig(j, 2), 0.0001)))
                 firstWrong = i;
                 return;
             end

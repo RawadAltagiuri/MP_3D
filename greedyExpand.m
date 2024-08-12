@@ -76,9 +76,13 @@ function [greedyChild, isValid] = steeringChild(node, sp)
     for i = 1:size(child_conf, 1)
         if child_conf(i, 1) > 0
             child_conf(i, 1) = parent_conf(i, 1) + min(child_conf(i, 1), sp.stepSize(1));
-            child_conf(i, 2) = parent_conf(i, 2) + min(child_conf(i, 2), sp.stepSize(1));
         else
             child_conf(i, 1) = parent_conf(i, 1) + max(child_conf(i, 1), -sp.stepSize(1));
+        end
+
+        if child_conf(i, 2) > 0
+            child_conf(i, 2) = parent_conf(i, 2) + min(child_conf(i, 2), sp.stepSize(1));
+        else
             child_conf(i, 2) = parent_conf(i, 2) + max(child_conf(i, 2), -sp.stepSize(1));
         end
     end
@@ -110,6 +114,7 @@ function [greedyChild, isValid] = steeringChild(node, sp)
 
         return;
     end
+
 
     isValid = true;
     greedyChild.label = 'steering';

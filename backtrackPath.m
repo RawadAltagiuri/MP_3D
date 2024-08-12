@@ -12,20 +12,15 @@ function [fullPath, totalCost] = backtrackPath(sp, graphTree)
             totalCost = -1;
             return;
         end
-
-        cost = costOfPath(sp, path);
-        if isequal(path{1}, parentNode{1})
-            path(1) = [];
+        
+        if ~isempty(paths) && isequal(path{end}, paths{1})
+            path(end) = [];
         end
 
-        % path(1) = [];
-
-        paths = [paths, {path}];
-        totalCost = totalCost + cost;
+        paths = [path, paths];
         curNode = parentNode;
     end
-    paths = flip(paths, 2);
-    for i = 1:size(paths, 2)
-        fullPath = [fullPath, paths{i}];
-    end
+
+    fullPath = paths;
+    totalCost = costOfPath(sp, fullPath);
 end
