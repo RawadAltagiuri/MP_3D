@@ -1,4 +1,6 @@
 function [path, cost, tree, final_child] = searchAlgorithmRRT_star(sp, rrtStarConf, SHOW)
+    path = {};
+    cost = -1;
     tree = {};
     final_child = [];
     
@@ -8,7 +10,7 @@ function [path, cost, tree, final_child] = searchAlgorithmRRT_star(sp, rrtStarCo
 
     prevTreeSize = 0;
     bestPath = [];
-    bestCost = 10000;
+    bestCost = realmax;
     graphTree = {sp.start_conf, 0, {}, 0, sp.start_conf};
     for i = 1:rrtStarConf.numOfNodes
         % If size has changed (which means a node is added),
@@ -47,19 +49,7 @@ function [path, cost, tree, final_child] = searchAlgorithmRRT_star(sp, rrtStarCo
     if ~isempty(bestPath)
         path = bestPath;
         cost = bestCost;
-        tree = graphTree;
-        return;
     end
-
-    prevTreeSize = size(graphTree, 1);
-    graphTree = updateTreeRRT_star(sp, rrtStarConf, graphTree, sp.goal_conf);
-    if prevTreeSize ~= size(graphTree, 1)
-        [path, cost] = backtrackPath(sp, graphTree);
-    else
-        path = {};
-        cost = -1;
-    end
-
     tree = graphTree;
 end
 

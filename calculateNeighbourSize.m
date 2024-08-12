@@ -1,4 +1,5 @@
-function neighbourSize = calculateNeighbourSize(tempConfig, targetConfig, sp)
+function neighbourSize = calculateNeighbourSize(sp)
+    tempConfig = sp.start_conf;
     tempConfig(1:end, 1:end) = 0;
     for i = 1:size(tempConfig, 1)
         tempConfig(i, 3) = sp.design(i);

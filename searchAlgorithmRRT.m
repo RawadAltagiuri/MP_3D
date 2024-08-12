@@ -1,6 +1,6 @@
 function [path, cost, tree, final_child] = searchAlgorithmRRT(sp, rrtConf, SHOW)
     path = {};
-    cost = 0;
+    cost = -1;
     tree = {};
     final_child = [];
     
@@ -29,7 +29,7 @@ production.
                 cost = prevCost + cost;
 
                 tree = graphTree;
-                final_child = tree{end, 1};
+                final_child = size(tree, 1);
                 return;
             end
         end

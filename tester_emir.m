@@ -49,16 +49,16 @@
 clear, clc, close;
 
 load envs
-sp = envs{1};
+sp = envs{5};
 sp.baseRotate = false;
 sp.heuristicLimit = 0.01;
 
 
 
-rrtConf.pOfGoal = 0.5;
+rrtConf.pOfGoal = 0.1;
 rrtConf.numOfNodes = 200;
-rrtConf.stepSize = 15;
-rrtConf.neighbourSize = calculateNeighbourSize(sp.start_conf, sp.goal_conf, sp);
+rrtConf.stepSize = 1;
+rrtConf.neighbourSize = calculateNeighbourSize(sp);
 % tic
 counter = 0;
 
@@ -74,7 +74,7 @@ rrtConf.pOfGoal = 0.3;
 rrtConf.numOfNodes = 1000;
 rrtConf.stepSize = 3;
 
-[path, cost, tree, final_child] = searchAlgorithmRRT_star(sp, rrtConf, false);
+[path, cost, tree, final_child] = searchAlgorithmRRT(sp, rrtConf, true);
 
 % sp.lengthMin = 45;
 % sp.goal_conf(end-2:end, :) = 0;

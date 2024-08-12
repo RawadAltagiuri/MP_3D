@@ -156,10 +156,9 @@ function coordinates = solveForwardKinematics_3D(conf, home_base, draw)
     end
 
     if draw
-        modSp.home_base = home_base;
+        modSp = sp;
         modSp.obstacles = [];
-        drawInit(conf, conf, modSp)
-        drawConfig(conf, modSp, 'b');
+        animate(sp, {})
     end
 end
 
