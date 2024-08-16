@@ -13,6 +13,15 @@ be not from that specific action. For example, even if 'config's length is small
 than 'goal's, and top priority is retraction, it may not be able to
 retract because it first need to steer to some position, then it will
 perform steering action in the name of 'Retraction'.
+
+Inputs:
+- sp, the problem specification
+- config, the configuration to expand from, it is a sp.j x 3 matrix.
+- goal, the goal configuration to expand to, its structure is same as
+config.
+
+Outputs:
+- Resulting configuration from expansion from config to goal.
 %}
 function config = greedyExpand(sp, config, goal)
     diffLength = sum(goal(:, 3)) - sum(config(:, 3));
