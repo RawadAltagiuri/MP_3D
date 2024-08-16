@@ -13,7 +13,7 @@
 %'expandedNodes': the number of expanded nodes to find the optimal solution
 %
 
-function [solution, exapndedNodes] = searchAlgorithm(sp)
+function [solution, exapndedNodes] = searchAlgorithm(sp, fringeSize)
     exapndedNodes = 0;
     root.g = 0;
     root.h = getHeuristic(sp.typeOfHeuristic, sp.start_conf, sp);
@@ -21,7 +21,7 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
     root.path = sp.start_conf;
     fringe = PDQ('init');
     PDQ('add', fringe, {[root.f, root.g, root.h], root.path}); %Initiating the the priority deque which is a custom class implemented in c++ and used with a wrapper in matlab
-    PDQ('setMaxSize', fringe, 10000); %Set the max size of the priority deque
+    PDQ('setMaxSize', fringe, fringeSize); %Set the max size of the priority deque
     set = java.util.HashSet; %A hashset used from the Java library to prevent cycles
     while ~PDQ('empty', fringe)
         [priority, path] = PDQ('poll', fringe);

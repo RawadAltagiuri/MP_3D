@@ -162,7 +162,7 @@ sp.home_base = [0,0,0,0,0];
 
 
 tic
-[solution, expandedNodes] =searchAlgorithm(sp);
+[solution, expandedNodes] =searchAlgorithm(sp, 25);
 time = toc
 if isempty(solution)
     return;
