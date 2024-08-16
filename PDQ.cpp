@@ -1,9 +1,25 @@
 #include "mex.h"
 #include "PDQquickMode.h"
+#include <cstring>
+#include "PriorityQueue.h"
+
+using namespace std;
 
 //Previously Named wrapperPDQquickMode
 // This program works as the translator between MATLAB and C++. It uses the priority_deque class (in the PDQHeap.h file) and the mex.h library to create a MEX file that can be used in MATLAB.
-priority_deque<std::pair<std::vector<double>, std::vector<std::vector<double>>>> *pq = NULL;
+
+
+struct Solution {
+    std::vector<double> first;
+    std::vector<std::vector<double>> second;
+
+    Solution(std::pair<std::vector<double>, std::vector<std::vector<double>>> solPairA): first{solPairA.first}, second{solPairA.second} {} 
+    bool operator<(Solution& otherSol) {
+        return first[0] < otherSol.first[0];
+    }
+};
+
+PriorityQueue<Solution> *pq = NULL;
 // The gateway function
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
@@ -19,7 +35,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     // Initialize, e.g: pq_ptr = priority_deque_mex('init')
     if(strcmp(command, "init") == 0) { //strcmp returns 0 if the two strings are equal
         // Create a priority_deque instance and store the pointer in plhs[0]
-        pq = new priority_deque<std::pair<std::vector<double>, std::vector<std::vector<double>>>>();
+        pq = new PriorityQueue<Solution>();
         plhs[0] = mxCreateNumericMatrix(1, 1, mxINDEX_CLASS, mxREAL);
         memcpy(mxGetData(plhs[0]), &pq, sizeof(pq));
         return;
@@ -68,8 +84,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
             inputMat.push_back(row);
         }
         input.second = inputMat;
+        Solution inputSol = Solution(input);
             // input.second = pair;
-        pq->add(input);
+        pq->insert(input);
         return;
     }
 
@@ -90,7 +107,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         }
 
         // Get the pair returned by the priority deque
-        std::pair<std::vector<double>, std::vector<std::vector<double>>> result = pq->poll();
+        Solution result = pq->poll();
         std::vector<double> firstElement = result.first;
         std::vector<std::vector<double>> secondElement = result.second;
 
@@ -126,7 +143,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
         }
 
         // Get the pair returned by the priority deque
-        std::pair<std::vector<double>, std::vector<std::vector<double>>> result = pq->peek();
+        Solution result = pq->peek();
         std::vector<double> firstElement = result.first;
         std::vector<std::vector<double>> secondElement = result.second;
 
