@@ -45,7 +45,7 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
                 fringeNode.h = getHeuristic(sp.typeOfHeuristic, sp.start_conf, sp);
             end
         end
-        [greedyChildren] = greedyExpand(fringeNode, sp); %Generating children of the current node according to greedy algorithm
+        [greedyChildren] = WrapperForOmersGreedyExpand(fringeNode, sp)
         validGreedyFound = false;
         for i = 1 :size(greedyChildren, 1)
             child = greedyChildren(i);

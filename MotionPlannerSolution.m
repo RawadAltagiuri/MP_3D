@@ -48,7 +48,7 @@
 
 clear, clc, close;
 
-sp.problemName = "wall";
+sp.problemName = "hole";
 sp.typeOfAlg = 'astar';
 sp.typeOfHeuristic = 'continue';
 
@@ -188,7 +188,7 @@ for i=2:size(formattedPathForAnimation,3)
     [growthCount, retractCount, steerCount] = actionCounter(formattedPathForAnimation(:, :, i), formattedPathForAnimation(:, :, i-1), growthCount, retractCount, steerCount);
 end
  
- softRobot_animation(formattedPathForAnimation, [0,0,0], true, sp);
+ softRobot_animation(formattedPathForAnimation, sp.home_base, true, sp);
 
 
 
