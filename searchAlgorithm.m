@@ -29,7 +29,7 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
         %find the nearest node to the random configuration
         nearest_node = findNearestNode(nodes_map, random_conf, sp);
         sp.random_conf = random_conf;
-        greedyChildren = greedyExpand(nearest_node, sp);
+        greedyChildren = WrapperForOmersGreedyExpand(nearest_node, sp);
         if isempty(greedyChildren)
             continue; % skip the rest of the current iteration
         else

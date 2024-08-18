@@ -1,135 +1,82 @@
-%Produces 'greedy' children of the given node (configuration), the
-%children are one for eversion and one for steering
-%
-%Input:
-% 'node': The configuration matrix of the parent
-% 'sp': The search problem as described in 'MotionPlannerSolution.m'
+%{
+Generates a sub-sequent configuration to go from 'config'
+to 'goal'.
+Prefered order of action is:
+ 1- Retraction,
+ 2- Steer,
+ 3- Grow,
+In this preference list, if robot can do the prior action, then it will
+generate the result configuration of the action.
+It should be noted that due to physical and other constraints of the robot,
+even though a specific action is chosen, the resulting configuration may 
+be not from that specific action. For example, even if 'config's length is smaller
+than 'goal's, and top priority is retraction, it may not be able to
+retract because it first need to steer to some position, then it will
+perform steering action in the name of 'Retraction'.
 
-function [children] = greedyExpand(node, searchProblem)
-    children = [];
+Inputs:
+- sp, the problem specification
+- config, the configuration to expand from, it is a sp.j x 3 matrix.
+- goal, the goal configuration to expand to, its structure is same as
+config.
 
-    [greedyChild, isValid] = steeringChild(node, searchProblem); % Produce the steering child
-    % check if the steering child is colliding with the obstacles
-    if isValid % only check for collision if the child was initially considered valid
-        [isColliding, ~] = collisionCheck(greedyChild.path(:,end-2:end), searchProblem);
-        if ~isColliding
-            children = [children ; greedyChild];
+Outputs:
+- Resulting configuration from expansion from config to goal.
+%}
+function config = greedyExpand(sp, config, goal)
+    diffLength = sum(goal(:, 3)) - sum(config(:, 3));
+    lastExpanded = -1;
+    for i = size(config, 1):-1:1
+        if config(i, 3) > 0.0001
+            lastExpanded = i;
+            break,
         end
     end
+    diffAngles = goal(1:lastExpanded, 1:2) - config(1:lastExpanded, 1:2);
 
-    [greedyChild, isValid] = eversionChild(node, searchProblem); % Produce the eversion child
-    % check if the eversion child is colliding with the obstacles
-    if isValid % only check for collision if the child was initially considered valid
-        [isColliding, ~] = collisionCheck(greedyChild.path(:,end-2:end), searchProblem);
-        if ~isColliding
-            children = [children ; greedyChild];
+    if diffLength < -0.0001
+        %Retraction
+
+        retAmount = max(diffLength, -sp.stepSize(2));
+        if config(lastExpanded, 3) + retAmount < sp.lengthMin && ~isequal(config(lastExpanded, 1:2), [0, 0])
+            angleAmounts = -config(lastExpanded, 1:2);
+            for i = 1:size(angleAmounts, 2)
+                angleAmount = angleAmounts(i);
+                if angleAmount > 0
+                    angleAmount = min(angleAmount, sp.stepSize(1));
+                else
+                    angleAmount = max(angleAmount, -sp.stepSize(1));
+                end
+                angleAmounts(i) = angleAmount;
+            end
+            config(lastExpanded, 1:2) = config(lastExpanded, 1:2) + angleAmounts;
+        else
+            config = retract(config, -retAmount);
         end
-    end
+    elseif ~isequal(diffAngles, zeros(lastExpanded, 2))
+        %Steering
 
-    %sort the children based on the heuristic value
-    if size(children, 1) > 1 && children(2).h < children(1).h
-        temp = children(1);
-        children(1) = children(2);
-        children(2) = temp;
-    end
-end
+        if config(lastExpanded, 3) < sp.lengthMin && ~isequal(config(lastExpanded, 1:2), [0, 0])
+            growAmount = sp.lengthMin - config(lastExpanded, 3);
+            growAmount = min(sp.stepSize(2), growAmount);
 
-%Produces the eversion child
-%Input:
-% 'node': The configuration matrix of the parent
-% 'sp': The search problem as described in 'MotionPlannerSolution.m'
-% Output:
-% 'greedyChild': The generated child node
-% 'isValid': Flag indicating whether the child is a valid node
-
-function [greedyChild, isValid] = eversionChild(node, searchProblem)
-    %Extract the configuration of the parent node
-    parent_conf = node.path(:, end-2:end);
-    child_conf = parent_conf;
-    %Since a link cannot expand unless the previous link is full expanded,
-    %we can calculate the eversion of the next link by sum of current links
-    %+ amount of eversion which is the difference between the goal and the
-    %parent
-    amountOfEversion = (sign(sum(searchProblem.random_conf(:, 3)) - sum(parent_conf(:, 3))) * searchProblem.stepSize(2));
-    totaleversion = sum(parent_conf(:, 3)) + amountOfEversion;
-    
-    %distributing the eversion among links
-    for r = 1 : searchProblem.j
-        child_conf(r, 3) = totaleversion;
-        if child_conf(r, 3) < searchProblem.random_conf(r, 3) && amountOfEversion < 0
-            child_conf(r, 3) = searchProblem.random_conf(r, 3);
-        elseif child_conf(r, 3) > searchProblem.random_conf(r, 3) && amountOfEversion > 0
-            child_conf(r, 3) = searchProblem.random_conf(r, 3);
+            config = grow(sp, config, growAmount);
+        else
+            for i = 1:size(diffAngles, 1) * size(diffAngles, 2)
+                if diffAngles(i) > 0
+                    diffAngles(i) = min(diffAngles(i), sp.stepSize(1));
+                else
+                    diffAngles(i) = max(diffAngles(i), -sp.stepSize(1));
+                end
+            end
+            config(1:lastExpanded, 1:2) = config(1:lastExpanded, 1:2) + diffAngles;
         end
-        if child_conf(r, 3) > searchProblem.design(r)
-            child_conf(r, 3) = searchProblem.design(r);
-        elseif child_conf(r, 3) < 0
-            child_conf(r, 3) = 0;
-            break;
-        end
-        totaleversion = totaleversion - child_conf(r, 3);
+    elseif diffLength > 0.0001
+        % Grow.
+        
+        growAmount = min(diffLength, sp.stepSize(2));
+        config = grow(sp, config, growAmount);
+    else
+        config = [];
     end
-    
-    %check if the child configuration is the same as the parent's configuration
-    if isequal(child_conf, parent_conf)
-        greedyChild = [];
-        isValid = false;
-        return;
-    end
-    isValid = true;
-    greedyChild.label = 'eversion';
-    greedyChild.g = node.g + calculateCost(node.path(:,end-2:end), child_conf, searchProblem.home_base);
-    greedyChild.h = getHeuristic(searchProblem.typeOfHeuristic, child_conf, searchProblem);
-    greedyChild.f = calculateCostBasedOnAlgorithm(greedyChild.g, greedyChild.h, searchProblem.typeOfAlg);
-    greedyChild.path = [node.path , child_conf];
-end
-
-%Produces the eversion child
-%Input:
-% 'node': The configuration matrix of the parent
-% 'sp': The search problem as described in 'MotionPlannerSolution.m'
-%Output:
-% 'greedyChild': The generated child node
-% 'isValid': Flag indicating whether the child is a valid node
-function [greedyChild, isValid] = steeringChild(node, searchProblem)
-    % Extract the configuration of the parent node
-    parent_conf = node.path(:, end-2:end);
-    child_conf = parent_conf;
-
-     %update the x and y coordinates of the child based on steering towards the goal
-    child_conf(:, 1:2) = parent_conf(:, 1:2) + (sign(searchProblem.random_conf(:, 1:2) - parent_conf(:, 1:2)) * searchProblem.stepSize(1));
-    
-%   Make sure we don't overshoot to our taget due to the step size
-    for ConfCount = 1:searchProblem.j
-        if searchProblem.random_conf(ConfCount, 1) > parent_conf(ConfCount, 1) && searchProblem.random_conf(ConfCount, 1) < child_conf(ConfCount, 1)
-            child_conf(ConfCount,1) = searchProblem.random_conf(ConfCount, 1);
-        elseif searchProblem.random_conf(ConfCount, 1) < parent_conf(ConfCount, 1) && searchProblem.random_conf(ConfCount, 1) > child_conf(ConfCount, 1)
-            child_conf(ConfCount,1) = searchProblem.random_conf(ConfCount, 1);
-        end
-        if searchProblem.random_conf(ConfCount, 2) > parent_conf(ConfCount, 2) && searchProblem.random_conf(ConfCount, 2) < child_conf(ConfCount, 2)
-            child_conf(ConfCount,2) = searchProblem.random_conf(ConfCount, 2);
-        elseif searchProblem.random_conf(ConfCount, 2) < parent_conf(ConfCount, 2) && searchProblem.random_conf(ConfCount, 2) > child_conf(ConfCount, 2)
-            child_conf(ConfCount,2) = searchProblem.random_conf(ConfCount, 2);
-        end
-    end
-    %Check if the resulting child violates the minimum length constraint
-    for r = 1 : searchProblem.j
-        if child_conf(r, 3) < searchProblem.lengthMin
-            child_conf(r:end, 1:2) = parent_conf(r:end, 1:2);
-            break;
-        end
-    end
-
-    %check if the child configuration is the same as the parent's configuration
-    if isequal(child_conf, parent_conf)
-        greedyChild = [];
-        isValid = false;
-        return;
-    end
-    isValid = true;
-    greedyChild.label = 'steering';
-    greedyChild.g = node.g + calculateCost(node.path(:,end-2:end), child_conf, searchProblem.home_base);
-    greedyChild.h = getHeuristic(searchProblem.typeOfHeuristic, child_conf, searchProblem);
-    greedyChild.f = calculateCostBasedOnAlgorithm(greedyChild.g, greedyChild.h, searchProblem.typeOfAlg);
-    greedyChild.path = [node.path , child_conf];
 end
