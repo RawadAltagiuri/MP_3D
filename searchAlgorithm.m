@@ -29,7 +29,7 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
         %find the nearest node to the random configuration
         nearest_node = findNearestNode(nodes_map, random_conf, sp);
         sp.random_conf = random_conf;
-        greedyChildren = greedyExpand(nearest_node, sp);
+        greedyChildren = WrapperForOmersGreedyExpand(nearest_node, sp);
         if isempty(greedyChildren)
             continue; % skip the rest of the current iteration
         else
@@ -55,11 +55,11 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
         end
     end
 
-    if i == sp.iterations && isempty(finalChild)
-        disp("Goal not reached, re-running MotionPlannerSolution");
-        [solution, exapndedNodes] = searchAlgorithm(sp);
-        return;
-    end
+%     if i == sp.iterations && isempty(finalChild)
+%         disp("Goal not reached, re-running MotionPlannerSolution");
+%         [solution, exapndedNodes] = searchAlgorithm(sp);
+%         return;
+%     end
         
 
     exapndedNodes = i;
