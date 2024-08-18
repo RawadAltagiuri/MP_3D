@@ -19,21 +19,21 @@ function [BestParent, child] = findBestParent(child, nearest_node, nodes_map, sp
         original_random_conf = sp.random_conf;
         sp.random_conf = parent_node.path(:, end-2:end);
         
-        greedyChildren = greedyExpand(child, sp);
+        greedyChildren = WrapperForOmersGreedyExpand(child, sp);
         
         % Restore the original random_conf
         sp.random_conf = original_random_conf;
         
-        for j = 1:length(greedyChildren)
-            if isequal(greedyChildren(j).path(:, end-2:end), parent_node.path(:, end-2:end))
-                potential_parents = [potential_parents, parent_node];
-                if parent_node.g < lowest_g
-                    lowest_g = parent_node.g;
-                    BestParent = parent_node;
-                end
-                break; % Found a match, no need to check other children
+
+        if isequal(greedyChildren.path(:, end-2:end), parent_node.path(:, end-2:end))
+            potential_parents = [potential_parents, parent_node];
+            if parent_node.g < lowest_g
+                lowest_g = parent_node.g;
+                BestParent = parent_node;
             end
+            break; % Found a match, no need to check other children
         end
+
     end
     
     if isempty(BestParent)
