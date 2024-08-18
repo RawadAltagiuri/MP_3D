@@ -55,14 +55,14 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
         end
     end
 
-%     if i == sp.iterations && isempty(finalChild)
-%         disp("Goal not reached, re-running MotionPlannerSolution");
-%         [solution, exapndedNodes] = searchAlgorithm(sp);
-%         return;
-%     end
+    exapndedNodes = i;
+    if i == sp.iterations && isempty(finalChild)
+        solution = [];
+
+        return;
+    end
         
 
-    exapndedNodes = i;
     solution.map = nodes_map;
 
     %create the path beginning from the final child to the root, then reverse it, we retrieve the parent of the last (:, end-2:end) from the map and then add it to the right of the path
