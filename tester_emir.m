@@ -49,16 +49,11 @@
 clear, clc, close;
 
 load envs
-sp = envs{5};
+sp = envs{1};
 sp.baseRotate = false;
 sp.heuristicLimit = 0.01;
 
 
-
-rrtConf.pOfGoal = 0.1;
-rrtConf.numOfNodes = 200;
-rrtConf.stepSize = 1;
-rrtConf.neighbourSize = calculateNeighbourSize(sp);
 % tic
 counter = 0;
 
@@ -70,11 +65,13 @@ counter = 0;
 % [path, cost] = directExpansion(sp, 10000, sp.start_conf, sp.goal_conf);
 % [solution, exapndedNodes] = searchAlgorithm_Sto(sp, 100000);
 % time = toc 
-rrtConf.pOfGoal = 0.3;
-rrtConf.numOfNodes = 1000;
-rrtConf.stepSize = 3;
+rrtConf.pOfGoal = 0;
+rrtConf.numOfNodes = 100;
+rrtConf.stepSize = 20;
+rrtConf.neighbourSize = calculateNeighbourSize(sp);
 
-[path, cost, tree, final_child] = searchAlgorithmRRT(sp, rrtConf, true);
+
+[path, cost, tree, final_child] = searchAlgorithmRRT_star(sp, rrtConf, false);
 
 % sp.lengthMin = 45;
 % sp.goal_conf(end-2:end, :) = 0;

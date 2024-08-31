@@ -23,7 +23,7 @@ function [path, cost, tree, final_child] = searchAlgorithmRRT_star(sp, rrtStarCo
                 path = [prevPath, path];
                 cost = prevCost + cost;
 
-                if cost <= bestCost
+                if cost < bestCost
                     bestPath = path;
                     bestCost = cost;
                     final_child = size(graphTree, 1);

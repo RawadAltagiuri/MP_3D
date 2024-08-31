@@ -34,15 +34,8 @@ production.
             end
         end
 
-        if rand(1) > rrtConf.pOfGoal
-            randomConfig = randomConf(sp);
-            chosenGoal = false;
-        else
-            randomConfig = sp.goal_conf;
-            chosenGoal = true;
-        end
+        randomConfig = randomConf(sp);
 
-        
         prevTreeSize = size(graphTree, 1);
         graphTree = updateTreeRRT(sp, rrtConf, graphTree, randomConfig);
 
@@ -51,28 +44,6 @@ production.
             drawConfig(graphTree{end, 1}, sp, 'b');
             pause
         end
-
-        % If goal was sampled and tree size has changed,
-        % which means a path is found.
-        if chosenGoal && prevTreeSize ~= size(graphTree, 1) && ...
-                getHeuristic(sp.typeOfHeuristic, graphTree{end, 1}, sp) < 1
-            [path, cost] = backtrackPath(sp, graphTree);
-            tree = graphTree;
-            final_child = tree{end, 1};
-            return;
-        end
-    end
-
-
-    prevTreeSize = size(graphTree, 1);
-    graphTree = updateTreeRRT(sp, rrtConf, graphTree, sp.goal_conf);
-    if prevTreeSize ~= size(graphTree, 1) && getHeuristic(sp.typeOfHeuristic, graphTree{end, 1}, sp) < 1
-        [path, cost] = backtrackPath(sp, graphTree);
-        tree = graphTree;
-        final_child = tree{end, 1};
-    else
-        path = {};
-        cost = -1;
     end
 end
 

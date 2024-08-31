@@ -8,6 +8,9 @@ run_num = 10;
 
 
 for i=1:size(envs, 2)
+    if i == 3
+        continue
+    end
     sp_counter = i      
     sp = envs{i};
     tabulation(sp, run_num);
