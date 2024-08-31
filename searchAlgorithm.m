@@ -52,6 +52,8 @@ function [solution, exapndedNodes] = searchAlgorithm(sp)
     end
 
     if i == sp.iterations && isempty(finalChild)
+        disp('No Solution');
+        plotConfigTree(nodes_map, sp)
         solution = [];
         exapndedNodes = i;
         return;
