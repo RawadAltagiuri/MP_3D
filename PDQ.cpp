@@ -1,6 +1,5 @@
 #include "mex.h"
 #include "PDQquickMode.h"
-#include "cstring"
 
 //Previously Named wrapperPDQquickMode
 // This program works as the translator between MATLAB and C++. It uses the priority_deque class (in the PDQHeap.h file) and the mex.h library to create a MEX file that can be used in MATLAB.
