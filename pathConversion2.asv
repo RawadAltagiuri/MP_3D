@@ -1,0 +1,5 @@
+function cellPath = pathConversion2(path)
+    cellPath = {};
+    for i = 1:
+end
+

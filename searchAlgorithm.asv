@@ -12,28 +12,22 @@
 %
 %'expandedNodes': the number of expanded nodes to find the optimal solution
 %
-function [solution, expandedNodes] = searchAlgorithm(sp, fringeSize, isDet)
-    if isDet
-        [solution, expandedNodes] = searchAlgorithm_Det(sp, fringeSize);
-    else
-        [solution, expandedNodes] = searchAlgorithm_Sto(sp, fringeSize);
-    end
+function [solution, expandedNodes] = searchAlgorithm(sp, fringeSize)
+
 end
 
 function [solution, expandedNodes] = searchAlgorithm_Sto(sp, fringeSize)
-    sp.obstacles(:, 4:5) = sp.obstacles(:, 4:5) + 5;
-
     expandedNodes = 0;
     root.g = 0;
     root.h = getHeuristic(sp.typeOfHeuristic, sp.start_conf, sp);
     root.f = calculateCostBasedOnAlgorithm(root.g, root.h, sp.typeOfAlg);
     root.path = sp.start_conf;
-    fringe = PDQ_sto('init');
-    PDQ_sto('add', fringe, {[root.f, root.g, root.h], root.path}); %Initiating the the priority deque which is a custom class implemented in c++ and used with a wrapper in matlab
-    PDQ_sto('setMaxSize', fringe, fringeSize); %Set the max size of the priority deque
+    fringe = PDQ('init');
+    PDQ('add', fringe, {[root.f, root.g, root.h], root.path}); %Initiating the the priority deque which is a custom class implemented in c++ and used with a wrapper in matlab
+    PDQ('setMaxSize', fringe, fringeSize); %Set the max size of the priority deque
     set = java.util.HashSet; %A hashset used from the Java library to prevent cycles
-    while ~PDQ_sto('empty', fringe)
-        [priority, path] = PDQ_sto('poll', fringe);
+    while ~PDQ('empty', fringe)
+        [priority, path] = PDQ('poll', fringe);
         fringeNode.f = priority(1);
         fringeNode.g = priority(2);
         fringeNode.h = priority(3);
@@ -48,7 +42,7 @@ function [solution, expandedNodes] = searchAlgorithm_Sto(sp, fringeSize)
                 solution = fringeNode;
                 return;
             else 
-                PDQ_sto('clear', fringe);
+                PDQ('clear', fringe);
                 set.clear;
                 sp.goal_conf = sp.goals(1:sp.j, 1:3);
                 fringeNode.h = getHeuristic(sp.typeOfHeuristic, sp.start_conf, sp);
@@ -62,7 +56,7 @@ function [solution, expandedNodes] = searchAlgorithm_Sto(sp, fringeSize)
             if ~set.contains(mat2str(child.path(:,end-2:end)))
                 if isColliding == false
                     validGreedyFound = true;
-                    PDQ_sto('add', fringe, {[child.f child.g child.h], child.path});
+                    PDQ('add', fringe, {[child.f child.g child.h], child.path});
                     set.add(mat2str(child.path(:,end-2:end)));
                 else
                     set.add(mat2str(child.path(:,end-2:end)));
@@ -76,7 +70,7 @@ function [solution, expandedNodes] = searchAlgorithm_Sto(sp, fringeSize)
                 [isColliding, ~] = collisionCheck(child.path(:,end-2:end), sp);
                 if ~set.contains(mat2str(child.path(:,end-2:end)))
                     if isColliding == false
-                        PDQ_sto('add', fringe, {[child.f child.g child.h], child.path});
+                        PDQ('add', fringe, {[child.f child.g child.h], child.path});
                         set.add(mat2str(child.path(:,end-2:end)));
                     else
                         set.add(mat2str(child.path(:,end-2:end)));
@@ -84,15 +78,15 @@ function [solution, expandedNodes] = searchAlgorithm_Sto(sp, fringeSize)
                 end
             end
         end
-        if PDQ_sto('empty', fringe)
+        if PDQ('empty', fringe)
             disp('no path found');
             solution = [];
         end
     end
-    PDQ_sto('delete', fringe);
+    PDQ('delete', fringe);
 end
 
-function [solution, expandedNodes] = searchAlgorithm_Det(sp, fringeSize)
+function [solution, expandedNodes] = searchAlgorithm_Det(sp, fringSize)
     expandedNodes = 0;
     root.g = 0;
     root.h = getHeuristic(sp.typeOfHeuristic, sp.start_conf, sp);
@@ -102,8 +96,8 @@ function [solution, expandedNodes] = searchAlgorithm_Det(sp, fringeSize)
     PDQ_det('add', fringe, {[root.f, root.g, root.h], root.path}); %Initiating the the priority deque which is a custom class implemented in c++ and used with a wrapper in matlab
     PDQ_det('setMaxSize', fringe, fringeSize); %Set the max size of the priority deque
     set = java.util.HashSet; %A hashset used from the Java library to prevent cycles
-    while ~PDQ_det('empty', fringe)
-        [priority, path] = PDQ_det('poll', fringe);
+    while ~PDQ('empty', fringe)
+        [priority, path] = PDQ('poll', fringe);
         fringeNode.f = priority(1);
         fringeNode.g = priority(2);
         fringeNode.h = priority(3);
