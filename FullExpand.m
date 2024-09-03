@@ -34,6 +34,7 @@ function [children] = FullExpand(node, sp)
     %Constrain to allow only the joints higher than the obstacles to
     %rotate
     lastIndexToExpand = findJointHigherThanAllObstacles(node.path(:,end-2:end), sp);
+%     lastIndexToExpand = size(sp.design, 1)-1;
     
     %Generate the steering children of steering only x or y
     for r = row: lastIndexToExpand

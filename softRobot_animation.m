@@ -77,7 +77,7 @@ function [] = softRobot_animation(commands, home_base, drawPath, sp)
 
         f.CurrentAxes.ZDir = 'Reverse';
         cameratoolbar('SetCoordSys','x');
-        view(60, 30)
+        view(100, 30)
 
         pause(0); %change this to make the animation faster/slower
     end

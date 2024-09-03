@@ -48,7 +48,7 @@
 
 clear, clc, close;
 
-sp.problemName = "hole";
+sp.problemName = "Maze";
 sp.typeOfAlg = 'astar';
 sp.typeOfHeuristic = 'continue';
 
@@ -146,8 +146,15 @@ switch sp.problemName
             [0 0 50; 0 0 100; 5 0 150; 20 0 150; 35 0 140]
             [0 0 50; 0 0 100; -5 0 150; -20 0 150; -35 0 140]
         ];
-        
+    case 'Maze'
+        %load the env.mat file, the 5th element is this case's parameters
+        load('envs.mat');
+        sp = envs{1, 5};
+        start.design = sp.design;
+        start.matrix = sp.start_conf;
 end
+
+
 
 
 

@@ -9,6 +9,7 @@
 
 
 function [index] = findJointHigherThanAllObstacles(current_conf,sp)
+    index = 0;
     maxObstacleHeight = sp.plane_z;
     for i = 1:size(sp.obstacles, 1)
         obs = sp.obstacles(i, :);
@@ -23,6 +24,10 @@ function [index] = findJointHigherThanAllObstacles(current_conf,sp)
         if currDepth < maxObstacleHeight
             index = i+1;
         end
+    end
+
+    if index == 0
+        index = size(sp.design, 1)-2;
     end
 
 end
