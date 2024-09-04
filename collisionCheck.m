@@ -5,13 +5,7 @@
 %       robot
 % 'op' structure of data that represents the robot and its details passed
 %       as a whole  through the function
-function [intersected_obstacles,j] = collisionCheck(conf,op)
-
-    %these two lines are to deal with obstacles as if they are bigger to
-    %avoid getting too close
-    op.obstacles(:, 4) = op.obstacles(:, 4) + 5; % increases the radius by 25 so it makes the range that should be considered as collision
-    op.obstacles(:, 5) = op.obstacles(:, 5) + 5; % increasing the height by 10 so it makes the range that should be considered as collision
-   
+function [intersected_obstacles,j] = collisionCheck(conf,op)  
     for ee=1:op.j % setting the current end effector of the robot
         if conf(ee,3)==0
             break

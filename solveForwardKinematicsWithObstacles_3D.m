@@ -8,7 +8,7 @@
 % OUTPUT:
 % 'robot_CC' (n+1)x3 contains the configuration of a soft robot in cartesian coordinates, for each joint: x, y, z (starting from home base, last one is the end effector)
 % 'u' 1x3 is the unit vector of the end effector's orientation
-function [robot_CC, u] = solveForwardKinematicsWithObstacles_3D(robot_PC, home_base, draw_plot, osbtacles)
+function robot_CC = solveForwardKinematicsWithObstacles_3D(robot_PC, home_base, draw_plot, osbtacles)
     
     n_joints = size(robot_PC,1); % number of joints of the robot
     robot_CC = zeros(n_joints+1,3);   % initializing the 
