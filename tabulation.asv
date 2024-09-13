@@ -94,44 +94,15 @@ function tabulation(sp, run_num)
     % end
 
 
-    % Run for A*'s STOCHASTIC
+    % Run for A*'s
     idx = 3;
     comb_num = size(combinations_Astar, 2);
     for i=1:comb_num
         T = table('Size', sz, 'VariableTypes', varTypes, 'VariableNames',varNames);
         T(:, 1) = {"cost"; "runtime"; "expanded nodes"};
+        comb = i
         for j=2:run_num+1
-            comb = i;
-            run = j -1;
-            disp("A_star_Sto::Comb-"+ comb + "::Run-" + run);
-            tic
-            [solution, expandedNodes] = searchAlgorithm(sp, combinations_Astar{1, i}.fringeSize, false);
-            time = toc;
-            T(:, j) = {solution.g; time; expandedNodes};
-        end
-        filename = [sp.problemName, '.xlsx'];
-        excel_cell_idx = ['D', num2str(idx)];
-        writetable(T, filename, 'Sheet', 'A_star_Sto', 'Range', excel_cell_idx);
-
-        T2 = struct2table(combinations_Astar{1, i});
-        excel_cell_idx = ['B', num2str(idx)];
-        writetable(T2, filename, 'Sheet', 'A_star_Sto', 'Range', excel_cell_idx);
-        excel_cell_idx = ['A', num2str(idx)];
-        xlswrite(filename, i, 'A_star_Sto', excel_cell_idx)
-        idx = idx+6;
-        % T = table();
-    end
-
-    % Run for A*'s DETERMINISTIC
-    idx = 3;
-    comb_num = size(combinations_Astar, 2);
-    for i=1:comb_num
-        T = table('Size', sz, 'VariableTypes', varTypes, 'VariableNames',varNames);
-        T(:, 1) = {"cost"; "runtime"; "expanded nodes"};
-        for j=2:run_num+1
-            comb = i;
-            run = j -1;
-            disp("A_star_Det::Comb-"+ comb + "::Run-" + run);
+            run = j-1
             tic
             [solution, expandedNodes] = searchAlgorithm(sp, combinations_Astar{1, i}.fringeSize, true);
             time = toc;

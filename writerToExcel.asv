@@ -8,8 +8,7 @@ run_num = 10;
 
 
 for i=1:size(envs, 2)
+    disp("")      
     sp = envs{i};
-    disp("Problem-" + i + ": " + sp.problemName);
     tabulation(sp, run_num);
-    disp(" ");
 end

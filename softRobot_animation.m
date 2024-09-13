@@ -79,7 +79,7 @@ function [] = softRobot_animation(commands, home_base, drawPath, sp)
         cameratoolbar('SetCoordSys','x');
         view(60, 30)
 
-        pause(0); %change this to make the animation faster/slower
+        pause; %change this to make the animation faster/slower
     end
     
 end

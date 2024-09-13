@@ -5,7 +5,7 @@
 %       robot
 % 'op' structure of data that represents the robot and its details passed
 %       as a whole  through the function
-function [intersected_obstacles,j] = collisionCheck(conf,op)  
+function [intersected_obstacles,j] = collisionCheck(conf,op) 
     for ee=1:op.j % setting the current end effector of the robot
         if conf(ee,3)==0
             break
