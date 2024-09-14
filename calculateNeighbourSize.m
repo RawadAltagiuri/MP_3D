@@ -6,6 +6,6 @@ function neighbourSize = calculateNeighbourSize(sp)
     end
     targetConfig = tempConfig;
     targetConfig(2, 1) = targetConfig(2, 1) + sp.stepSize(1);
-    neighbourSize = calculateCost(sp, tempConfig, targetConfig);
+    neighbourSize = calculateCost_old(tempConfig, targetConfig, sp.home_base);
 end
 

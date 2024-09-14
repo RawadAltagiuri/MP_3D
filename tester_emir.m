@@ -65,9 +65,8 @@ counter = 0;
 % [path, cost] = directExpansion(sp, 10000, sp.start_conf, sp.goal_conf);
 % [solution, exapndedNodes] = searchAlgorithm_Sto(sp, 100000);
 % time = toc 
-rrtConf.pOfGoal = 0;
-rrtConf.numOfNodes = 100;
-rrtConf.stepSize = 20;
+rrtConf.numOfNodes = 500;
+rrtConf.stepSize = 3;
 rrtConf.neighbourSize = calculateNeighbourSize(sp);
 
 

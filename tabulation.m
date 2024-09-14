@@ -15,56 +15,18 @@ function tabulation(sp, run_num)
     varNames = "variables";
     varNames = [varNames, compose("run-%d", 1:run_num)];
     
-    % Run for RRT
-    idx = 3;
-    comb_num = size(combinations_RRT, 2)
-    for i=1:comb_num
-        T = table('Size', sz, 'VariableTypes', varTypes, 'VariableNames',varNames);
-        T(:, 1) = {"cost"; "cutcost"; "runtime"; "tree size"};
-        comb_counter = i
-        for j=2:run_num+1
-            tic
-            [path, cost, tree, ~] = searchAlgorithmRRT(sp, combinations_RRT{1, i}, false);
-            time = toc;
-
-            if ~isempty(path)
-                [cuttedPath, cut_cost] = cutPath(sp, path);
-            else
-                cuttedPath = [];
-                cut_cost = cost;
-            end
-
-            if checkPath(sp, path) ~= 0 || checkPath(sp, cuttedPath) ~= 0
-                DEBUG = 0;
-            end
-
-            T(:, j) = {cost; cut_cost; time; size(tree, 1)};
-        end
-        filename = [sp.problemName, '.xlsx'];
-        excel_cell_idx = ['F', num2str(idx)];
-        writetable(T, filename, 'Sheet', 'RRT', 'Range', excel_cell_idx);
-
-        T2 = struct2table(combinations_RRT{1, i});
-        excel_cell_idx = ['B', num2str(idx)];
-        writetable(T2, filename, 'Sheet', 'RRT', 'Range', excel_cell_idx)
-        excel_cell_idx = ['A', num2str(idx)];
-        xlswrite(filename, i, 'RRT', excel_cell_idx)
-        idx = idx+6;
-        % T = table();
-    end
-    
-    
-    % % Run for RRT*
+    % % Run for RRT
     % idx = 3;
-    % comb_num = size(combinations_RRT_star, 2)
+    % comb_num = size(combinations_RRT, 2);
     % for i=1:comb_num
     %     T = table('Size', sz, 'VariableTypes', varTypes, 'VariableNames',varNames);
-    %     T(:, 1) = {"cost"; "cut_cost"; "runtime"; "tree size"};
-    %     combinations_RRT_star{1, i}.neighbourSize = calculateNeighbourSize(sp) * combinations_RRT_star{1, i}.neighbourMult;
-    %     comb_counter = i
+    %     T(:, 1) = {"cost"; "cutcost"; "runtime"; "tree size"};
+    %     comb_counter = i;
     %     for j=2:run_num+1
+    %         run_counter = j-1;
+    %         disp("RRT::Comb-"+ comb_counter + "::Run-" + run_counter);
     %         tic
-    %         [path, cost, tree, ~] = searchAlgorithmRRT_star(sp, combinations_RRT_star{1, i}, false);
+    %         [path, cost, tree, ~] = searchAlgorithmRRT(sp, combinations_RRT{1, i}, false);
     %         time = toc;
     % 
     %         if ~isempty(path)
@@ -81,50 +43,73 @@ function tabulation(sp, run_num)
     %         T(:, j) = {cost; cut_cost; time; size(tree, 1)};
     %     end
     %     filename = [sp.problemName, '.xlsx'];
-    %     excel_cell_idx = ['G', num2str(idx)];
-    %     writetable(T, filename, 'Sheet', 'RRT_star', 'Range', excel_cell_idx);
+    %     excel_cell_idx = ['F', num2str(idx)];
+    %     writetable(T, filename, 'Sheet', 'RRT', 'Range', excel_cell_idx);
     % 
-    %     T2 = struct2table(combinations_RRT_star{1, i});
+    %     T2 = struct2table(combinations_RRT{1, i});
     %     excel_cell_idx = ['B', num2str(idx)];
-    %     writetable(T2, filename, 'Sheet', 'RRT_star', 'Range', excel_cell_idx);
+    %     writetable(T2, filename, 'Sheet', 'RRT', 'Range', excel_cell_idx)
     %     excel_cell_idx = ['A', num2str(idx)];
-    %     xlswrite(filename, i, 'RRT_star', excel_cell_idx)
-    %     idx = idx+7;
-    %     % T = table();
-    % end
-
-
-    % % Run for A*_det
-    % idx = 3;
-    % for i=1:comb_num
-    %     T = table('Size', sz, 'VariableTypes', varTypes, 'VariableNames',varNames);
-    %     T(:, 1) = {"cost"; "runtime"; "expanded nodes"};
-    %     for j=2:run_num+1
-    %         tic
-    %         [solution, expandedNodes] = searchAlgorithm_Det(sp, combinations_Astar{1, i}.fringeSize);
-    %         time = toc;
-    %         T(:, j) = {solution.g; time; expandedNodes};
-    %     end
-    %     filename = [sp.problemName, '.xlsx'];
-    %     excel_cell_idx = ['D', num2str(idx)];
-    %     writetable(T, filename, 'Sheet', 'A_star_Det', 'Range', excel_cell_idx);
-    % 
-    %     T2 = struct2table(combinations_Astar{1, i});
-    %     excel_cell_idx = ['B', num2str(idx)];
-    %     writetable(T2, filename, 'Sheet', 'A_star_Det', 'Range', excel_cell_idx);
+    %     xlswrite(filename, i, 'RRT', excel_cell_idx)
     %     idx = idx+6;
     %     % T = table();
     % end
-    % 
-    % % Run for A*_sto
+    
+    
+    % Run for RRT*
+    idx = 3;
+    comb_num = size(combinations_RRT_star, 2);
+    for i=1:comb_num
+        T = table('Size', sz, 'VariableTypes', varTypes, 'VariableNames',varNames);
+        T(:, 1) = {"cost"; "cut_cost"; "runtime"; "tree size"};
+        combinations_RRT_star{1, i}.neighbourSize = calculateNeighbourSize(sp) * combinations_RRT_star{1, i}.neighbourMult;
+        comb_counter = i;
+        for j=2:run_num+1
+            run_counter = j-1;
+            disp("RRT_star::Comb-"+ comb_counter + "::Run-" + run_counter);
+            tic
+            [path, cost, tree, ~] = searchAlgorithmRRT_star(sp, combinations_RRT_star{1, i}, false);
+            time = toc;
+
+            if ~isempty(path)
+                [cuttedPath, cut_cost] = cutPath(sp, path);
+            else
+                cuttedPath = [];
+                cut_cost = cost;
+            end
+
+            if checkPath(sp, path) ~= 0 || checkPath(sp, cuttedPath) ~= 0
+                DEBUG = 0;
+            end
+
+            T(:, j) = {cost; cut_cost; time; size(tree, 1)};
+        end
+        filename = [sp.problemName, '.xlsx'];
+        excel_cell_idx = ['G', num2str(idx)];
+        writetable(T, filename, 'Sheet', 'RRT_star', 'Range', excel_cell_idx);
+
+        T2 = struct2table(combinations_RRT_star{1, i});
+        excel_cell_idx = ['B', num2str(idx)];
+        writetable(T2, filename, 'Sheet', 'RRT_star', 'Range', excel_cell_idx);
+        excel_cell_idx = ['A', num2str(idx)];
+        xlswrite(filename, i, 'RRT_star', excel_cell_idx)
+        idx = idx+7;
+        % T = table();
+    end
+
+
+    % % Run for A*'s STOCHASTIC
     % idx = 3;
     % comb_num = size(combinations_Astar, 2);
     % for i=1:comb_num
     %     T = table('Size', sz, 'VariableTypes', varTypes, 'VariableNames',varNames);
     %     T(:, 1) = {"cost"; "runtime"; "expanded nodes"};
     %     for j=2:run_num+1
+    %         comb = i;
+    %         run = j -1;
+    %         disp("A_star_Sto::Comb-"+ comb + "::Run-" + run);
     %         tic
-    %         [solution, expandedNodes] = searchAlgorithm_Sto(sp, combinations_Astar{1, i}.fringeSize);
+    %         [solution, expandedNodes] = searchAlgorithm(sp, combinations_Astar{1, i}.fringeSize, false);
     %         time = toc;
     %         T(:, j) = {solution.g; time; expandedNodes};
     %     end
@@ -135,6 +120,36 @@ function tabulation(sp, run_num)
     %     T2 = struct2table(combinations_Astar{1, i});
     %     excel_cell_idx = ['B', num2str(idx)];
     %     writetable(T2, filename, 'Sheet', 'A_star_Sto', 'Range', excel_cell_idx);
+    %     excel_cell_idx = ['A', num2str(idx)];
+    %     xlswrite(filename, i, 'A_star_Sto', excel_cell_idx)
+    %     idx = idx+6;
+    %     % T = table();
+    % end
+    % 
+    % % Run for A*'s DETERMINISTIC
+    % idx = 3;
+    % comb_num = size(combinations_Astar, 2);
+    % for i=1:comb_num
+    %     T = table('Size', sz, 'VariableTypes', varTypes, 'VariableNames',varNames);
+    %     T(:, 1) = {"cost"; "runtime"; "expanded nodes"};
+    %     for j=2:run_num+1
+    %         comb = i;
+    %         run = j -1;
+    %         disp("A_star_Det::Comb-"+ comb + "::Run-" + run);
+    %         tic
+    %         [solution, expandedNodes] = searchAlgorithm(sp, combinations_Astar{1, i}.fringeSize, true);
+    %         time = toc;
+    %         T(:, j) = {solution.g; time; expandedNodes};
+    %     end
+    %     filename = [sp.problemName, '.xlsx'];
+    %     excel_cell_idx = ['D', num2str(idx)];
+    %     writetable(T, filename, 'Sheet', 'A_star_Det', 'Range', excel_cell_idx);
+    % 
+    %     T2 = struct2table(combinations_Astar{1, i});
+    %     excel_cell_idx = ['B', num2str(idx)];
+    %     writetable(T2, filename, 'Sheet', 'A_star_Det', 'Range', excel_cell_idx);
+    %     excel_cell_idx = ['A', num2str(idx)];
+    %     xlswrite(filename, i, 'A_star_Det', excel_cell_idx)
     %     idx = idx+6;
     %     % T = table();
     % end
