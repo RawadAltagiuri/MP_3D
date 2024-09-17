@@ -5,10 +5,7 @@
 %       robot
 % 'op' structure of data that represents the robot and its details passed
 %       as a whole  through the function
-function [intersected_obstacles,j] = collisionCheck(conf,op)
-    %these two lines are to deal with obstacles as if they are bigger to
-    %avoid getting too close
-   
+function [intersected_obstacles,j] = collisionCheck(conf,op) 
     for ee=1:op.j % setting the current end effector of the robot
         if conf(ee,3)==0
             break
@@ -67,7 +64,7 @@ function [result,i] = checkIfZObstacle(p_start,p_end,obs)
     u = (p_end-p_start)/norm(p_end-p_start);
     N = p_start;
     
-    R = GetRodriguesRotation(u',[0 0 1]');
+    R = getRodriguesRotation(u',[0 0 1]');
     p_start_r = (R*p_start')';
     p_end_r = (R*p_end')';
     
@@ -91,7 +88,7 @@ function [result,i] = checkIfBaseObstacle(p_start,p_end,obs)
     u = (p_end-p_start)/norm(p_end-p_start);
     N = p_start;
     
-    R = GetRodriguesRotation(u',[0 0 1]');
+    R = getRodriguesRotation(u',[0 0 1]');
     p_start_r = (R*p_start')';
     p_end_r = (R*p_end')';
     

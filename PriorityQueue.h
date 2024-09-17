@@ -17,6 +17,7 @@ class PriorityQueue {
         void setMaxSize(size_t);
         void insert(const T&);
         T poll();
+        void clear();
 
         //Accessors
         T peek() const;
@@ -119,6 +120,11 @@ bool PriorityQueue<T>::empty() const {
 template<typename T>
 bool PriorityQueue<T>::full() const {
     return v.size() >= maxSize;
+}
+
+template<typename T>
+void PriorityQueue<T>::clear() {
+    v.clear();
 }
 
 template<typename T>

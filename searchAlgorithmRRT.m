@@ -47,18 +47,14 @@ production.
     end
 end
 
-function heuristic = getHeuristicBridge(sp, conf1, conf2)
-    sp.goal_conf = conf2;
-    heuristic = getHeuristic(sp.typeOfHeuristic, conf1, sp);
-end
 
 function graphTree = updateTreeRRT(sp, rrtConf, graphTree, randomConfig)
     closestParent = 1;
-    closestDistance = getHeuristicBridge(sp, graphTree{1, 1}, randomConfig);
+    closestDistance = getHeuristic(sp, graphTree{1, 1}, randomConfig);
     % closestDistance = totalStep(graphTree{1, 1}, randomConfig, sp);
 
     for j = 2:size(graphTree, 1)
-        distance = getHeuristicBridge(sp, graphTree{j, 1}, randomConfig);
+        distance = getHeuristic(sp, graphTree{j, 1}, randomConfig);
         % distance = totalStep(graphTree{j, 1}, randomConfig, sp);
         if distance < closestDistance
             closestParent = j;

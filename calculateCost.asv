@@ -8,7 +8,19 @@
 %
 % OUTPUT:
 % 'cost' the cost, expressed as the sum of euclidean distances between each joint (including the end effector)
-function [cost] = calculateCost_old(conf_a, conf_b, home_base)
+function [cost] = calculateCost(sp, conf_a, conf_b)
+    switch sp.metric
+        case "space"
+            cost = calculateCostSpace(sp, conf_a, conf_b);
+        case "time"
+            cost = calculateCostTime(sp, conf_a, conf_b);
+        otherwise
+            error("'" + sp.metric + "' is not a valid metric.");
+    end
+end
+
+function [cost] = calculateCostSpace(sp, conf_a, conf_b)
+    home_base = sp.home_base;
     j = size(conf_a,1);
     conf_a_cc = solveForwardKinematics_3D(conf_a, home_base, false);
     conf_b_cc = solveForwardKinematics_3D(conf_b, home_base, false);
@@ -45,5 +57,31 @@ function [cost] = calculateCost_old(conf_a, conf_b, home_base)
     cost = sum(dist);
     
 end
+
+function timeCost = calculateCostTime(sp, conf_a, conf_b)
+    times = sp.times; % Steering: rad/time, Retraction: m/time, Growth: m/time
+    timeCost = 0;
+
+    angles1 = conf_a(:, 1:2);
+    angles2 = conf_b(:, 1:2);
+
+    diffAngles = abs(angles1 - angles2);
+
+      ~isequal(diffAngles, zeros(size(diffAngles, 1), 2))
+        maxSteering = max(max(diffAngles(:, 1), max(diffAngles(:, 2))));
+        timeCost = maxSteering / times(1);
+    
+        length1 = sum(conf_a(:, 3));
+        length2 = sum(conf_b(:, 3));
+
+        diffLength = length1 - length2;
+        if diffLength > 0
+            timeCost = diffLength / times(3);
+        else
+            timeCost = -diffLength / times(2);
+        end
+    
+end
+
 
 

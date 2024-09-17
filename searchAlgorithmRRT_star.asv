@@ -59,7 +59,7 @@ function graphTree = updateTreeRRT_star(sp, rrtConf, graphTree, randomConfig)
     neighbours = [];
     for i = 1:size(graphTree, 1)
         % cost = calculateCost(sp, graphTree{i, 1}, randomConfig);
-        cost = calculateCost_old(graphTree{i, 1}, randomConfig, sp.home_base);
+        cost = calculateCost(sp, graphTree{i, 1}, randomConfig);
         if cost < rrtConf.neighbourSize
             neighbours = [neighbours; i, cost + graphTree{i, 4}];
         end

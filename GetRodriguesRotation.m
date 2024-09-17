@@ -1,4 +1,4 @@
-function R = GetRodriguesRotation(v1, v2)
+function R = getRodriguesRotation(v1, v2)
 % R*v1=v2
 % v1 and v2 should be column vectors and 3x1
 

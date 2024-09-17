@@ -50,16 +50,12 @@ function [path, cost, tree, final_child] = searchAlgorithmRRT_star(sp, rrtStarCo
     tree = graphTree;
 end
 
-function heuristic = getHeuristicBridge(sp, conf1, conf2)
-    sp.goal_conf = conf2;
-    heuristic = getHeuristic(sp.typeOfHeuristic, conf1, sp);
-end
 
 function graphTree = updateTreeRRT_star(sp, rrtConf, graphTree, randomConfig)
     neighbours = [];
     for i = 1:size(graphTree, 1)
         % cost = calculateCost(sp, graphTree{i, 1}, randomConfig);
-        cost = calculateCost_old(graphTree{i, 1}, randomConfig, sp.home_base);
+        cost = calculateCost(sp, graphTree{i, 1}, randomConfig);
         if cost < rrtConf.neighbourSize
             neighbours = [neighbours; i, cost + graphTree{i, 4}];
         end
@@ -108,9 +104,9 @@ end
 
 function graphTree = updateTreeRRT(sp, rrtConf, graphTree, randomConfig)
     closestParent = 1;
-    closestDistance = getHeuristicBridge(sp, graphTree{1, 1}, randomConfig);
+    closestDistance = getHeuristic(sp, graphTree{1, 1}, randomConfig);
     for i = 2:size(graphTree, 1)
-        distance = getHeuristicBridge(sp, graphTree{i, 1}, randomConfig);
+        distance = getHeuristic(sp, graphTree{i, 1}, randomConfig);
         if distance < closestDistance
             closestParent = i;
             closestDistance = distance;

@@ -162,5 +162,3 @@ function coordinates = solveForwardKinematics_3D(conf, home_base, draw)
         drawConfig(conf, modSp, 'b');
     end
 end
-
-

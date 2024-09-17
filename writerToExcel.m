@@ -6,14 +6,10 @@ run_num = 10;
 
 % tabulation(envs{3}, run_num);
 
+
 for i=1:size(envs, 2)
-    sp_counter = i      
     sp = envs{i};
-
-    
-    modSp = sp;
-    paddingAmount = 5;
-    modSp.obstacles(:, 4:5) = modSp.obstacles(:, 4:5) + paddingAmount;
-
-    tabulation(modSp, run_num);
+    disp("Problem-" + i + ": " + sp.problemName);
+    tabulation(sp, run_num);
+    disp(" ");
 end

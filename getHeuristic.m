@@ -5,12 +5,6 @@
 % 'currentMat': n x 3 matrix that represents the current configurations of the robot 
 % 'searchProblem': a structure of the motion details that is going to get
 %                  passed to the calculate heuristic function
-function [h] = getHeuristic(typeOfHeuristic, currentMat, searchProblem)
-      switch typeOfHeuristic
-          case 'discrete'
-            h = calculateHeuristic(currentMat, searchProblem);
-          case 'continue'
-            % h = calculateCost(searchProblem, currentMat, searchProblem.goal_conf);
-            h = calculateCost_old(currentMat, searchProblem.goal_conf, searchProblem.home_base);
-      end
+function [h] = getHeuristic(sp, config, goal)
+        h = calculateCost(sp, config, goal);
 end

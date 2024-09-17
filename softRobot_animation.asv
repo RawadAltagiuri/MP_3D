@@ -7,15 +7,14 @@
 % DISCLAIMER:
 % It must me updated to draw obstacles when we will add any in the future
 function [] = softRobot_animation(sp, formattedPath)
-    speedMultiplier = 100;
+    speedMultiplier = 1;
  
     home_base = sp.home_base;
     steps = size(formattedPath,3);       % number of steps of motion
     n_joints = size(formattedPath,1);    % number of joints of the robot
     
     end_effectors = zeros(steps,3); % end effector array that will contain the coordinates of the end effector for each step of motion
-    % effectors = [];
-
+    
     f = figure;
     n_obstacles = size(sp.obstacles,1);
 
@@ -28,8 +27,8 @@ function [] = softRobot_animation(sp, formattedPath)
         xlabel('x');
         ylabel('y');
         zlabel('z');
-        xlim([-600 600]);
-        ylim([-600 600]);
+        xlim([-400 400]);
+        ylim([-400 400]);
         zlim([-100 1000]);
         plot3(home_base(1),home_base(2),home_base(3),'--gs','LineWidth',2,'MarkerSize',10,'MarkerEdgeColor','b'); %draw home
         startConf = solveForwardKinematics_3D(formattedPath(:,:,1),home_base,false);
@@ -37,8 +36,6 @@ function [] = softRobot_animation(sp, formattedPath)
         
         % collect the end effector coordinates for each step of motion to draw the path of the robot 
         end_effectors(k,:) = robot_CC(n_joints+1,:); 
-
-        % effectors = [effectors; robot_CC(:, :)];
         
         %draw the start configuration
         grayRobotColor = '#569c69';
@@ -51,13 +48,11 @@ function [] = softRobot_animation(sp, formattedPath)
         end
         
         % draws the path from the end effector array
-        hexCode = '#FFA500';
-        for j=1:3:k
-            plot3(end_effectors(j,1),end_effectors(j,2),end_effectors(j,3),'.','Color','b');
-        end
-
-        % for i = 1:size(effectors, 1)
-        %     plot3(effectors(i,1),effectors(i,2),effectors(i,3),'.','Color','b');
+        % if drawPath == true
+        %     hexCode = '#FFA500';
+        %     for j=1:3:k
+        %         plot3(end_effectors(j,1),end_effectors(j,2),end_effectors(j,3),'.','Color','b');
+        %     end
         % end
 
         % drawing the obstacles for the animation visualizing 
@@ -85,9 +80,10 @@ function [] = softRobot_animation(sp, formattedPath)
         view(60, 30)
 
         if k ~= 1
-            timeToPause = calculateCost(sp, formattedPath(:,:,k - 1), formattedPath(:,:,k));
-            pause(timeToPause / speedMultiplier);
+            timeToPause = calculateCost(sp, formattedPath(:,:,k - 1), formattedPath(:,:,k))
         end
+
     end
+    
 end
 

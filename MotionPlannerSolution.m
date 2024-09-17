@@ -3,6 +3,7 @@
 % •Rawad E. H. Altagiuri (Algorithms)
 % •Omar H. A. Zaghloul (Algorithms)
 
+
 %Start of the motion planner
 %
 % 'SP' is the search problem and its attributes are:
@@ -44,6 +45,7 @@
 % [path, h, g, f]
 % 
 
+
 clear, clc, close;
 
 sp.problemName = "wall";
@@ -62,7 +64,7 @@ switch sp.problemName
         sp.lengthMin = 5;
         sp.plane_z = 1000;
         sp.costArray = [1, 1, 1];
-        sp.stepSize = [2.5,30];
+        sp.stepSize = [5,40];
         sp.obstacles = [
         -50	-300 sp.plane_z	25	650
         -50	-250 sp.plane_z	25	650
@@ -155,65 +157,18 @@ sp.baseRotate = false;
 sp.start_conf = start.matrix;
 sp.j = size(sp.start_conf, 1);
 sp.goal_conf = sp.goals(1:sp.j, 1:3);
-sp.home_base = [0,0,0];
+sp.home_base = [0,0,0,0,0];
 
+sp.heuristicLimit = 0.1;
 
-
-% tic
-% [solution, expandedNodes] =searchAlgorithm(sp);
-% time = toc
-% if isempty(solution)
-%     return;
-% end
-% expandedNodes
-% solution.g
-
-numRuns = 10;
-taskName = sp.problemName;  % Set your task name
-sheetSizes = [100, 1000, 5000, 10000, 50000, 100000];  % Specify sheet sizes
-
-sp.pdqSize = 100;
 tic
-solution = searchAlgorithm_Det(sp, sp.pdqSize);
-toc
-
-% Create Excel file
-fileName = 'MPTestPDQ_Wall_Deterministic.xlsx' ;
-% Check if the file exists, and if not, create it
-% Loop through sheet sizes
-for sizeIdx = 1:length(sheetSizes)
-    sheetSize = sheetSizes(sizeIdx);
-
-    %Initialize arrays to store results
-    AllExpanded = zeros(numRuns, 1);
-    AllTime = zeros(numRuns, 1);
-    AllCost = zeros(numRuns, 1);
-    sp.pdqSize = sheetSizes(sizeIdx);
-%     Run the algorithm 500 times
-    for i = 1:numRuns
-
-        if i == 1 && sp.pdqSize ==100
-            zzz = 0;
-        end
-        tic;
-        [solution, expandedNodes] = searchAlgorithm_Det(sp, sp.pdqSize); % Assuming sp is already defined
-        time = toc;
-
-        AllExpanded(i) = expandedNodes;
-        AllTime(i) = time;
-        AllCost(i) = solution.g;
-        disp("size: " + sp.pdqSize)
-        disp("iteration: " + i)
-        disp("time: " + time)
-        disp(" ")
-    end
-
-    % Write results to the Excel sheet for the current size
-    sheetName = sprintf('%d', sheetSize);
-    xlswrite(fileName, {taskName}, sheetName, 'D1');
-    xlswrite(fileName, {'Time', 'Cost', 'Expanded Nodes'}, sheetName, 'D2');
-    xlswrite(fileName, [AllTime, AllCost, AllExpanded], sheetName, 'D3');
+[solution, expandedNodes] = searchAlgorithmA_star(sp, 5000, false);
+time = toc
+if isempty(solution)
+    return;
 end
+expandedNodes
+solution.g
 
 % Calculate the number of submatrices you will create
 numSubMatrices = size(solution.path, 2) / 3;
@@ -233,7 +188,7 @@ for i=2:size(formattedPathForAnimation,3)
     [growthCount, retractCount, steerCount] = actionCounter(formattedPathForAnimation(:, :, i), formattedPathForAnimation(:, :, i-1), growthCount, retractCount, steerCount);
 end
  
- softRobot_animation(formattedPathForAnimation, [0,0,0], true, sp);
+ softRobot_animation(formattedPathForAnimation, sp.home_base, true, sp);
 
 
 

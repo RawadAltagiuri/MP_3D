@@ -8,7 +8,8 @@
 %  'index': the index of the last joint above the obstacles
 
 
-function [index] = findJointHigherThanAllObstacles(sp)
+function [index] = findJointHigherThanAllObstacles(current_conf,sp)
+    index = 2;
     maxObstacleHeight = sp.plane_z;
     for i = 1:size(sp.obstacles, 1)
         obs = sp.obstacles(i, :);
@@ -18,17 +19,10 @@ function [index] = findJointHigherThanAllObstacles(sp)
     end
 
     currDepth = 0;
-
-    % Default index value based on the rotation of the base
-    index = 2;
-    if sp.baseRotate == true
-        index = 1;
-    end
     for i = 1:size(sp.design, 1)
         currDepth = currDepth + sp.design(i, 1);
         if currDepth < maxObstacleHeight
             index = i+1;
         end
     end
-
 end
