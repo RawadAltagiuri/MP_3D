@@ -145,6 +145,11 @@ function [child, isValid] = doEversion(node, operation, sp)
                 return;
             end
         end
+        if (conf(row, 3) < sp.lengthMin && conf(row, 2) > 0) || (conf(row, 3) < sp.lengthMin && conf(row, 1) > 0)
+            child = [];
+            isValid = false;
+            return;
+        end 
     end
     % ---- calculate cost -----
     child.g = node.g + calculateCost(sp, node.path(:,end-2:end), conf);
