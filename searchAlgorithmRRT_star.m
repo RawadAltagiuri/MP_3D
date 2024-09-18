@@ -1,4 +1,3 @@
-    
 function [path, cost, tree, final_child] = searchAlgorithmRRT_star(sp, rrtStarConf, SHOW)
     path = {};
     cost = -1;
@@ -39,6 +38,7 @@ function [path, cost, tree, final_child] = searchAlgorithmRRT_star(sp, rrtStarCo
 
         if SHOW && prevTreeSize ~= size(graphTree, 1)
             drawConfig(graphTree{end, 1}, sp, 'b');
+            drawConfig(graphTree{end, 5}, sp, 'k');
             pause
         end
     end
@@ -54,7 +54,6 @@ end
 function graphTree = updateTreeRRT_star(sp, rrtConf, graphTree, randomConfig)
     neighbours = [];
     for i = 1:size(graphTree, 1)
-        % cost = calculateCost(sp, graphTree{i, 1}, randomConfig);
         cost = calculateCost(sp, graphTree{i, 1}, randomConfig);
         if cost < rrtConf.neighbourSize
             neighbours = [neighbours; i, cost + graphTree{i, 4}];
@@ -81,6 +80,7 @@ function graphTree = updateTreeRRT_star(sp, rrtConf, graphTree, randomConfig)
         graphTree = updateTreeRRT(sp, rrtConf, graphTree, randomConfig);
         return;
     end
+
 
     realNeighbours = {};
     for i = 1:size(neighbours, 1)

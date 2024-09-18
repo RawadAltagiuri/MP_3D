@@ -47,6 +47,21 @@
 
 load envs.mat
 sp = envs{1};
+sp.start_conf = [0	0	50
+-45	45	175
+0	0	175
+25	-10	175
+20	-15	100
+0 0 0];
+
+sp.goal_conf = [0	0	50
+45	-45	175
+0	0	175
+-25	10	175
+-20	15	100
+0  0  0];
+
+
 sp.times = [1, 1, 1];
 sp.metric = "time";
 paddingAmount = 5;
@@ -55,11 +70,13 @@ sp.obstacles(:, 4:5) = sp.obstacles(:, 4:5) + paddingAmount;
 orgSp = sp;
 sp = preMotion(sp);
 
-prePath = directExpansion(sp, realmax, orgSp.start_conf, sp);
+[prePath, preCost] = directExpansion(sp, realmax, orgSp.start_conf, sp.start_conf);
+[postPath, postCost] = directExpansion(sp, realmax, sp.goal_conf, orgSp.goal_conf);
 
-solution = searchAlgorithmA_star(sp, 10000, false);
-solution.path = [pathConversionC_M(preP), solution.path];
-solution.g = solution.g + preCost;
+solution = searchAlgorithmA_star(sp, 10000, true);
+
+solution.path = [pathConversionC_M(prePath), solution.path, pathConversionC_M(postPath)];
+solution.g = solution.g + preCost + postCost;
 
 % Calculate the number of submatrices you will create
 numSubMatrices = size(solution.path, 2) / 3;

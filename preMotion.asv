@@ -1,8 +1,0 @@
-function path = preMotion(sp)
-    startConfig = sp.start_conf;
-    for lastJoint = size(startConfig, 1):-1:1
-        if startConfig(lastJoint, 1:2) ~= [0, 0]
-            
-    end
-end
-

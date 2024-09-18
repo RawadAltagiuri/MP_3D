@@ -73,18 +73,8 @@ function [solution, expandedNodes] = searchAlgorithm_Sto(sp, fringeSize)
         set.add(mat2str(fringeNode.path(:,end-2:end))); %Getting the last configuration from the polled path
         expandedNodes = expandedNodes +1;
         if(fringeNode.h < sp.heuristicLimit)
-            if size(sp.goals, 1) ~= 0
-                sp.goals(1:sp.j, :) = [];
-            end
-            if size(sp.goals, 1) == 0 %Found the optimal path
-                solution = fringeNode;
-                return;
-            else 
-                PDQ_sto('clear', fringe);
-                set.clear;
-                sp.goal_conf = sp.goals(1:sp.j, 1:3);
-                fringeNode.h = getHeuristic(sp, sp.start_conf, sp.goal_conf);
-            end
+            solution = fringeNode;
+            break;
         end
         [greedyChildren] = WrapperForOmersGreedyExpand(fringeNode, sp);
         validGreedyFound = false;
@@ -143,18 +133,8 @@ function [solution, expandedNodes] = searchAlgorithm_Det(sp, fringeSize)
         set.add(mat2str(fringeNode.path(:,end-2:end))); %Getting the last configuration from the polled path
         expandedNodes = expandedNodes +1;
         if(fringeNode.h < sp.heuristicLimit)
-            if size(sp.goals, 1) ~= 0
-                sp.goals(1:sp.j, :) = [];
-            end
-            if size(sp.goals, 1) == 0 %Found the optimal path
-                solution = fringeNode;
-                return;
-            else
-                PDQ_det('clear', fringe);
-                set.clear;
-                sp.goal_conf = sp.goals(1:sp.j, 1:3);
-                fringeNode.h = getHeuristic(sp, sp.start_conf, sp.goal_conf);
-            end
+            solution = fringeNode;
+            break;
         end
         [greedyChildren] = WrapperForOmersGreedyExpand(fringeNode, sp);
         validGreedyFound = false;

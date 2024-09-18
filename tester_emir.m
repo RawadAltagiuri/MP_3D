@@ -49,9 +49,9 @@
 clear, clc, close;
 
 load envs
-sp = envs{1};
-% sp.times = [1, 1, 1];
-sp.metric = "space";
+sp = envs{5};
+sp.times = [1, 1, 1];
+sp.metric = "time";
 paddingAmount = 5;
 sp.obstacles(:, 4:5) = sp.obstacles(:, 4:5) + paddingAmount;
 
@@ -59,32 +59,19 @@ sp.baseRotate = false;
 sp.heuristicLimit = 0.01;
 
 
-% tic
-counter = 0;
-
-% while true
-%     [path, cost, tree, final_child] = searchAlgorithmRRT_star(sp, rrtConf, false);
-%     counter = counter + 1
-% end
-
-% [path, cost] = directExpansion(sp, 10000, sp.start_conf, sp.goal_conf);
-% [solution, exapndedNodes] = searchAlgorithm_Sto(sp, 100000);
-% time = toc 
 rrtConf.numOfNodes = 500;
 rrtConf.stepSize = 5;
-rrtConf.neighbourSize = calculateNeighbourSize(sp);
+rrtConf.neighbourSize = calculateNeighbourSize(sp) * 50;
 
 
 [path, cost, tree, final_child] = searchAlgorithmRRT_star(sp, rrtConf, false);
-
-% sp.lengthMin = 45;
-% sp.goal_conf(end-2:end, :) = 0;
-% [path, cost] = directExpansion(sp, realmax, sp.start_conf, sp.goal_conf);
 
 solution.g = cost;
 solution.f = solution.g;
 solution.h = 0;
 
+modSp = sp;
+modSp.obstacles = [];
 animate(sp, path);
 
 
