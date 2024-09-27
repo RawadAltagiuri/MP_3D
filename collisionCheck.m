@@ -1,151 +1,139 @@
-% This function is responsible of shecking collision between the robot and
-% the obstacles 
-% INPUT:
-% 'conf' n x 3 matrix that represents the current configuration of the
-%       robot
-% 'op' structure of data that represents the robot and its details passed
-%       as a whole  through the function
-function [intersected_obstacles,j] = collisionCheck(conf,op) 
-    for ee=1:op.j % setting the current end effector of the robot
-        if conf(ee,3)==0
-            break
-        end
-    end
-    xyz = solveForwardKinematics_3D(conf, op.home_base, false);
-    intersected_obstacles = false; % setting the aboolean value of intersection to false and begins to check each joint and link it it collides with the robot 
-    for j=1:1:ee %%might cause an error
-        p_start = xyz(j,:); % getting the starting joint that is being under the checking 
-        p_end = xyz(j+1,:); % getting the current ending joint that is being under the checking
-        link_length = norm(p_end(1:2)-p_start(1:2)); % identifying the link length of the current link
-        nearby_obstacles = findNearbyObstacles(p_start(1:2),link_length,op.lengthMin, op.obstacles); % checks if there are any nearby obstacles
-        n_nearby_obstacles = size(nearby_obstacles,2);
-        if isequal(p_start, p_end)% the change in line 9 (j=1:1:ee-1 to j=1:1:ee causes an error when p_end and p_start are equal, so we should stop here)
-            return;
-        end
-        for z=1:1:n_nearby_obstacles % this loop execludes the checking among the nearby obstacles that needs to be checked
-            obs = op.obstacles(nearby_obstacles(z),:); 
-            if p_start(3) < (obs(3)-obs(5)) && p_end(3) > (obs(3)-obs(5))
-                [resultZ,int] = checkIfZObstacle(p_start,p_end,obs); % checking if the current joints and link collide with the obstacle by any height
-                if resultZ == true
-                    if intersectObstacle_2D([int(1:2); p_end(1:2)],op.obstacles(nearby_obstacles(z),:),false)  
-                        intersected_obstacles = true;
-                        break;
-                    end
-                end
-            elseif p_end(3) >= (obs(3)-obs(5))
-                if obs(3) == op.plane_z
-                    if intersectObstacle_2D([p_start(1:2); p_end(1:2)],op.obstacles(nearby_obstacles(z),:),false)  
-                        intersected_obstacles = true;
-                        break;
-                    end
-                else
-                    [resultBase, notUsed] = checkIfBaseObstacle(p_start,p_end,obs); % checking if the current joints and link collide with the base of the obstacle
-                    if resultBase == true
-                        if intersectObstacle_2D([notUsed(1:2); notUsed(1:2)],op.obstacles(nearby_obstacles(z),:),false)  
-                            intersected_obstacles = true;
-                            break;
-                        end
-                    end
-                end
-            else
-                % no intersection 
-            end
-            
-        end  
-        if intersected_obstacles
+function intersections = collisionCheck(conf)
+    global op;
+    drawProblem3D(conf);
+    obstacles = op.obstacles;
+    nObstacles = size(obstacles,1);
+
+    nodes = solveForwardKinematics3D(conf,op.home_base,0);
+    nUsedLinks = 0;
+    for i = 1:size(conf,1)
+        if conf(i,3)==0
+            nUsedLinks = i-1;
             break;
         end
     end
-end
-% this function checks if the obstacle collides with the obstacle at the z
-% coordinates
-function [result,i] = checkIfZObstacle(p_start,p_end,obs)
-    result = false;
-    u = (p_end-p_start)/norm(p_end-p_start);
-    N = p_start;
     
-    R = getRodriguesRotation(u',[0 0 1]');
-    p_start_r = (R*p_start')';
-    p_end_r = (R*p_end')';
-    
-    %This checks the intersection between the segment and the plane defined by the top of the cylinder obstacle
-    n = [0 0 1];
-    M = [obs(1) obs(2) obs(3)-obs(5)];
-    i = line_plane_intersection(u,N,n,M);  
-    if isempty(i)
-        result = false;
-        return;
+    nUsedNodes = nUsedLinks + 1;
+
+    intersections = 0;
+    for i = 1 : nUsedNodes - 1 
+        for j = 1 : nObstacles
+            intersections = intersections + doTheyIntersect(nodes(i,:),nodes(i+1,:),obstacles(j,:));
+        end
     end
-    i_r = (R*i')';    
-    if p_start_r(3) <= i_r(3) && i_r(3) <= p_end_r(3)
-        result = true;
-    end
-end
-%this function checks the collision between the current segment and the
-%base of the obstacle 
-function [result,i] = checkIfBaseObstacle(p_start,p_end,obs)
-    result = false;
-    u = (p_end-p_start)/norm(p_end-p_start);
-    N = p_start;
-    
-    R = getRodriguesRotation(u',[0 0 1]');
-    p_start_r = (R*p_start')';
-    p_end_r = (R*p_end')';
-    
-    %This checks the intersection between the segment and the plane defined by the top of the cylinder obstacle
-    n = [0 0 1];
-    M = [obs(1) obs(2) obs(3)];
-    i = line_plane_intersection(u,N,n,M);  
-    if isempty(i)
-        result = false;
-        return;
-    end
-    i_r = (R*i')';    
-    if p_start_r(3) <= i_r(3) && i_r(3) <= p_end_r(3)
-        result = true;
-    end
-    %YOU SHOULD RETURN THE SEGMENT INSIDE
+    disp(intersections)
 end
 
-function [I,rc] = line_plane_intersection(u, N, n, M, verbose)
-assert(nargin > 3,'Not enough input arguments.');
-assert(nargin < 6,'Too many input arguments.');
-if nargin < 5    
-    verbose = true;    
-else    
-    assert(islogical(verbose) || isreal(verbose),'verbose must be of type either logical or real numeric.');    
-end
-assert(isequal(size(u),size(N),size(n),size(M)),'Inputs u, M, n, and M must have the same size.');
-assert(isequal(numel(u),numel(N),numel(n),numel(M),3),'Inputs u, M, n, and M must have the same number of elements (3).');
-assert(isequal(ndims(u),ndims(N),ndims(n),ndims(M)),'Inputs u, M, n, and M must have the same number of dimensions.');
-%% Body
-% Plane offset parameter
-d = -dot(n,M);
-% Specific cases treatment
-if ~dot(n,u) % n & u perpendicular vectors
-    if dot(n,N) + d == 0 % N in P => line belongs to the plane
-        if verbose
-            disp('(N,u) line belongs to the (M,n) plane. Their intersection is the whole (N,u) line.');
-        end
-        I = M;
-        rc = 2;
-    else % line // to the plane
-        if verbose
-            disp('(N,u) line is parallel to the (M,n) plane. Their intersection is the empty set.');
-        end
-        I = [];
-        rc = 0;
+function intersect = doTheyIntersect(startPt,endPt,obstacle)
+    intersectXY = planarIntersection(startPt,endPt,obstacle,"XY");
+    if ~intersectXY
+        intersect = false;
+        return;
     end
-else
+    intersectYZ = planarIntersection(startPt,endPt,obstacle,"YZ");
+    intersectXZ = planarIntersection(startPt,endPt,obstacle,"XZ");
+    intersect = intersectYZ && intersectXZ && intersectXY;
+end
+
+function intersect  = planarIntersection(startPt,endPt,obstacle,plane)
+    intersect = false;
     
-    % Parametric line parameter t
-    t = - (d + dot(n,N)) / dot(n,u);
+    if plane=="YZ"
+        obstacleX = obstacle(2);
+        obstacleY = obstacle(3);
+        startPoint = [startPt(2) startPt(3)];
+        endPoint = [endPt(2) endPt(3)];
+    elseif plane=="XZ"
+        obstacleX = obstacle(1);
+        obstacleY = obstacle(3);
+        startPoint = [startPt(1) startPt(3)];
+        endPoint = [endPt(1) endPt(3)];
+    elseif plane=="XY"
+        obstacleX = obstacle(1);
+        obstacleY = obstacle(2);
+        startPoint = [startPt(1) startPt(2)];
+        endPoint = [endPt(1) endPt(2)];
+        radius = obstacle(4);
+        segment = [startPoint; endPoint];
+        circle = [obstacleX, obstacleY, radius];
+        intersect = segmentIntersectsCircle(segment,circle);
+        return;
+    end
+    radius = obstacle(4);
+    height= obstacle(5);
+    lowerVertex1 = [obstacleX-radius, obstacleY];
+    lowerVertex2 = [obstacleX+radius, obstacleY]; 
+    upperVertex1 = [obstacleX-radius, obstacleY-height];
+    upperVertex2 = [obstacleX+radius, obstacleY-height];
+
+    inside = lineInsideRectangle(startPoint,endPoint,[upperVertex1; upperVertex2; lowerVertex2; lowerVertex1]);
+
+    if inside
+        intersect = true;
+        return;
+    end
     
-    % Intersection coordinates
-    I = N + u*t;
-    
-    rc = 1;
+    [x1out, ~] = polyxpoly([startPoint(1), endPoint(1)],[startPoint(2),endPoint(2)],...
+        [lowerVertex1(1), upperVertex1(1)],[lowerVertex1(2), upperVertex1(2)]);
+    [x2out, ~] = polyxpoly([startPoint(1), endPoint(1)],[startPoint(2),endPoint(2)],...
+        [lowerVertex2(1), upperVertex2(1)],[lowerVertex2(2), upperVertex2(2)]);
+    [x3out, ~] = polyxpoly([startPoint(1), endPoint(1)],[startPoint(2),endPoint(2)],...
+        [upperVertex1(1), upperVertex2(1)],[upperVertex1(2), upperVertex2(2)]);
+    [x4out, ~] = polyxpoly([startPoint(1), endPoint(1)],[startPoint(2),endPoint(2)],...
+        [lowerVertex1(1), lowerVertex2(1)],[lowerVertex1(2), lowerVertex2(2)]);
+
+    if ~isempty(x1out) || ~isempty(x2out) || ~isempty(x3out) || ~isempty(x4out)
+        intersect = true;
+    end
     
 end
-end % line_plane_intersection
 
+function intersects = segmentIntersectsCircle(segment,circle)
+    point1 = segment(1,:);
+    point2 = segment(2,:);
+    center = circle(1:2);
+    centerToSegmentDistance = pointToSegment3D([center 0],[point1 0],[point2 0]);
+
+    radius = circle(3);
+    
+    if centerToSegmentDistance > radius
+        intersects = false;
+    else
+        intersects = true;
+    end
+end
+
+function inside = lineInsideRectangle(startPoint,endPoint,rectangle)
+    inside = false;
+    upperVertex1 = rectangle(1,:);
+    lowerVertex2 = rectangle(3,:);
+
+
+    distanceStartToUpper1X = abs(startPoint(1)-upperVertex1(1));
+    distanceStartToUpper2X = abs(startPoint(1)-lowerVertex2(1));
+    distanceUpper1Upper2X = abs(upperVertex1(1)-lowerVertex2(1));
+    
+    distanceStartToUpper1Y = abs(startPoint(2)-upperVertex1(2));
+    distanceStartToLower2Y = abs(startPoint(2)-lowerVertex2(2));
+    distanceUpper1Lower2Y = abs(upperVertex1(2)-lowerVertex2(2));
+
+    if (distanceStartToUpper1X+distanceStartToUpper2X == distanceUpper1Upper2X) && ...
+            (distanceStartToUpper1Y+distanceStartToLower2Y == distanceUpper1Lower2Y)
+        inside = true;
+        return;
+    end
+    
+    distanceStartToUpper1X = abs(endPoint(1)-upperVertex1(1));
+    distanceStartToUpper2X = abs(endPoint(1)-lowerVertex2(1));
+    distanceUpper1Upper2X = abs(upperVertex1(1)-lowerVertex2(1));
+    
+    distanceStartToUpper1Y = abs(endPoint(2)-upperVertex1(2));
+    distanceStartToLower2Y = abs(endPoint(2)-lowerVertex2(2));
+    distanceUpper1Lower2Y = abs(upperVertex1(2)-lowerVertex2(2));
+
+    if (distanceStartToUpper1X+distanceStartToUpper2X == distanceUpper1Upper2X) && ...
+            (distanceStartToUpper1Y+distanceStartToLower2Y == distanceUpper1Lower2Y)
+        inside = true;
+        return;
+    end
+end
