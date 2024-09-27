@@ -1,10 +1,9 @@
-function intersections = collisionCheck(conf)
+function intersects = collisionCheck(conf)
     global op;
-    drawProblem3D(conf);
     obstacles = op.obstacles;
     nObstacles = size(obstacles,1);
 
-    nodes = solveForwardKinematics_3D(conf,op.home_base,0);
+    nodes = solveForwardKinematics3D(conf,op.home_base,0);
     nUsedLinks = 0;
     for i = 1:size(conf,1)
         if conf(i,3)==0
@@ -15,13 +14,15 @@ function intersections = collisionCheck(conf)
     
     nUsedNodes = nUsedLinks + 1;
 
-    intersections = 0;
+    intersects = false;
     for i = 1 : nUsedNodes - 1 
         for j = 1 : nObstacles
-            intersections = intersections + doTheyIntersect(nodes(i,:),nodes(i+1,:),obstacles(j,:));
+            if doTheyIntersect(nodes(i,:),nodes(i+1,:),obstacles(j,:))
+                intersects = true;
+                return;
+            end
         end
     end
-    disp(intersections)
 end
 
 function intersect = doTheyIntersect(startPt,endPt,obstacle)
@@ -31,8 +32,17 @@ function intersect = doTheyIntersect(startPt,endPt,obstacle)
         return;
     end
     intersectYZ = planarIntersection(startPt,endPt,obstacle,"YZ");
+    if ~intersectYZ
+        intersect = false;
+        return;
+    end
     intersectXZ = planarIntersection(startPt,endPt,obstacle,"XZ");
-    intersect = intersectYZ && intersectXZ && intersectXY;
+
+    if ~intersectXZ
+        intersect = false;
+        return;
+    end
+    intersect = true;
 end
 
 function intersect  = planarIntersection(startPt,endPt,obstacle,plane)
