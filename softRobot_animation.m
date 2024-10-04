@@ -7,7 +7,7 @@
 % DISCLAIMER:
 % It must me updated to draw obstacles when we will add any in the future
 function [] = softRobot_animation(sp, formattedPath)
-    speedMultiplier = 100;
+    speedMultiplier = 1000;
  
     home_base = sp.home_base;
     steps = size(formattedPath,3);       % number of steps of motion
@@ -32,8 +32,8 @@ function [] = softRobot_animation(sp, formattedPath)
         ylim([-600 600]);
         zlim([-100 1000]);
         plot3(home_base(1),home_base(2),home_base(3),'--gs','LineWidth',2,'MarkerSize',10,'MarkerEdgeColor','b'); %draw home
-        startConf = solveForwardKinematics_3D(formattedPath(:,:,1),home_base,false);
-        robot_CC = solveForwardKinematics_3D(formattedPath(:,:,k),home_base,false); %solve the forward kinematics for a given robot configuration
+        startConf = solveForwardKinematics_3D(formattedPath(:,:,1),home_base);
+        robot_CC = solveForwardKinematics_3D(formattedPath(:,:,k),home_base); %solve the forward kinematics for a given robot configuration
         
         % collect the end effector coordinates for each step of motion to draw the path of the robot 
         end_effectors(k,:) = robot_CC(n_joints+1,:); 

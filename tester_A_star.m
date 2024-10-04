@@ -1,28 +1,30 @@
+clear
+
 load envs.mat
-sp = envs{1};
+sp = envs{3};
 
-sp.design = [50
-175
-175
-175
-175
-150];
+% sp.design = [50
+% 175
+% 175
+% 175
+% 175
+% 150];
 
-sp.j = 6;
-
-sp.start_conf = [0	0	50
--45	45	175
-0	0	175
-25	-10	175
-20	-15	100
-0 0 0];
-
-sp.goal_conf = [0	0	50
-45	-45	175
-0	0	175
--25	10	175
--20	15	175
-0 0 90];
+% sp.j = 6;
+% 
+% sp.start_conf = [0 0 50
+% -45	45	175
+% 0	0	175
+% 25	-10	175
+% 20	-15	100
+% 0 0 0];
+% 
+% sp.goal_conf = [0	0	50
+% 45	-45	175
+% 0	0	175
+% -25	10	175
+% -20	15	175
+% 0 0 90];
 
 sp.times = [1, 1, 1];
 sp.metric = "time";
@@ -35,10 +37,10 @@ sp = preMotion(sp);
 [prePath, preCost] = directExpansion(sp, realmax, orgSp.start_conf, sp.start_conf);
 [postPath, postCost] = directExpansion(sp, realmax, sp.goal_conf, orgSp.goal_conf);
 
-solution = searchAlgorithmA_star(sp, 10000, true);
+solution = searchAlgorithmA_star(sp, 10000, false);
 
 solution.path = [pathConversionC_M(prePath), solution.path, pathConversionC_M(postPath)];
-solution.g = solution.g + preCost + postCost;
+cost = solution.g + preCost + postCost;
 
 animate(sp, solution.path);
 

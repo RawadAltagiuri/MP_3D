@@ -39,12 +39,19 @@ production.
         prevTreeSize = size(graphTree, 1);
         graphTree = updateTreeRRT(sp, rrtConf, graphTree, randomConfig);
 
+        if prevTreeSize < size(graphTree, 1) && getHeuristic(sp, graphTree{end, 1}, sp.goal_conf) < sp.goalRegion
+            cost = costOfPath(sp, path);
+            break;
+        end
+
         % Show the plot if SHOW flag is set.
         if SHOW && prevTreeSize ~= size(graphTree, 1)
             drawConfig(graphTree{end, 1}, sp, 'b');
             pause
         end
     end
+
+    tree = graphTree;
 end
 
 

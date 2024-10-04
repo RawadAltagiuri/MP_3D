@@ -15,7 +15,7 @@ function [d, inside, xp] = pointToSegment3D(pt, v1, v2)
     u(2) = (v1(2)-v2(2)) / mod;
     u(3) = (v1(3)-v2(3)) / mod;
     
-    R = GetRodriguesRotation(u',[1 0 0]');
+    R = getRodriguesRotation(u',[1 0 0]');
     v1_1 = (R*v1')';
     v2_1 = (R*v2')';
     pt_1 = (R*pt')';

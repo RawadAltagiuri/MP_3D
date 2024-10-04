@@ -49,22 +49,30 @@
 clear, clc, close;
 
 load envs
-sp = envs{5};
-sp.times = [1, 1, 1];
+sp = envs{2};
+sp.times = [1, 0.3, 0.3];
 sp.metric = "time";
 paddingAmount = 5;
 sp.obstacles(:, 4:5) = sp.obstacles(:, 4:5) + paddingAmount;
 
 sp.baseRotate = false;
-sp.heuristicLimit = 0.01;
+sp.heuristicLimit = 0.1;
+sp.goalRegion = 50;
 
-
-rrtConf.numOfNodes = 500;
+rrtConf.numOfNodes = 1000;
 rrtConf.stepSize = 5;
-rrtConf.neighbourSize = calculateNeighbourSize(sp) * 50;
+rrtConf.neighbourSize = calculateNeighbourSize(sp) * 10;
 
 
-[path, cost, tree, final_child] = searchAlgorithmRRT_star(sp, rrtConf, false);
+[path, cost, tree, final_child] = searchAlgorithmRRT(sp, rrtConf, false);
+
+minCost = realmax;
+for i = 1:size(tree, 1)
+    cost = calculateCost(sp, tree{i, 1}, sp.goal_conf);
+    if cost < minCost
+        minCost = cost;
+    end
+end
 
 solution.g = cost;
 solution.f = solution.g;

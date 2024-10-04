@@ -2,14 +2,8 @@ function intersects = collisionCheck(conf,op)
     obstacles = op.obstacles;
     nObstacles = size(obstacles,1);
 
-    nodes = solveForwardKinematics_3D(conf,op.home_base,0);
-    nUsedLinks = 0;
-    for i = 1:size(conf,1)
-        if conf(i,3)==0
-            nUsedLinks = i-1;
-            break;
-        end
-    end
+    nodes = solveForwardKinematics_3D(conf,op.home_base);
+    nUsedLinks = size(conf,1);
     
     nUsedNodes = nUsedLinks + 1;
 

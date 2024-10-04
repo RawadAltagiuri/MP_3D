@@ -65,9 +65,14 @@ function timeCost = calculateCostTime(sp, conf_a, conf_b)
     angles2 = conf_b(:, 1:2);
 
     diffAngles = abs(angles1 - angles2);
+    
+    timeCost = 0;
+    for i = 1:size(diffAngles, 1)
+        timeCost = timeCost + (max(diffAngles(i, 1), diffAngles(i, 2))) / times(1);
+    end
 
-    totalAngleDiff = sum(sum(diffAngles));
-    timeCost = totalAngleDiff / times(1);
+    % totalAngleDiff = sum(sum(diffAngles));
+    % timeCost = totalAngleDiff / times(1);
 
     length1 = sum(conf_a(:, 3));
     length2 = sum(conf_b(:, 3));

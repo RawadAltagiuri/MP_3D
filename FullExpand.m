@@ -34,7 +34,7 @@ function [children] = fullExpand(sp, node)
     %Constrain to allow only the joints higher than the obstacles to
     %rotate
     lastIndexToExpand = findJointHigherThanAllObstacles(node.path(:,end-2:end), sp);
-%     lastIndexToExpand = size(sp.design, 1)-1;
+%   lastIndexToExpand = size(sp.design, 1)-1;
     
     %Generate the steering children of steering only x or y
     for r = row: lastIndexToExpand
@@ -82,6 +82,12 @@ end
 function [child, isValid] = doEversion(node, operation, sp)
     conf = node.path(:,end-2:end);
 
+    for lastExpanded = size(conf, 1):-1:1
+        if conf(lastExpanded, 3) ~= 0
+            break;
+        end
+    end
+
     % Check if the operation is valid based on the current configuration
     if operation == 0 % grow
         if sum(conf(:,3)) == sum(sp.design)
@@ -96,13 +102,7 @@ function [child, isValid] = doEversion(node, operation, sp)
             return;
         end
 
-        % Gripper constraint.
-        %%%
-        % for lastExpanded = size(conf, 1):-1:1
-        %     if conf(lastExpanded, 3) ~= 0
-        %         break;
-        %     end
-        % end
+        %%% Gripper Constraint
         % 
         % if conf(lastExpanded, 3) - sp.stepSize(2) < sp.lengthMin && ~isequal(conf(lastExpanded, 1:2), [0, 0])
         %     child = [];
@@ -145,11 +145,11 @@ function [child, isValid] = doEversion(node, operation, sp)
                 return;
             end
         end
-        if (conf(row, 3) < sp.lengthMin && conf(row, 2) > 0) || (conf(row, 3) < sp.lengthMin && conf(row, 1) > 0)
-            child = [];
-            isValid = false;
-            return;
-        end 
+        % if (conf(row, 3) < sp.lengthMin && conf(row, 2) > 0) || (conf(row, 3) < sp.lengthMin && conf(row, 1) > 0)
+        %     child = [];
+        %     isValid = false;
+        %     return;
+        % end 
     end
     % ---- calculate cost -----
     child.g = node.g + calculateCost(sp, node.path(:,end-2:end), conf);
@@ -163,8 +163,6 @@ function [child, isValid] = doEversion(node, operation, sp)
     child.f = calculateCostBasedOnAlgorithm(child.g, child.h, sp.typeOfAlg);
     child.path = [node.path , conf]; % to get all configurations of a path, divide the path by 3 columns
 end
-
-
 
 % Function to perform steering operation on a node
 % Input:

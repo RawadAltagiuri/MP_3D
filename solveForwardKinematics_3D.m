@@ -1,4 +1,4 @@
-function coordinates = solveForwardKinematics_3D(conf, base, draw)
+function coordinates = solveForwardKinematics_3D(conf, base)
     % Number of transformations
     num_links = size(conf, 1);
     
