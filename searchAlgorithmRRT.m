@@ -47,6 +47,7 @@ production.
         % Show the plot if SHOW flag is set.
         if SHOW && prevTreeSize ~= size(graphTree, 1)
             drawConfig(graphTree{end, 1}, sp, 'b');
+            drawConfig(randomConfig, sp, 'k');
             pause
         end
     end

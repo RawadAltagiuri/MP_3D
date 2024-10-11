@@ -122,31 +122,15 @@ function [child, isValid] = doEversion(node, operation, sp)
     end
     %Perform the eversion operation based on the specified operation type
     if operation == 0   
-        %% Gripper Constraint
+        % Gripper Constraint
         % In case of gripper constraint violation, return valid path to
         % of retraction tat satisfies this constraint.
         if conf(lastExpanded, 3) - sp.stepSize(2) < sp.lengthMin && ~isequal(conf(lastExpanded, 1:2), [0, 0])
             retConf = conf;
             retConf(lastExpanded, 3) = sp.lengthMin;
             [retPath, retCost] = directExpansion(sp, realmax, conf, retConf);
-
             if isempty(retPath)
-                child = [];
-                isValid = false;
-                return;
-            end
-
-            child.g = retCost;
-            child.h = getHeuristic(sp, retConf, sp.goal_conf);
-            child.f = calculateCostBasedOnAlgorithm(child.g, child.h, sp.typeOfAlg);
-            child.label = "e-";
-            cutRetPath = retPath(2:end);
-            path = pathConversionC_M(cutRetPath);
-            child.path = [node.path, path]; % to get all configurations of a path, divide the path by 3 columns
-            isValid = true;
-            return;
         end
-        %%
 
         conf(row, 3) = conf(row, 3) + sp.stepSize(1, 2);
         if conf(row, 3) > sp.design(row)

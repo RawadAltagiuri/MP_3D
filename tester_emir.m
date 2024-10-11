@@ -64,7 +64,7 @@ rrtConf.stepSize = 5;
 rrtConf.neighbourSize = calculateNeighbourSize(sp) * 10;
 
 
-[path, cost, tree, final_child] = searchAlgorithmRRT(sp, rrtConf, false);
+[path, cost, tree, final_child] = searchAlgorithmRRT(sp, rrtConf, true);
 
 minCost = realmax;
 for i = 1:size(tree, 1)

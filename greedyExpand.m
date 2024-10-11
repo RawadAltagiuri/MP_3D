@@ -28,7 +28,7 @@ function nextConfig = greedyExpand(sp, config, goal, actionOrder)
         sp
         config
         goal
-        actionOrder = ['R', 'S', 'G'];
+        actionOrder = ['S', 'R', 'G'];
     end
 
     

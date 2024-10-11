@@ -140,7 +140,7 @@ function [solution, expandedNodes] = searchAlgorithm_Det(sp, fringeSize)
         validGreedyFound = false;
         for i = 1 :size(greedyChildren, 1)
             child = greedyChildren(i);
-            [isColliding, ~] = collisionCheck(child.path(:,end-2:end), sp);%Checking if the greedy children are valid (not colliding), if not we will generate children according to the current algorithm [Astar, UCS, greedy]
+            isColliding = collisionCheck(child.path(:,end-2:end), sp);%Checking if the greedy children are valid (not colliding), if not we will generate children according to the current algorithm [Astar, UCS, greedy]
             if ~set.contains(mat2str(child.path(:,end-2:end)))
                 if isColliding == false
                     validGreedyFound = true;
@@ -165,7 +165,7 @@ function [solution, expandedNodes] = searchAlgorithm_Det(sp, fringeSize)
 
             for i = 1:size(children, 1)
                 child = children(i);
-                [isColliding, ~] = collisionCheck(child.path(:,end-2:end), sp);
+                isColliding = collisionCheck(child.path(:,end-2:end), sp);
                 if ~set.contains(mat2str(child.path(:,end-2:end)))
                     if isColliding == false
                         PDQ_det('add', fringe, {[child.f child.g child.h], child.path});
