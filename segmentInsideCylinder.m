@@ -1,4 +1,5 @@
 function [inside,insideXZ,insideYZ] = segmentInsideCylinder(startPt,endPt,obstacle)
+
 radius = obstacle(4);
 height= obstacle(5);
 obstacleX = obstacle(2);
@@ -13,7 +14,6 @@ upperVertex2 = [obstacleX+radius, obstacleY-height];
 
 insideYZ = lineInsideRectangle(startPoint,endPoint,[upperVertex1; upperVertex2; lowerVertex2; lowerVertex1]);
 
-
 obstacleX = obstacle(1);
 obstacleY = obstacle(3);
 startPoint = [startPt(1) startPt(3)];
@@ -25,12 +25,19 @@ upperVertex2 = [obstacleX+radius, obstacleY-height];
 
 insideXZ = lineInsideRectangle(startPoint,endPoint,[upperVertex1; upperVertex2; lowerVertex2; lowerVertex1]);
 
-inside = insideXZ && insideYZ;
+distance = pointToSegment3D([obstacle(1:2) 0],[startPt(1:2) 0],[endPt(1:2) 0]);
+if distance > obstacle(4)
+    insideXY = false;
+else
+    insideXY = true;
+end
+inside = insideXY && insideXZ && insideYZ;
 
 end
 
 function inside = lineInsideRectangle(startPoint,endPoint,rectangle)
-    inside = false;
+    insideStart = false;
+    insideEnd = false;
     upperVertex1 = rectangle(1,:);
     lowerVertex2 = rectangle(3,:);
 
@@ -45,8 +52,7 @@ function inside = lineInsideRectangle(startPoint,endPoint,rectangle)
 
     if (distanceStartToUpper1X+distanceStartToUpper2X == distanceUpper1Upper2X) && ...
             (distanceStartToUpper1Y+distanceStartToLower2Y == distanceUpper1Lower2Y)
-        inside = true;
-        return;
+        insideStart = true;
     end
     
     distanceStartToUpper1X = abs(endPoint(1)-upperVertex1(1));
@@ -59,7 +65,7 @@ function inside = lineInsideRectangle(startPoint,endPoint,rectangle)
 
     if (distanceStartToUpper1X+distanceStartToUpper2X == distanceUpper1Upper2X) && ...
             (distanceStartToUpper1Y+distanceStartToLower2Y == distanceUpper1Lower2Y)
-        inside = true;
-        return;
+        insideEnd = true;
     end
+    inside = insideStart && insideEnd;
 end
