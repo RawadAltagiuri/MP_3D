@@ -1,0 +1,178 @@
+classdef Configuration < matlab.mixin.Copyable
+    % This class represents a configuration of a soft-robot.
+    % As a configuration has different representations (in joint space or
+    % cartasian), instance of this class has respective properties for
+    % each representation.
+    % Each representation is instantiated the first time it is used
+    % (or computed) rather than in construction of the object itself.
+
+    % Properties:
+    % j_space, configuration in joint space.
+    % c_space, configuration in cartasian space.
+    properties (Access = private)
+        j_space double
+        c_space double
+    end
+
+    methods (Static)
+        % Generates a random configuration according to robot's design
+        % parameters and a specified method of random generation. The
+        % default method of random generation is uniform.
+        % 
+        % Generated random configuration is valid in a sense that a complete
+        % path can be constructed from any other valid configuration to this
+        % one and visa-versa.
+        function conf = randomConfig(randomMethod)
+            global sp;
+            switch (randomMethod)
+                otherwise
+                    conf = uniformRandom(sp);
+            end
+        end
+    end
+
+    methods (Static, Access = private)
+        function conf = uniformRandom(sp)
+            lengthSum = 0;
+            for i = 2:size(sp.design)
+                length = sp.design(i);
+                lengthSum = lengthSum + length;
+            end
+            length = rand(1) * lengthSum + sp.design(1);
+
+            steerRange = sp.steerBounds(2) - sp.steerBounds(1);
+
+            conf = zeros(size(sp.design, 1), 3);
+            conf(1, :) = [0, 0, sp.design(1)];
+            remindingLength = length - sp.design(1);
+            for i = 2:size(sp.design, 1)
+                if remindingLength < sp.design(i)
+                    conf(i, :) = [rand(1) * steerRange + sp.steerBounds(1), rand(1) * steerRange + sp.steerBounds(1), remindingLength];
+                    for j = (i + 1):size(sp.design, 1)
+                        conf(j, :) = [0, 0, 0];
+                    end
+                    break;
+                else
+                    conf(i, :) = [rand(1) * steerRange + sp.steerBounds(1), rand(1) * steerRange + sp.steerBounds(1), sp.design(i)];
+                    remindingLength = remindingLength - sp.design(i);
+                end
+            end
+
+            % Accomodate for gripper.
+            lastExpanded = -1;
+            for i = size(conf, 1):-1:1
+                if conf(i, 3) > 0.0001
+                    lastExpanded = i;
+                    break;
+                end
+            end
+
+            if conf(lastExpanded, 3) < sp.lengthMin
+                conf(lastExpanded, 1:2) = 0;
+            end
+        end
+    end
+    
+    methods
+        % Constructor
+        % Takes configuration in joint space.
+        function obj = Configuration(j_space)
+            obj.j_space = j_space;
+        end
+
+        % Solves forward kinematics (converts joint coordinates into
+        % cartasian coordinates of each joint).
+        function solveFK(obj)
+
+        end
+
+        % Grows this configuration by a specified amount.
+        % Inputs:
+        % - amountOfGrow, amount to grow
+        function grow(obj, growAmount)
+            global sp;
+            
+            for lastExpanded = size(obj.j_space, 1):-1:1
+                if obj.j_space(lastExpanded, 3) ~= 0
+                    break;
+                end
+            end
+
+            while growAmount > 0 && lastExpanded <= size(obj.j_space, 1)
+                diff = sp.design(lastExpanded) - obj.j_space(lastExpanded, 3);
+                if sp.design(lastExpanded) - obj.j_space(lastExpanded, 3) > growAmount
+                    obj.j_space(lastExpanded, 3) = obj.j_space(lastExpanded, 3) + growAmount;
+                    break;
+                else
+                    obj.j_space(lastExpanded, 3) = sp.design(lastExpanded);
+                    growAmount = growAmount - diff;
+                    lastExpanded = lastExpanded + 1;
+                end
+            end
+        end
+
+        % Retracts this configuration by a specified amount.Takes sp, configuration and amount of retraction and returns the resulting
+        % configuration from retraction config that amount.
+        % Important thing to notice here is that this function does NOT take any
+        % robot constraints into account. That is, retraction is simply the collapse
+        % of the last link.
+        %
+        % Inputs:
+        % - amountOfRet, amount to retraction
+        function retract(obj, retAmount)
+            for lastExpanded = size(conf, 1):-1:1
+                if obj.j_space(lastExpanded, 3) ~= 0
+                    break;
+                end
+            end
+
+            while retAmount > 0 && lastExpanded > 0
+                if conf(lastExpanded, 3) > retAmount
+                    conf(lastExpanded, 3) = conf(lastExpanded, 3) - retAmount;
+                    break;
+                else
+                    retAmount = retAmount - obj.j_spacelastExpanded, 3);
+                    conf(lastExpanded, :) = 0;
+                    lastExpanded = lastExpanded - 1;
+                end
+            end
+        end
+
+        % Retrieves the path to go to a target configuration with a limit.
+        % This method basically runs the local planner to retrieve the
+        % path. In case of a collusion, obstacle's relative index is
+        % returned.
+        % 
+        % Inputs:
+        % stepSize, number of steps to iterate to go to target configuration.
+        % targetConfig, target configuration.
+        % obstacles, obstacles in the way.
+        %
+        % Outputs:
+        % p, path.
+        % obstacle, the collided (in case p is empty) obstacles.
+        %
+        % Note: In case of a valid path, p is non-empty and obstacle is
+        % empty. On the other hand if there is a collusion p is empty and
+        % obstacle is non empty. That is, either 'p' is empty or 'obstacle'
+        % and not both.
+        function [p, obstacle] = directExpansion(obj, stepSize, targetConfig, obstacles)
+            
+        end
+
+        % Checks whether this configuration collides with given obstacles.
+        %
+        % Inputs:
+        % obstacles, cylinders in [x, y, z, r, h] form.
+        % 
+        % Outputs:
+        % isCollide, boolean flag indicating a collusion or not.
+        function isCollide = collusionCheck(obj, obstacles)
+            if isempty(obj.c_space)
+                solveFK(sp);
+            end
+            iscollide();
+        end
+    end
+end
+
