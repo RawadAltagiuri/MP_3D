@@ -12,6 +12,9 @@ classdef Configuration < matlab.mixin.Copyable
     properties (Access = private)
         j_space double
         c_space double
+
+        length
+        lastExpanded
     end
 
     methods (Static)
@@ -24,6 +27,7 @@ classdef Configuration < matlab.mixin.Copyable
         % one and visa-versa.
         function conf = randomConfig(randomMethod)
             global sp;
+
             switch (randomMethod)
                 otherwise
                     conf = uniformRandom(sp);
@@ -70,6 +74,8 @@ classdef Configuration < matlab.mixin.Copyable
             if conf(lastExpanded, 3) < sp.lengthMin
                 conf(lastExpanded, 1:2) = 0;
             end
+
+            conf = Configuration(conf);
         end
     end
     
@@ -78,35 +84,43 @@ classdef Configuration < matlab.mixin.Copyable
         % Takes configuration in joint space.
         function obj = Configuration(j_space)
             obj.j_space = j_space;
+
+            obj.lastExpanded = -1;
+            for i = size(conf, 1):-1:1
+                if conf(i, 3) > 0.0001
+                    obj.lastExpanded = i;
+                    break;
+                end
+            end
+
+            obj.length = sum(j_space, 3);
         end
 
         % Solves forward kinematics (converts joint coordinates into
         % cartasian coordinates of each joint).
         function solveFK(obj)
+            global sp;
 
+            if ~isempty(obj.c_space)
+                return;
+            end
+
+            obj.c_space = solveForwardKinematics_3D(obj.j_space, sp.home_base);
         end
 
         % Grows this configuration by a specified amount.
         % Inputs:
         % - amountOfGrow, amount to grow
         function grow(obj, growAmount)
-            global sp;
-            
-            for lastExpanded = size(obj.j_space, 1):-1:1
-                if obj.j_space(lastExpanded, 3) ~= 0
-                    break;
-                end
-            end
-
-            while growAmount > 0 && lastExpanded <= size(obj.j_space, 1)
-                diff = sp.design(lastExpanded) - obj.j_space(lastExpanded, 3);
-                if sp.design(lastExpanded) - obj.j_space(lastExpanded, 3) > growAmount
-                    obj.j_space(lastExpanded, 3) = obj.j_space(lastExpanded, 3) + growAmount;
+            while growAmount > 0 && obj.lastExpanded <= size(obj.j_space, 1)
+                diff = sp.design(obj.lastExpanded) - obj.j_space(obj.lastExpanded, 3);
+                if sp.design(obj.lastExpanded) - obj.j_space(obj.lastExpanded, 3) > growAmount
+                    obj.j_space(obj.lastExpanded, 3) = obj.j_space(obj.lastExpanded, 3) + growAmount;
                     break;
                 else
-                    obj.j_space(lastExpanded, 3) = sp.design(lastExpanded);
+                    obj.j_space(obj.lastExpanded, 3) = sp.design(obj.lastExpanded);
                     growAmount = growAmount - diff;
-                    lastExpanded = lastExpanded + 1;
+                    obj.lastExpanded = obj.lastExpanded + 1;
                 end
             end
         end
@@ -120,23 +134,36 @@ classdef Configuration < matlab.mixin.Copyable
         % Inputs:
         % - amountOfRet, amount to retraction
         function retract(obj, retAmount)
-            for lastExpanded = size(conf, 1):-1:1
-                if obj.j_space(lastExpanded, 3) ~= 0
-                    break;
-                end
-            end
-
-            while retAmount > 0 && lastExpanded > 0
-                if conf(lastExpanded, 3) > retAmount
-                    conf(lastExpanded, 3) = conf(lastExpanded, 3) - retAmount;
+            while retAmount > 0 && obj.lastExpanded > 0
+                if obj.j_space(obj.lastExpanded, 3) > retAmount
+                    obj.j_space(obj.lastExpanded, 3) = obj.j_space(obj.lastExpanded, 3) - retAmount;
                     break;
                 else
-                    retAmount = retAmount - obj.j_spacelastExpanded, 3);
-                    conf(lastExpanded, :) = 0;
-                    lastExpanded = lastExpanded - 1;
+                    retAmount = retAmount - obj.j_space(obj.lastExpanded, 3);
+                    obj.j_space(obj.lastExpanded, :) = 0;
+                    obj.lastExpanded = obj.lastExpanded - 1;
                 end
             end
         end
+
+        %%%
+        function nextConfig = greedyExpand(goalConfig, actionOrder)
+            arguments
+                goalConfig
+                actionOrder = ['S', 'R', 'G'];
+            end
+
+            global sp;
+
+            nextConfig = [];
+            for action = actionOrder
+                nextConfig = doAction(sp, config, goalConfig, action);
+                if  ~isempty(nextConfig)
+                    return;
+                end
+            end
+        end
+        %%%
 
         % Retrieves the path to go to a target configuration with a limit.
         % This method basically runs the local planner to retrieve the
@@ -156,23 +183,182 @@ classdef Configuration < matlab.mixin.Copyable
         % empty. On the other hand if there is a collusion p is empty and
         % obstacle is non empty. That is, either 'p' is empty or 'obstacle'
         % and not both.
-        function [p, obstacle] = directExpansion(obj, stepSize, targetConfig, obstacles)
-            
+        function [path, obstacle] = directExpansion(obj, stepSize, targetConfig, obstacles)
+            global sp;
+
+            path = Path;
+            while ~equal(obj.j_space, targetConfig.j_space) && (size(path, 2) - 1) < step_size
+                config = greedyExpand(sp, config, end_conf);
+
+                if isempty(config)
+                    error("Target configuration is not reachable from current configuration!");
+                end
+
+                collObs = obj.collCheck(obstacles);
+                if collObs ~= -1
+                    path = [];
+                    obstacle = collObs;
+                    return;
+                end
+
+                path.add(config);
+            end
+
+            cost = costOfPath(sp, path);
         end
 
         % Checks whether this configuration collides with given obstacles.
         %
         % Inputs:
         % obstacles, cylinders in [x, y, z, r, h] form.
-        % 
+        %
         % Outputs:
         % isCollide, boolean flag indicating a collusion or not.
-        function isCollide = collusionCheck(obj, obstacles)
+        function isCollide = collCheck(obj, obstacles)
             if isempty(obj.c_space)
                 solveFK(sp);
             end
             iscollide();
         end
+    end
+
+    methods (Access = private)
+        function config = doAction(config, goalConfig, action)
+            globa
+            switch action
+                case 'S'
+                    config = steering(sp, config, goalConfig);
+                case 'R'
+                    config = retraction(sp, config, goalConfig);
+                case 'G'
+                    config = growing(sp, config, goalConfig);
+                otherwise
+                    error("Action: '" + action + "' is not defined.");
+            end
+        end
+
+        function config = steering(sp, config, goal)
+            lastExpanded = -1;
+            for i = size(config, 1):-1:1
+                if config(i, 3) > 0.0001
+                    lastExpanded = i;
+                    break,
+                end
+            end
+            diffAngles = goal(1:lastExpanded, 1:2) - config(1:lastExpanded, 1:2);
+
+            if isequal(diffAngles, zeros(lastExpanded, 2))
+                config = [];
+                return;
+            end
+
+            if config(lastExpanded, 3) < sp.lengthMin && ~isequal(config(lastExpanded, 1:2) - goal(lastExpanded, 1:2), [0, 0])
+                growAmount = sp.lengthMin - config(lastExpanded, 3);
+                growAmount = min(sp.stepSize(2), growAmount);
+
+                config = grow(sp, config, growAmount);
+            else
+                % jointIndex = 1;
+                % angleIndex = 1;
+                % maxAngle = abs(diffAngles(1, 1));
+                % for i = 1:size(diffAngles, 1)
+                %     for j = 1:size(diffAngles, 2)
+                %         if abs(diffAngles(i, j)) > maxAngle
+                %             maxAngle = abs(diffAngles(i, j));
+                %             jointIndex = i;
+                %             angleIndex = j;
+                %         end
+                %     end
+                % end
+                %
+                % if diffAngles(jointIndex, angleIndex) > 0
+                %     config(jointIndex, angleIndex) = config(jointIndex, angleIndex) + min(diffAngles(jointIndex, angleIndex), sp.stepSize(1));
+                % else
+                %     config(jointIndex, angleIndex) = config(jointIndex, angleIndex) + max(diffAngles(jointIndex, angleIndex), -sp.stepSize(1));
+                % end
+
+                angleChanged = false;
+                for i = 1:size(diffAngles, 1)
+                    if angleChanged
+                        break;
+                    end
+
+                    if diffAngles(i, 1) ~= 0
+                        angleChanged = true;
+
+                        if diffAngles(i, 1) > 0
+                            config(i, 1) = config(i, 1) + min(diffAngles(i, 1), sp.stepSize(1));
+                        else
+                            config(i, 1) = config(i, 1) + max(diffAngles(i, 1), -sp.stepSize(1));
+                        end
+                    end
+                    if diffAngles(i, 2) ~= 0
+                        angleChanged = true;
+
+                        if diffAngles(i, 2) > 0
+                            config(i, 2) = config(i, 2) + min(diffAngles(i, 2), sp.stepSize(1));
+                        else
+                            config(i, 2) = config(i, 2) + max(diffAngles(i, 2), -sp.stepSize(1));
+                        end
+                    end
+                end
+
+                % for i = 1:size(diffAngles, 1) * size(diffAngles, 2)
+                %     if diffAngles(i) > 0
+                %         diffAngles(i) = min(diffAngles(i), sp.stepSize(1));
+                %     else
+                %         diffAngles(i) = max(diffAngles(i), -sp.stepSize(1));
+                %     end
+                % end
+                % config(1:lastExpanded, 1:2) = config(1:lastExpanded, 1:2) + diffAngles;
+            end
+        end
+
+        function config = retraction(sp, config, goal)
+            lastExpanded = -1;
+            for i = size(config, 1):-1:1
+                if config(i, 3) > 0.0001
+                    lastExpanded = i;
+                    break,
+                end
+            end
+            diffLength = sum(goal(:, 3)) - sum(config(:, 3));
+
+            if abs(diffLength) < 0.0001 || diffLength >= 0
+                config = [];
+                return;
+            end
+
+            retAmount = max(diffLength, -sp.stepSize(2));
+            if config(lastExpanded, 3) + retAmount < sp.lengthMin && ~isequal(config(lastExpanded, 1:2), [0, 0])
+                angleAmounts = -config(lastExpanded, 1:2);
+                for i = 1:size(angleAmounts, 2)
+                    angleAmount = angleAmounts(i);
+                    if angleAmount > 0
+                        angleAmount = min(angleAmount, sp.stepSize(1));
+                    else
+                        angleAmount = max(angleAmount, -sp.stepSize(1));
+                    end
+                    angleAmounts(i) = angleAmount;
+                end
+                config(lastExpanded, 1:2) = config(lastExpanded, 1:2) + angleAmounts;
+            else
+                config = retract(config, -retAmount);
+            end
+        end
+
+        function config = growing(sp, config, goal)
+            diffLength = sum(goal(:, 3)) - sum(config(:, 3));
+
+            if abs(diffLength) < 0.0001 || diffLength < 0
+                config = [];
+                return;
+            end
+
+            growAmount = min(diffLength, sp.stepSize(2));
+            config = grow(sp, config, growAmount);
+        end
+
     end
 end
 
