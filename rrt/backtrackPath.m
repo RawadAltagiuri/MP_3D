@@ -1,6 +1,13 @@
-function [fullPath, totalCost] = backtrackPath(sp, graphTree)
+%{
+Forms a path from the root node to node in the tree with a
+given index. The path is formed by backtracking from the indexed node
+to the root in the tree.
+
+@omerk
+%}
+function [fullPath, totalCost] = backtrackPath(sp, graphTree, index)
     totalCost = 0;
-    curNode = graphTree(end, :);
+    curNode = graphTree(index, :);
     fullPath = {};
     paths = {};
     while curNode{2} > 0

@@ -4,6 +4,8 @@ Generates a random configuration according to robot's design parameters.
 Generated random configuration is valid in a sense that a complete
 path can be constructed from any other valid configuration to this
 one and visa-versa.
+
+@omerk
 %}
 function conf = randomConf(sp)
     lengthSum = 0;

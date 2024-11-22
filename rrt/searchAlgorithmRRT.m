@@ -1,3 +1,7 @@
+%{
+Vanilla version of RRT (rapidly exploring random tree) with
+a probabilistic bias on goal node/region.
+%}
 function [path, cost, tree, final_child] = searchAlgorithmRRT(sp, rrtConf, SHOW)
     path = {};
     cost = -1;

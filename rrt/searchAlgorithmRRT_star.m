@@ -1,3 +1,4 @@
+% Implementation of RRT*.
 function [path, cost, tree, final_child] = searchAlgorithmRRT_star(sp, rrtStarConf, SHOW)
     path = {};
     cost = -1;
