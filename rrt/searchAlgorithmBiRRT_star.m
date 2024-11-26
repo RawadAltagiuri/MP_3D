@@ -1,0 +1,131 @@
+function [rrtSol] = searchAlgorithmBiRRT_star(sp, rrtConf, SHOW)
+    % searchAlgorithmBiRRT_star
+    % Implementation of Bi-RRT_star that follows the following paper:
+    % <a href=
+    % "matlab: web('https://dspace.mit.edu/handle/1721.1/79884')">Optimal bidirectional rapidly-exploring random trees</a>
+    %
+    % Inputs:
+    % - rrtConf (1x1 struct) struct containing parameters specific to Bi-RRT* and
+    % must contain the following fields:
+    % + iteration, number of nodes attempted to be generated.
+    % + pOfGoal, probability of sampling in the goal region.
+    % + stepSize, step size of RRT.
+    % + neighbourSize, neighbour size of RRT*.
+    % + pOfVC, probability of random vertex contraction on the best path.
+    %
+    % Outputs:
+    % - rrtSol (1x1 struct) struct containing solution, which includes:
+    % + treeA, start tree.
+    % + treeB, goal tree.
+    % + bestPath, struct containing the best path, explanation is given in body
+    % of the function.
+    rrtSol.treeA = [];
+    rrtSol.treeB = [];
+    rrtSol.bestPath = [];
+
+    % To check if something is added to tree in an effect of some
+    % operation.
+    prevTreeSize = 0;
+
+    % Struct containing info about the best path found so far. It contains
+    % the following fields:
+    % - nodes, (1x2) array for best nodes of start and goal tree,
+    % respectively.
+    % - connection (1xN) cell array, path in-between tree nodes.
+    % - cost, cost of the best path.
+    bestPath.nodes = [];
+    bestPath.connection = [];
+    bestPath.cost = realmax;
+    
+    % Trees named A and B, for start and goal trees respectively.
+    graphTreeA = {sp.start_conf, 0, {}, 0, sp.start_conf};
+    graphTreeB = {sp.goal_conf, 0, {}, 0, sp.start_conf};
+
+    %{
+    Storing trees in an array to access them
+    in iterative manner.
+    A tree switcher is used to to switch between trees.
+    %}
+    trees = {graphTreeA; graphTreeB};
+    treeSwitcher = 0;
+    for i = 1:rrtConf.iteration
+        t = treeSwitcher + 1;
+
+        % Sample either the goal or a random configuration.
+        biasProb = rand;
+        if biasProb < rrtConf.pOfGoal
+            sampleConfig = sp.goal_conf;
+        else
+            sampleConfig = randomConf(sp);
+        end
+
+        % Find the nearest node and run the local planner.
+        [nearestIndex, ~] = findNearest(sp, trees{t}, sampleConfig);
+        [newConfig, newCost] = directExpansion(sp, rrtConf.stepSize, trees{t}{nearestIndex}, sampleConfig);
+        
+        % Find neighbours.
+        neighbours = {};
+        if ~isempty(bestPath.connection)
+            neighbours = findNeighbours(sp, trees{t}, newConfig, rrtConf.neighbourSize);
+        end
+        neighbours(end + 1, :) = {nearestIndex, newCost};
+        
+        neighbours = sortrows(neighbours, 2);
+
+        % Find the parent of the new config.
+        for n = 1:size(neighbours, 1)
+            neighbour = neighbours(n, :);
+            [path, cost] = directExpansion(sp, rrtConf.stepSize, trees{t}{neighbour{1}, 1}, newConfig);
+            if ~isempty(path)
+                trees{t}(end + 1, :) = {newConfig, neighbour{1}, path, cost, sampleConfig};
+                break;
+            end
+        end
+        
+        % If no suitable parent is found, continue the next iteration.
+        if prevTreeSize ~= size(trees{t}, 1)
+            continue;
+        end
+
+        neighbours(n, :) = [];
+
+        % Rewiring.
+        for n = 1:size(neighbours, 1)
+            neighbour = neighbours(n, :);
+            [path, cost] = directExpansion(sp, realmax, newConfig, trees{t}{neighbour{1}, 1});
+            if ~isempty(path) && cost < trees{t}{neighbour{1}, 4}
+                trees{t}{neighbour{1}, 2} = size(trees{t}, 1);
+                trees{t}{neighbour{1}, 3} = path;
+                trees{t}{neighbour{1}, 4} = cost;
+            end
+        end
+
+        % Attempt to connect trees.
+        tp = mod(t + 1, 2);
+        [nearestIndex, nearestCost] = findNearest(sp, trees{tp}, newConfig);
+        [connectPath, connectCost] = directExpansion(sp, realmax, newConfig, trees{tp}{nearestIndex, 1});
+        totalConnectCost = trees{t}{end, 4} + connectCost + trees{tp}{nearestIndex, 4};
+        if ~isempty(connectPath) && totalConnectCost < bestPath.cost
+            bestPath.nodes(t) = size(trees{t}, 1);
+            bestPath.nodes(tp) = nearestIndex;
+            bestPath.connection = connectPath;
+            bestPath.cost = totalConnectCost;
+        end
+
+       % Random vertex contraction with a certain probability.
+       if rand < rrtConf.pOfVC
+           [trees, bestPath] = randomVertexContraction(sp, trees, bestPath);
+       end
+       
+       % Branch-and-Bound (see the function details).
+       trees = branchAndBound(sp, trees);
+
+       % Switch trees.
+       treeSwitcher = mod((treeSwitcher + 1), 2);
+    end
+
+    rrtSol.treeA = trees{1};
+    rrtSol.treeB = trees{2};
+    rrtSol.bestPath = bestPath;
+end
+

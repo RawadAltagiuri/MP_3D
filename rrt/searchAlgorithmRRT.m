@@ -27,7 +27,7 @@ production.
         if prevTreeSize ~= size(graphTree, 1)
             [path, cost] = directExpansion(sp, realmax, graphTree{end, 1}, sp.goal_conf);
             if ~isempty(path)
-                [prevPath, prevCost] = backtrackPath(sp, graphTree);
+                [prevPath, prevCost] = backtrackPath(sp, graphTree, size(graphTree, 1));
 
                 path = [prevPath, path];
                 cost = prevCost + cost;
